@@ -1,10 +1,8 @@
-// app/js/components/ContentLoader.js
 export class ContentLoader {
     constructor() {
         this.cache = new Map();
         this.marked = window.marked;
         
-        // Configure marked
         this.marked.setOptions({
             highlight: function(code, lang) {
                 if (window.Prism && window.Prism.languages[lang]) {
@@ -18,7 +16,6 @@ export class ContentLoader {
     }
     
     async loadMarkdown(path) {
-        // Check cache first
         if (this.cache.has(path)) {
             console.log(`📦 Loading from cache: ${path}`);
             return this.cache.get(path);
@@ -42,9 +39,7 @@ export class ContentLoader {
                 loadedAt: new Date()
             };
             
-            // Cache the result
             this.cache.set(path, content);
-            
             return content;
             
         } catch (error) {
