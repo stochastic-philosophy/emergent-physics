@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Debug Test</title>
+    <style>
+        body { font-family: monospace; margin: 20px; }
+        .error { color: red; background: #fee; padding: 10px; margin: 10px 0; }
+        .success { color: green; background: #efe; padding: 10px; margin: 10px 0; }
+        .info { color: blue; background: #eef; padding: 10px; margin: 10px 0; }
+        button { padding: 10px; margin: 5px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Emergent Physics Debug</h1>
+    
+    <button onclick="testBasics()">Test 1: Basic Setup</button>
+    <button onclick="testFiles()">Test 2: File Structure</button>
+    <button onclick="testLibraries()">Test 3: External Libraries</button>
+    <button onclick="testContent()">Test 4: Content Loading</button>
+    <button onclick="clearResults()">Clear</button>
+    
+    <div id="results"></div>
+
+    <script>
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+            console.log(message);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        async function testBasics() {
+            log('🧪 Testing basic setup...', 'info');
+            
+            // Test current URL
+            log(`📍 Current URL: ${window.location.href}`, 'info');
+            
+            // Test if this is GitHub Pages
+            if (window.location.href.includes('github.io')) {
+                log('✅ GitHub Pages detected', 'success');
+            } else {
+                log('⚠️ Not GitHub Pages - testing locally?', 'info');
+            }
+            
+            // Test basic DOM
+            log(`📄 Document ready state: ${document.readyState}`, 'info');
+            log(`🌐 User agent: ${navigator.userAgent}`, 'info');
+            
+            log('✅ Basic setup test completed', 'success');
+        }
+        
+        async function testFiles() {
+            log('📁 Testing file structure...', 'info');
+            
+            const testFiles = [
+                'index.html',
+                'app/css/main.css',
+                'app/content/fi/home.md',
+                'app/js/main.js'
+            ];
+            
+            for (const file of testFiles) {
+                try {
+                    const response = await fetch(file, { method: 'HEAD' });
+                    if (response.ok) {
+                        log(`✅ Found: ${file}`, 'success');
+                    } else {
+                        log(`❌ Missing: ${file} (${response.status})`, 'error');
+                    }
+                } catch (error) {
+                    log(`❌ Error checking ${file}: ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        async function testLibraries() {
+            log('📚 Testing external libraries...', 'info');
+            
+            const libraries = [
+                'https://cdn.jsdelivr.net/npm/marked/marked.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js',
+                'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'
+            ];
+            
+            for (const lib of libraries) {
+                try {
+                    const response = await fetch(lib, { method: 'HEAD' });
+                    if (response.ok) {
+                        log(`✅ Library reachable: ${lib}`, 'success');
+                    } else {
+                        log(`❌ Library failed: ${lib} (${response.status})`, 'error');
+                    }
+                } catch (error) {
+                    log(`❌ Network error for ${lib}: ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        async function testContent() {
+            log('📝 Testing content loading...', 'info');
+            
+            try {
+                const response = await fetch('app/content/fi/home.md');
+                if (response.ok) {
+                    const content = await response.text();
+                    log(`✅ Content loaded: ${content.length} characters`, 'success');
+                    log(`📄 First 100 chars: "${content.substring(0, 100)}..."`, 'info');
+                } else {
+                    log(`❌ Content load failed: ${response.status} ${response.statusText}`, 'error');
+                    log('💡 Tip: Check if app/content/fi/home.md exists', 'info');
+                }
+            } catch (error) {
+                log(`❌ Content error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Auto-run basic test
+        setTimeout(testBasics, 1000);
+    </script>
+</body>
+</html>
