@@ -1,19 +1,16 @@
-// app/js/main.js
 import { Router } from './router/Router.js';
-import { Navigation } from './components/Navigation.js';
 import { ContentLoader } from './components/ContentLoader.js';
 import { ThemeManager } from './components/ThemeManager.js';
 import { LanguageManager } from './components/LanguageManager.js';
-import { SimulationEngine } from './components/SimulationEngine.js';
+import { AutoTableOfContents } from './components/AutoTableOfContents.js';
 
 class EmergentPhysicsApp {
     constructor() {
         this.router = new Router();
-        this.navigation = new Navigation();
         this.contentLoader = new ContentLoader();
         this.themeManager = new ThemeManager();
         this.languageManager = new LanguageManager();
-        this.simulationEngine = new SimulationEngine();
+        this.autoTOC = new AutoTableOfContents();
         
         this.currentLanguage = 'fi';
         this.isLoading = false;
@@ -22,37 +19,36 @@ class EmergentPhysicsApp {
     async init() {
         console.log('🚀 Initializing Emergent Physics SPA...');
         
-        // Initialize components
         this.themeManager.init();
         this.languageManager.init(this.handleLanguageChange.bind(this));
-        this.navigation.init(this.handleNavigation.bind(this));
         
-        // Setup routing
         this.setupRouting();
-        
-        // Load initial content
         await this.loadInitialContent();
-        
-        // Hide loading spinner
         this.hideLoadingSpinner();
         
-        console.log('✅ SPA Initialized successfully');
+        console.log('✅ SPA Initialized');
     }
     
     setupRouting() {
-        // Define routes
         const routes = {
             '': () => this.loadContent('home'),
             'home': () => this.loadContent('home'),
-            'projects/indivisible-stochastic': () => this.loadContent('projects/indivisible-stochastic/overview'),
+            'projects/indivisible-stochastic': () => this.loadProjectOverview(),
+            'projects/indivisible-stochastic/overview': () => this.loadContent('projects/indivisible-stochastic/overview'),
             'projects/indivisible-stochastic/phase1': () => this.loadContent('projects/indivisible-stochastic/phase1'),
             'projects/indivisible-stochastic/phase2': () => this.loadContent('projects/indivisible-stochastic/phase2'),
             'projects/indivisible-stochastic/phase3': () => this.loadContent('projects/indivisible-stochastic/phase3'),
-            'simulations/hybrid-models': () => this.loadSimulation('hybrid-models'),
-            'about': () => this.loadContent('about')
         };
         
         this.router.init(routes);
+    }
+    
+    async loadProjectOverview() {
+        await this.loadContent('projects/indivisible-stochastic/overview');
+        
+        // Lisää automaattinen TOC
+        this.autoTOC.currentPath = `${this.currentLanguage}/projects/indivisible-stochastic`;
+        await this.autoTOC.injectTOC('.content-container');
     }
     
     async loadContent(contentPath) {
@@ -79,38 +75,30 @@ class EmergentPhysicsApp {
         }
     }
     
-    async loadSimulation(simulationType) {
-        console.log(`🔬 Loading simulation: ${simulationType}`);
-        
-        // Load markdown description
-        await this.loadContent(`simulations/${simulationType}`);
-        
-        // Initialize interactive simulation
-        this.simulationEngine.loadSimulation(simulationType);
+    async loadInitialContent() {
+        const currentRoute = window.location.hash.substring(1) || 'home';
+        await this.loadContent(currentRoute);
     }
     
     renderContent(content) {
         const container = document.getElementById('content-container');
         
-        // Smooth transition
         container.style.opacity = '0';
         
         setTimeout(() => {
             container.innerHTML = content.html;
             
-            // Re-render math expressions
+            // Re-render math
             if (window.MathJax) {
                 MathJax.typesetPromise([container]);
             }
             
-            // Re-highlight code blocks
+            // Re-highlight code
             if (window.Prism) {
                 Prism.highlightAllUnder(container);
             }
             
-            // Add click handlers for internal links
             this.setupInternalLinks(container);
-            
             container.style.opacity = '1';
         }, 150);
     }
@@ -132,7 +120,6 @@ class EmergentPhysicsApp {
         this.currentLanguage = newLanguage;
         document.documentElement.lang = newLanguage;
         
-        // Reload current content in new language
         const currentRoute = this.router.getCurrentRoute();
         this.loadContent(currentRoute || 'home');
         
@@ -145,7 +132,6 @@ class EmergentPhysicsApp {
         const tocSidebar = document.getElementById('table-of-contents');
         
         if (headers.length > 3) {
-            // Generate TOC
             tocList.innerHTML = '';
             headers.forEach((header, index) => {
                 const anchor = `toc-${index}`;
@@ -186,7 +172,6 @@ class EmergentPhysicsApp {
         const names = {
             'projects': 'Projektit',
             'indivisible-stochastic': 'Indivisible Stochastic',
-            'simulations': 'Simulaatiot',
             'phase1': 'Vaihe 1',
             'phase2': 'Vaihe 2', 
             'phase3': 'Vaihe 3'
@@ -222,11 +207,9 @@ class EmergentPhysicsApp {
     }
 }
 
-// Initialize application when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     const app = new EmergentPhysicsApp();
     app.init();
 });
 
-// Export for debugging
 window.EmergentPhysicsApp = EmergentPhysicsApp;
