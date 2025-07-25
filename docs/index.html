@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emergent Physics Research - Stochastic Philosophy</title>
     
-    <!-- Preload critical CSS -->
-    <link rel="preload" href="app/css/main.css" as="style">
     <link rel="stylesheet" href="app/css/main.css">
     
     <!-- External libraries -->
-    <script src="libs/marked.min.js"></script>
-    <script src="libs/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" id="prism-theme">
     
-    <!-- MathJax Configuration -->
+    <!-- MathJax -->
     <script>
         MathJax = {
             tex: {
@@ -31,13 +31,11 @@
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
-    <!-- Loading Spinner -->
     <div id="loading-spinner" class="spinner">
         <div class="quantum-loader"></div>
         <p>Loading emergent physics...</p>
     </div>
     
-    <!-- Navigation -->
     <nav id="main-navigation" class="navbar">
         <div class="nav-brand">
             <h1>Emergent Physics Research</h1>
@@ -49,38 +47,25 @@
                 <button data-lang="fi" class="lang-btn active">FI</button>
                 <button data-lang="en" class="lang-btn">EN</button>
             </div>
-            <button id="theme-toggle" class="theme-btn" title="Toggle Dark/Light">
+            <button id="theme-toggle" class="theme-btn">
                 <span class="theme-icon">🌓</span>
             </button>
         </div>
     </nav>
     
-    <!-- Main Content Area -->
     <main id="app-content" class="main-content">
-        <!-- Breadcrumb Navigation -->
         <nav id="breadcrumb" class="breadcrumb" aria-hidden="true"></nav>
         
-        <!-- Dynamic Content Container -->
         <div id="content-container" class="content-container">
-            <!-- Content loaded dynamically here -->
+            <!-- Content loaded here -->
         </div>
         
-        <!-- Floating Table of Contents (for long articles) -->
         <aside id="table-of-contents" class="toc-sidebar" aria-hidden="true">
             <h3>Sisällysluettelo</h3>
             <ul id="toc-list"></ul>
         </aside>
     </main>
     
-    <!-- Simulation Modal (for interactive demos) -->
-    <div id="simulation-modal" class="modal" aria-hidden="true">
-        <div class="modal-content">
-            <span class="modal-close">&times;</span>
-            <div id="simulation-container"></div>
-        </div>
-    </div>
-    
-    <!-- SPA Application Scripts -->
     <script type="module" src="app/js/main.js"></script>
 </body>
 </html>
