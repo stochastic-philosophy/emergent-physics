@@ -222,3 +222,133 @@ body {
         padding: 1rem;
     }
 }
+
+/* Lisää app/css/main.css loppuun */
+
+.toc-summary {
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.summary-stats {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.stat {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.toc-suggestions {
+    margin-top: 2rem;
+    border: 2px dashed var(--warning-color);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.suggestion-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.suggestion-item {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-name {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+.suggestion-reason {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.suggested-files {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.suggested-files h4 {
+    margin: 0 0 1rem 0;
+    color: var(--warning-color);
+}
+
+.suggested-files ul {
+    margin: 0 0 1rem 1.5rem;
+}
+
+.suggested-files code {
+    background: var(--bg-tertiary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+}
+
+.auto-hint {
+    background: var(--success-color);
+    color: white;
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 1rem 0 0 0;
+    font-size: 0.9rem;
+}
+
+.retry-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin: 1rem 0;
+    transition: background var(--transition-fast);
+}
+
+.retry-btn:hover {
+    background: #1e40af;
+}
+
+.error-details {
+    margin-top: 1rem;
+}
+
+.error-details summary {
+    cursor: pointer;
+    padding: 0.5rem;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+}
+
+.error-details pre {
+    margin: 0.5rem 0 0 0;
+    padding: 1rem;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    overflow-x: auto;
+    font-size: 0.8rem;
+    border-left: 3px solid var(--error-color);
+}
