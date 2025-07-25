@@ -1,4 +1,3 @@
-// app/js/router/Router.js
 export class Router {
     constructor() {
         this.routes = {};
@@ -8,10 +7,7 @@ export class Router {
     init(routes) {
         this.routes = routes;
         
-        // Listen to hash changes
         window.addEventListener('hashchange', this.handleRouteChange.bind(this));
-        
-        // Handle initial route
         this.handleRouteChange();
     }
     
@@ -25,7 +21,6 @@ export class Router {
             this.currentRoute = route;
             this.routes[route]();
         } else {
-            // Try to find partial match
             const partialMatch = Object.keys(this.routes).find(r => 
                 route.startsWith(r) && this.routes[r]
             );
