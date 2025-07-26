@@ -40,5 +40,41 @@
         "phase3": { "fi": "Vaihe 3", "en": "Phase 3" }
       }
     }
+  },
+  "translations": {
+    "fi": {
+      "nav": {
+        "files": "Tiedostot",
+        "theme": "Teema",
+        "language": "Kieli",
+        "download": "Lataa"
+      },
+      "ui": {
+        "loading": "Ladataan...",
+        "welcome": "Tervetuloa!",
+        "select_file": "Valitse tiedosto vasemmalta nähdäksesi sisällön.",
+        "physics_equations": "Fysiikan yhtälöitä:",
+        "einstein_field": "Einsteinin kenttäyhtälöt:",
+        "schrodinger": "Schrödingerin yhtälö:",
+        "shannon_entropy": "Shannon entropia:"
+      }
+    },
+    "en": {
+      "nav": {
+        "files": "Files",
+        "theme": "Theme", 
+        "language": "Language",
+        "download": "Download"
+      },
+      "ui": {
+        "loading": "Loading...",
+        "welcome": "Welcome!",
+        "select_file": "Select a file from the left to view content.",
+        "physics_equations": "Physics equations:",
+        "einstein_field": "Einstein field equations:",
+        "schrodinger": "Schrödinger equation:",
+        "shannon_entropy": "Shannon entropy:"
+      }
+    }
   }
 }
