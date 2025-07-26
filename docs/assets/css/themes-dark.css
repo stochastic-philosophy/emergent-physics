@@ -158,6 +158,21 @@ body.theme-dark {
     border-color: var(--primary-color);
 }
 
+.theme-dark .project-navigation {
+    border-color: var(--border-color);
+}
+
+.theme-dark .back-to-home-btn {
+    color: var(--text-secondary);
+    border-color: var(--border-color);
+}
+
+.theme-dark .back-to-home-btn:hover {
+    background-color: var(--primary-color);
+    color: var(--primary-text);
+    border-color: var(--primary-color);
+}
+
 .theme-dark .file-item {
     background-color: var(--card-background);
     border-color: var(--border-color);
