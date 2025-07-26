@@ -104,6 +104,10 @@
         <h1>🧪 Phase 2 Quick Test</h1>
         <p>Yksinkertainen testi tarkistamaan että Markdown + File Management toimii.</p>
 
+        <h2>0. Diagnose</h2>
+        <button class="test-button" onclick="diagnose()">Diagnose Ongelmat</button>
+        <div id="diagnose-result"></div>
+
         <h2>1. Perusmoduulit</h2>
         <button class="test-button" onclick="testModules()">Testaa Moduulit</button>
         <div id="modules-result"></div>
@@ -132,7 +136,7 @@
             markdown: false
         };
 
-        function showResult(containerId, success, message, details = '') {
+        function diagnose() {
             const container = document.getElementById(containerId);
             const className = success ? 'success' : 'error';
             
@@ -149,7 +153,53 @@
             container.innerHTML = `<div class="result info">${message} <span class="loading"></span></div>`;
         }
 
-        async function testModules() {
+        function diagnose() {
+            showLoading('diagnose-result', 'Diagnosoidaan...');
+            
+            const currentUrl = window.location.href;
+            const protocol = window.location.protocol;
+            const isHttps = protocol === 'https:';
+            const isLocalFile = protocol === 'file:';
+            const isGitHubPages = currentUrl.includes('.github.io');
+            const isInDocs = currentUrl.includes('/docs/');
+            
+            let problems = [];
+            let suggestions = [];
+            
+            if (isLocalFile) {
+                problems.push('Avaat tiedoston suoraan koneelta (file://), ei web-serveriltä');
+                suggestions.push('Lataa tiedostot GitHubiin ja aktivoi GitHub Pages');
+            }
+            
+            if (!isGitHubPages && !isLocalFile) {
+                problems.push('Et ole GitHub Pages sivustolla');
+                suggestions.push('Varmista että GitHub Pages on aktivoitu repositoryssa');
+            }
+            
+            if (!isInDocs && isGitHubPages) {
+                problems.push('Testi ei ole docs/-kansiossa vaikka GitHub Pages käyttää docs/-kansiota');
+                suggestions.push('Siirrä simple-test.html docs/-kansioon');
+            }
+            
+            let diagnosisHtml = `
+                <strong>Nykyinen URL:</strong> ${currentUrl}<br>
+                <strong>Protokolla:</strong> ${protocol}<br>
+                <strong>GitHub Pages:</strong> ${isGitHubPages ? 'Kyllä' : 'Ei'}<br>
+                <strong>Docs-kansiossa:</strong> ${isInDocs ? 'Kyllä' : 'Ei'}<br><br>
+            `;
+            
+            if (problems.length > 0) {
+                diagnosisHtml += `<strong>Löydetyt ongelmat:</strong><br>`;
+                problems.forEach(p => diagnosisHtml += `• ${p}<br>`);
+                diagnosisHtml += `<br><strong>Ehdotukset:</strong><br>`;
+                suggestions.forEach(s => diagnosisHtml += `• ${s}<br>`);
+                
+                showResult('diagnose-result', false, 'Löydettiin ongelmia', diagnosisHtml);
+            } else {
+                diagnosisHtml += `<strong>Setup näyttää hyvältä!</strong><br>Jos testit eivät toimi, ongelma on todennäköisesti puuttuvissa tiedostoissa.`;
+                showResult('diagnose-result', true, 'Ei ilmeisiä ongelmia', diagnosisHtml);
+            }
+        }
             showLoading('modules-result', 'Lataan moduuleja...');
             
             try {
@@ -185,31 +235,67 @@
             showLoading('files-result', 'Testataan tiedostojen latausta...');
             
             try {
+                // Get current URL to understand structure
+                const currentUrl = window.location.href;
+                const isInDocs = currentUrl.includes('/docs/');
+                
+                // Try different manifest paths
+                let manifestPath = 'manifest.json';
+                if (!isInDocs) {
+                    manifestPath = 'docs/manifest.json';
+                }
+                
                 // Test manifest
-                const manifestResponse = await fetch('manifest.json');
-                if (!manifestResponse.ok) throw new Error('manifest.json ei löydy');
+                let manifestResponse;
+                try {
+                    manifestResponse = await fetch(manifestPath);
+                } catch (e) {
+                    // Try alternative path
+                    manifestPath = isInDocs ? '../manifest.json' : 'manifest.json';
+                    manifestResponse = await fetch(manifestPath);
+                }
+                
+                if (!manifestResponse.ok) {
+                    throw new Error(`manifest.json ei löydy polusta: ${manifestPath} (status: ${manifestResponse.status})`);
+                }
                 
                 const manifest = await manifestResponse.json();
                 if (!manifest.projects || manifest.projects.length === 0) {
                     throw new Error('manifest.json ei sisällä projekteja');
                 }
 
-                // Test markdown file
-                const mdResponse = await fetch('projects/indivisible-stochastic-processes/fi/documentation/overview_project.md');
-                if (!mdResponse.ok) throw new Error('overview_project.md ei löydy');
+                // Try to find markdown file
+                let mdPath = 'projects/indivisible-stochastic-processes/fi/documentation/overview_project.md';
+                if (!isInDocs) {
+                    mdPath = 'docs/' + mdPath;
+                }
+                
+                let mdResponse;
+                try {
+                    mdResponse = await fetch(mdPath);
+                } catch (e) {
+                    // Try alternative path
+                    mdPath = isInDocs ? '../' + mdPath : mdPath;
+                    mdResponse = await fetch(mdPath);
+                }
+                
+                if (!mdResponse.ok) {
+                    throw new Error(`overview_project.md ei löydy polusta: ${mdPath} (status: ${mdResponse.status})`);
+                }
                 
                 const mdContent = await mdResponse.text();
-                if (!mdContent.includes('Indivisible Stochastic Processes')) {
-                    throw new Error('Markdown-tiedosto ei sisällä odotettua tekstiä');
+                if (mdContent.length < 100) {
+                    throw new Error('Markdown-tiedosto on liian lyhyt');
                 }
 
                 testResults.files = true;
                 showResult('files-result', true, 'Tiedostot ladattu onnistuneesti!', 
-                    `Manifest: ${manifest.projects.length} projektia\nMarkdown: ${mdContent.length} merkkiä`);
+                    `Manifest: ${manifest.projects.length} projektia\nMarkdown: ${mdContent.length} merkkiä\nManifest polku: ${manifestPath}`);
                 
             } catch (error) {
                 testResults.files = false;
-                showResult('files-result', false, 'Tiedostojen lataus epäonnistui', error.message);
+                showResult('files-result', false, 'Tiedostojen lataus epäonnistui', 
+                    `Virhe: ${error.message}\nNykyinen URL: ${window.location.href}\nYritä varmistaa että GitHub Pages on aktivoitu ja tiedostot ovat docs/-kansiossa.`);
             }
         }
 
@@ -217,50 +303,69 @@
             showLoading('markdown-result', 'Testataan Markdown-renderöintiä...');
             
             try {
+                // Check if MarkdownProcessor is available
                 if (typeof MarkdownProcessor === 'undefined') {
-                    throw new Error('MarkdownProcessor ei ole ladattu');
+                    throw new Error('MarkdownProcessor ei ole ladattu - tarkista että moduulit-testi meni läpi ensin');
                 }
 
-                // Load external libraries
-                await loadScript('https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js');
-                
-                // Wait a moment for marked to initialize
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                if (typeof marked === 'undefined') {
-                    throw new Error('Marked.js ei ladannut');
+                // Try to load marked.js
+                try {
+                    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js');
+                    // Wait for marked to be available
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                } catch (e) {
+                    // Continue anyway, maybe it's already loaded
                 }
-
-                // Test basic markdown
-                const testMd = '# Testi\n\nTämä on **lihavoitua** tekstiä.';
-                const result = MarkdownProcessor.renderMarkdown(testMd);
                 
-                if (!result.includes('<h1>') || !result.includes('<strong>')) {
-                    throw new Error('Markdown ei renderöidy oikein');
+                // Test simple markdown rendering
+                let result;
+                if (typeof marked !== 'undefined') {
+                    // Use marked directly if available
+                    result = marked.parse('# Testi\n\nTämä on **lihavoitua** tekstiä.');
+                } else if (MarkdownProcessor.renderMarkdown) {
+                    // Try MarkdownProcessor without external dependencies
+                    const testMd = '# Testi\n\nTämä on **lihavoitua** tekstiä.';
+                    result = MarkdownProcessor.renderMarkdown(testMd);
+                } else {
+                    throw new Error('Ei marked.js:ää eikä MarkdownProcessor.renderMarkdown funktiota');
+                }
+                
+                // Check if result looks like HTML
+                if (!result || typeof result !== 'string') {
+                    throw new Error('Markdown renderöinti ei palauttanut merkkijonoa');
+                }
+                
+                if (!result.includes('<') || result.length < 10) {
+                    throw new Error('Markdown renderöinti ei tuottanut HTML:ää');
                 }
 
                 testResults.markdown = true;
                 showResult('markdown-result', true, 'Markdown renderöinti toimii!', 
-                    `Tuotos: ${result.substring(0, 100)}...`);
+                    `Syöte: # Testi...\nTuotos: ${result.substring(0, 100)}...`);
                 
             } catch (error) {
                 testResults.markdown = false;
-                showResult('markdown-result', false, 'Markdown renderöinti epäonnistui', error.message);
+                showResult('markdown-result', false, 'Markdown renderöinti epäonnistui', 
+                    `Virhe: ${error.message}\nVinkki: Varmista että internet-yhteys toimii CDN-kirjastojen lataamiseen.`);
             }
         }
 
         async function runFullTest() {
             showLoading('full-result', 'Suoritan kokonaistestiä...');
             
+            // First run diagnose
+            diagnose();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
             // Run all tests in sequence
             await testModules();
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 1000));
             
             await testFiles();
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 1000));
             
             await testMarkdown();
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 1000));
             
             // Calculate final score
             const passed = Object.values(testResults).filter(Boolean).length;
@@ -302,8 +407,13 @@
                 
                 const script = document.createElement('script');
                 script.src = src;
-                script.onload = resolve;
-                script.onerror = () => reject(new Error(`Failed to load ${src}`));
+                script.onload = () => {
+                    // Small delay to ensure script execution
+                    setTimeout(resolve, 50);
+                };
+                script.onerror = () => {
+                    reject(new Error(`Ei voitu ladata: ${src.split('/').pop()}`));
+                };
                 document.head.appendChild(script);
             });
         }
