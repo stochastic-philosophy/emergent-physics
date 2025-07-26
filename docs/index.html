@@ -6,20 +6,43 @@
     <title>Emergent Physics Research</title>
     <link rel="stylesheet" href="style.css">
     
-    <!-- MathJax 3 - Fysiikan yhtälöille -->
+    <!-- MathJax 3 - KORJATTU fysiikan yhtälöille -->
     <script>
     window.MathJax = {
       tex: {
         inlineMath: [['$', '$'], ['\\(', '\\)']],
         displayMath: [['$$', '$$'], ['\\[', '\\]']],
-        packages: ['base', 'ams', 'physics', 'mhchem', 'color'],
+        packages: ['base', 'ams', 'newcommand', 'color'],
         macros: {
-          ket: ['{\\left| #1 \\right\\rangle}', 1],
-          bra: ['{\\left\\langle #1 \\right|}', 1],
-          braket: ['{\\left\\langle #1 \\middle| #2 \\right\\rangle}', 2],
-          hbar: '{\\hslash}',
-          lagr: '{\\mathcal{L}}',
-          tr: '{\\text{tr}}'
+          // Kvanttinotaatiot
+          ket: ['\\left|#1\\right\\rangle', 1],
+          bra: ['\\left\\langle#1\\right|', 1],
+          braket: ['\\left\\langle#1\\middle|#2\\right\\rangle', 2],
+          ketbra: ['\\left|#1\\right\\rangle\\left\\langle#2\\right|', 2],
+          
+          // Fysiikan vakiot
+          hbar: '\\hslash',
+          
+          // Operaattorit
+          op: ['\\hat{#1}', 1],
+          tr: '\\text{tr}',
+          Tr: '\\text{Tr}',
+          
+          // Kalkulukset
+          lagr: '\\mathcal{L}',
+          hamilt: '\\mathcal{H}',
+          
+          // Derivaatat
+          pder: ['\\frac{\\partial #1}{\\partial #2}', 2],
+          
+          // Vektorit
+          vec: ['\\mathbf{#1}', 1],
+          
+          // Probability
+          prob: ['\\text{P}\\left(#1\\right)', 1],
+          
+          // Information theory
+          entropy: ['H\\left(#1\\right)', 1]
         }
       },
       startup: {
@@ -78,19 +101,29 @@
                 <div class="content-area">
                     <div id="content" class="content">
                         <div class="welcome">
-                            <h2>Tervetuloa! 🔬</h2>
-                            <p>Valitse tiedosto vasemmalta nähdäksesi sisällön.</p>
+                            <h2 data-translate="ui.welcome">Tervetuloa! 🔬</h2>
+                            <p data-translate="ui.select_file">Valitse tiedosto vasemmalta nähdäksesi sisällön.</p>
                             
-                            <!-- MathJax testaus -->
-                            <h3>Fysiikan yhtälöitä:</h3>
-                            <p>Einsteinin kenttäyhtälöt:</p>
+                            <!-- MathJax testaus - KORJATTU -->
+                            <h3 data-translate="ui.physics_equations">Fysiikan yhtälöitä:</h3>
+                            
+                            <h4 data-translate="ui.einstein_field">Einsteinin kenttäyhtälöt:</h4>
                             $$G_{\mu\nu} + \Lambda g_{\mu\nu} = \frac{8\pi G}{c^4} T_{\mu\nu}$$
                             
-                            <p>Schrödingerin yhtälö:</p>
-                            $$i\hbar\frac{\partial}{\partial t}\ket{\psi} = \hat{H}\ket{\psi}$$
+                            <h4 data-translate="ui.schrodinger">Schrödingerin yhtälö:</h4>
+                            $$i\hbar\pder{\ket{\psi}}{t} = \op{H}\ket{\psi}$$
                             
-                            <p>Shannon entropia:</p>
-                            $$H(X) = -\sum_{i=1}^{n} P(x_i) \log_2 P(x_i)$$
+                            <h4 data-translate="ui.shannon_entropy">Shannon entropia:</h4>
+                            $$\entropy{X} = -\sum_{i=1}^{n} \prob{x_i} \log_2 \prob{x_i}$$
+                            
+                            <h4>Kommutattorit:</h4>
+                            $$[\op{x}, \op{p}] = i\hbar$$
+                            
+                            <h4>Polkuintegraali:</h4>
+                            $$\braket{q_f, t_f}{q_i, t_i} = \int \mathcal{D}[q(t)] \exp\left(\frac{i}{\hbar}\int_{t_i}^{t_f} \lagr dt\right)$$
+                            
+                            <h4>Von Neumann entropia:</h4>
+                            $$S(\rho) = -\Tr(\rho \log \rho)$$
                         </div>
                     </div>
                 </div>
