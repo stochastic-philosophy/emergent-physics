@@ -10,12 +10,15 @@
         .log { color: #4ecdc4; padding: 5px; margin: 2px 0; }
         .warn { color: #ffe66d; padding: 5px; margin: 2px 0; }
         #output { max-height: 80vh; overflow-y: auto; border: 1px solid #333; padding: 10px; }
+        button { padding: 10px; margin: 5px; background: #333; color: #0f0; border: 1px solid #0f0; cursor: pointer; }
+        button:hover { background: #0f0; color: #000; }
     </style>
 </head>
 <body>
     <h1>🐛 TABLET DEBUG CONSOLE</h1>
     <button onclick="clearDebug()">Clear</button>
     <button onclick="testFeatures()">Test Features</button>
+    <button onclick="testMathJax()">Test MathJax</button>
     <div id="output"></div>
 
     <script>
@@ -71,6 +74,15 @@
                 })
                 .then(data => console.log('✅ JSON parsing works'))
                 .catch(e => console.error('❌ Fetch failed:', e));
+        }
+        
+        function testMathJax() {
+            console.log('Testing MathJax...');
+            if (window.MathJax) {
+                console.log('✅ MathJax loaded');
+            } else {
+                console.error('❌ MathJax not loaded');
+            }
         }
     </script>
 </body>
