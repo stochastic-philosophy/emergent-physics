@@ -4,6 +4,14 @@
 
 Tämä on **Vaihe 1** implementation: minimaalinen SPA-runko debug-työkaluineen.
 
+## 🔧 Korjattu v1.1 (2025-01-25)
+
+### ✅ Korjaukset:
+- **🐛 Debug.html console-virhe korjattu** - console.log override toimii nyt oikein
+- **🔙 Takaisin-linkki lisätty** - projektisivuilta pääsee takaisin etusivulle
+- **📱 Active project highlighting** - valittu projekti näkyy korostettuna
+- **🌐 Kielikohtaiset takaisin-napit** - FI: "Takaisin etusivulle", EN: "Back to Home"
+
 ### ✅ Mitä on luotu
 
 #### Tiedostorakenne:
