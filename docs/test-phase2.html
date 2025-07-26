@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 2 Test Suite - Emergent Physics Research</title>
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            line-height: 1.4;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: #2d2d2d;
+            border-radius: 12px;
+            border: 2px solid #4CAF50;
+        }
+        
+        .header h1 {
+            color: #4CAF50;
+            margin-bottom: 1rem;
+        }
+        
+        .test-section {
+            margin-bottom: 2rem;
+            background: #2d2d2d;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #404040;
+        }
+        
+        .test-header {
+            background: #3d3d3d;
+            padding: 1rem;
+            font-weight: bold;
+            color: #60a5fa;
+            border-bottom: 1px solid #404040;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .test-content {
+            padding: 1rem;
+        }
+        
+        .test-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: #1a1a1a;
+            border-radius: 6px;
+            border: 1px solid #404040;
+        }
+        
+        .test-status {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-pending { background: #6b7280; color: white; }
+        .status-pass { background: #10b981; color: white; }
+        .status-fail { background: #ef4444; color: white; }
+        .status-running { background: #f59e0b; color: white; }
+        
+        .test-name {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .test-details {
+            font-size: 0.875rem;
+            color: #9ca3af;
+            margin-left: 2rem;
+            margin-top: 0.5rem;
+            font-family: monospace;
+        }
+        
+        .run-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        
+        .run-button:hover { background: #2563eb; }
+        .run-button:disabled { background: #6b7280; cursor: not-allowed; }
+        
+        .results-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .summary-card {
+            background: #2d2d2d;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #404040;
+        }
+        
+        .summary-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .summary-label {
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+        
+        .github-link {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background: #24292e;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        
+        .github-link:hover { background: #1a1e22; }
+        
+        .console-output {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.875rem;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+        
+        .log-entry {
+            margin-bottom: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+        }
+        
+        .log-info { color: #60a5fa; }
+        .log-success { color: #10b981; }
+        .log-warn { color: #f59e0b; }
+        .log-error { color: #ef4444; }
+        
+        @media (max-width: 768px) {
+            .test-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            
+            .results-summary {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Phase 2 Test Suite</h1>
+            <p>Emergent Physics Research Platform - Markdown + File Management Testing</p>
+            <button id="runAllTests" class="run-button">Run All Tests</button>
+        </div>
+
+        <!-- Dependencies Test -->
+        <div class="test-section">
+            <div class="test-header">
+                📦 Dependencies & Modules
+                <button onclick="runTestGroup('dependencies')" class="run-button">Test Dependencies</button>
+            </div>
+            <div class="test-content" id="dependencies-tests">
+                <div class="test-item" data-test="debug-logger">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">DEBUG module loaded</div>
+                </div>
+                <div class="test-item" data-test="utils">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">Utils module (35 functions)</div>
+                </div>
+                <div class="test-item" data-test="storage">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">Storage module (localStorage)</div>
+                </div>
+                <div class="test-item" data-test="ui">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">UI module (DOM manipulation)</div>
+                </div>
+                <div class="test-item" data-test="theme-manager">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">ThemeManager (themes + languages)</div>
+                </div>
+                <div class="test-item" data-test="file-manager">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">FileManager (NEW in Phase 2)</div>
+                </div>
+                <div class="test-item" data-test="markdown-processor">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">MarkdownProcessor (NEW in Phase 2)</div>
+                </div>
+                <div class="test-item" data-test="app">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">App main orchestration</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CDN Libraries Test -->
+        <div class="test-section">
+            <div class="test-header">
+                🌐 CDN Libraries (Phase 2 New)
+                <button onclick="runTestGroup('cdn')" class="run-button">Test CDN</button>
+            </div>
+            <div class="test-content" id="cdn-tests">
+                <div class="test-item" data-test="marked">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">Marked.js (Markdown processing)</div>
+                </div>
+                <div class="test-item" data-test="mathjax">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">MathJax (LaTeX rendering)</div>
+                </div>
+                <div class="test-item" data-test="prism">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">Prism.js (Code highlighting)</div>
+                </div>
+                <div class="test-item" data-test="feather">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">Feather Icons (UI icons)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- File Operations Test -->
+        <div class="test-section">
+            <div class="test-header">
+                📁 File Operations (Core Phase 2)
+                <button onclick="runTestGroup('files')" class="run-button">Test Files</button>
+            </div>
+            <div class="test-content" id="files-tests">
+                <div class="test-item" data-test="manifest-load">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">Load manifest.json</div>
+                </div>
+                <div class="test-item" data-test="project-manifest">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">Load project manifest (FI)</div>
+                </div>
+                <div class="test-item" data-test="markdown-file">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">Load overview_project.md</div>
+                </div>
+                <div class="test-item" data-test="file-detection">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">File type detection</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Markdown Processing Test -->
+        <div class="test-section">
+            <div class="test-header">
+                📝 Markdown Processing (Phase 2 Core)
+                <button onclick="runTestGroup('markdown')" class="run-button">Test Markdown</button>
+            </div>
+            <div class="test-content" id="markdown-tests">
+                <div class="test-item" data-test="basic-markdown">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">Basic Markdown → HTML</div>
+                </div>
+                <div class="test-item" data-test="latex-math">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">LaTeX math rendering</div>
+                </div>
+                <div class="test-item" data-test="code-highlighting">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">Code syntax highlighting</div>
+                </div>
+                <div class="test-item" data-test="combined-processing">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">Combined processing (MD+LaTeX+Code)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Summary -->
+        <div class="results-summary" id="results-summary">
+            <div class="summary-card">
+                <div class="summary-number" id="total-tests">0</div>
+                <div class="summary-label">Total Tests</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-number" id="passed-tests" style="color: #10b981;">0</div>
+                <div class="summary-label">Passed</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-number" id="failed-tests" style="color: #ef4444;">0</div>
+                <div class="summary-label">Failed</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-number" id="success-rate">0%</div>
+                <div class="summary-label">Success Rate</div>
+            </div>
+        </div>
+
+        <!-- Console Output -->
+        <div class="test-section">
+            <div class="test-header">
+                💻 Test Console Output
+                <button onclick="clearConsole()" class="run-button">Clear</button>
+            </div>
+            <div class="test-content">
+                <div class="console-output" id="test-console">
+                    <div class="log-entry log-info">Test suite initialized. Click "Run All Tests" to begin...</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="index.html" class="github-link">← Back to Main Site</a>
+            <a href="debug.html" class="github-link">Debug Tools →</a>
+        </div>
+    </div>
+
+    <script>
+        // Test state
+        const testState = {
+            running: false,
+            results: {},
+            totalTests: 0,
+            passedTests: 0,
+            failedTests: 0
+        };
+
+        // Test definitions
+        const tests = {
+            dependencies: {
+                'debug-logger': () => typeof DEBUG !== 'undefined',
+                'utils': () => typeof Utils !== 'undefined' && typeof Utils.formatDate === 'function',
+                'storage': () => typeof Storage !== 'undefined' && typeof Storage.get === 'function',
+                'ui': () => typeof UI !== 'undefined' && typeof UI.showLoading === 'function',
+                'theme-manager': () => typeof ThemeManager !== 'undefined' && typeof ThemeManager.getTheme === 'function',
+                'file-manager': () => typeof FileManager !== 'undefined' && typeof FileManager.loadFile === 'function',
+                'markdown-processor': () => typeof MarkdownProcessor !== 'undefined' && typeof MarkdownProcessor.processCombined === 'function',
+                'app': () => typeof App !== 'undefined' && typeof App.init === 'function'
+            },
+            cdn: {
+                'marked': async () => {
+                    try {
+                        await loadScript('https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js');
+                        return typeof marked !== 'undefined';
+                    } catch (e) { return false; }
+                },
+                'mathjax': async () => {
+                    try {
+                        if (!window.MathJax) {
+                            window.MathJax = { tex: { inlineMath: [['$', '$']] } };
+                            await loadScript('https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js');
+                        }
+                        return window.MathJax && window.MathJax.typesetPromise;
+                    } catch (e) { return false; }
+                },
+                'prism': async () => {
+                    try {
+                        await loadScript('https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js');
+                        return typeof Prism !== 'undefined';
+                    } catch (e) { return false; }
+                },
+                'feather': () => typeof feather !== 'undefined'
+            },
+            files: {
+                'manifest-load': async () => {
+                    try {
+                        const response = await fetch('manifest.json');
+                        const data = await response.json();
+                        return data && data.projects && data.projects.length > 0;
+                    } catch (e) { return false; }
+                },
+                'project-manifest': async () => {
+                    try {
+                        const response = await fetch('projects/indivisible-stochastic-processes/fi/manifest.json');
+                        const data = await response.json();
+                        return data && data.categories;
+                    } catch (e) { return false; }
+                },
+                'markdown-file': async () => {
+                    try {
+                        const response = await fetch('projects/indivisible-stochastic-processes/fi/documentation/overview_project.md');
+                        const content = await response.text();
+                        return content && content.includes('# Indivisible Stochastic Processes');
+                    } catch (e) { return false; }
+                },
+                'file-detection': () => {
+                    if (typeof FileManager === 'undefined') return false;
+                    return FileManager.detectFileType('test.md') === 'markdown' &&
+                           FileManager.detectFileType('test.py') === 'code' &&
+                           FileManager.detectFileType('test.json') === 'data';
+                }
+            },
+            markdown: {
+                'basic-markdown': async () => {
+                    if (typeof MarkdownProcessor === 'undefined') return false;
+                    try {
+                        await MarkdownProcessor.init();
+                        const result = MarkdownProcessor.renderMarkdown('# Test\n**bold**');
+                        return result.includes('<h1>') && result.includes('<strong>');
+                    } catch (e) { return false; }
+                },
+                'latex-math': async () => {
+                    if (!window.MathJax) return false;
+                    try {
+                        const testEl = document.createElement('div');
+                        testEl.innerHTML = '$x^2$';
+                        await window.MathJax.typesetPromise([testEl]);
+                        return true;
+                    } catch (e) { return false; }
+                },
+                'code-highlighting': async () => {
+                    if (typeof Prism === 'undefined') return false;
+                    try {
+                        const testEl = document.createElement('div');
+                        testEl.innerHTML = '<pre><code class="language-python">print("hello")</code></pre>';
+                        Prism.highlightAllUnder(testEl);
+                        return true;
+                    } catch (e) { return false; }
+                },
+                'combined-processing': async () => {
+                    if (typeof MarkdownProcessor === 'undefined') return false;
+                    try {
+                        const testContent = '# Test\n$x^2$\n```python\nprint("test")\n```';
+                        const result = await MarkdownProcessor.processCombined(testContent);
+                        return result.includes('<h1>') && result.includes('<code');
+                    } catch (e) { return false; }
+                }
+            }
+        };
+
+        // Helper functions
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        function log(message, type = 'info') {
+            const console = document.getElementById('test-console');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            console.appendChild(entry);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function updateTestStatus(testName, status, details = '') {
+            const testEl = document.querySelector(`[data-test="${testName}"]`);
+            if (!testEl) return;
+            
+            const statusEl = testEl.querySelector('.test-status');
+            statusEl.className = `test-status status-${status}`;
+            statusEl.textContent = status === 'pass' ? '✓' : status === 'fail' ? '✗' : '○';
+            
+            let detailsEl = testEl.querySelector('.test-details');
+            if (details && !detailsEl) {
+                detailsEl = document.createElement('div');
+                detailsEl.className = 'test-details';
+                testEl.appendChild(detailsEl);
+            }
+            if (detailsEl) {
+                detailsEl.textContent = details;
+            }
+        }
+
+        function updateSummary() {
+            document.getElementById('total-tests').textContent = testState.totalTests;
+            document.getElementById('passed-tests').textContent = testState.passedTests;
+            document.getElementById('failed-tests').textContent = testState.failedTests;
+            
+            const successRate = testState.totalTests > 0 
+                ? Math.round((testState.passedTests / testState.totalTests) * 100)
+                : 0;
+            document.getElementById('success-rate').textContent = successRate + '%';
+        }
+
+        async function runTest(testName, testFn) {
+            updateTestStatus(testName, 'running');
+            log(`Running test: ${testName}`, 'info');
+            
+            try {
+                const result = await testFn();
+                if (result) {
+                    updateTestStatus(testName, 'pass');
+                    testState.passedTests++;
+                    log(`✓ ${testName} passed`, 'success');
+                } else {
+                    updateTestStatus(testName, 'fail', 'Test returned false');
+                    testState.failedTests++;
+                    log(`✗ ${testName} failed`, 'error');
+                }
+            } catch (error) {
+                updateTestStatus(testName, 'fail', error.message);
+                testState.failedTests++;
+                log(`✗ ${testName} failed: ${error.message}`, 'error');
+            }
+            
+            updateSummary();
+        }
+
+        async function runTestGroup(groupName) {
+            if (testState.running) return;
+            
+            testState.running = true;
+            log(`Starting test group: ${groupName}`, 'info');
+            
+            const groupTests = tests[groupName];
+            for (const [testName, testFn] of Object.entries(groupTests)) {
+                await runTest(testName, testFn);
+                await new Promise(resolve => setTimeout(resolve, 100)); // Small delay
+            }
+            
+            testState.running = false;
+            log(`Completed test group: ${groupName}`, 'info');
+        }
+
+        async function runAllTests() {
+            if (testState.running) return;
+            
+            // Reset state
+            testState.running = true;
+            testState.results = {};
+            testState.totalTests = 0;
+            testState.passedTests = 0;
+            testState.failedTests = 0;
+            
+            // Count total tests
+            for (const group of Object.values(tests)) {
+                testState.totalTests += Object.keys(group).length;
+            }
+            
+            log('=== Starting Phase 2 Test Suite ===', 'info');
+            updateSummary();
+            
+            // Run all test groups
+            for (const groupName of Object.keys(tests)) {
+                await runTestGroup(groupName);
+            }
+            
+            testState.running = false;
+            log('=== Test Suite Complete ===', 'success');
+            
+            // Final report
+            const successRate = Math.round((testState.passedTests / testState.totalTests) * 100);
+            if (successRate >= 80) {
+                log(`🎉 Phase 2 is ready! Success rate: ${successRate}%`, 'success');
+            } else if (successRate >= 60) {
+                log(`⚠️ Phase 2 needs work. Success rate: ${successRate}%`, 'warn');
+            } else {
+                log(`❌ Phase 2 has major issues. Success rate: ${successRate}%`, 'error');
+            }
+        }
+
+        function clearConsole() {
+            document.getElementById('test-console').innerHTML = 
+                '<div class="log-entry log-info">Console cleared...</div>';
+        }
+
+        // Event listeners
+        document.getElementById('runAllTests').addEventListener('click', runAllTests);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Count total tests for display
+            for (const group of Object.values(tests)) {
+                testState.totalTests += Object.keys(group).length;
+            }
+            updateSummary();
+            
+            log('Phase 2 Test Suite loaded. Ready to test Markdown + File Management features.', 'info');
+        });
+    </script>
+</body>
+</html>
