@@ -1,0 +1,169 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2025-01-25",
+  "description": "Emergent Physics Research Projects Manifest",
+  "projects": [
+    {
+      "id": "indivisible-stochastic-processes",
+      "name": {
+        "fi": "Indivisible Stochastic Processes",
+        "en": "Indivisible Stochastic Processes"
+      },
+      "description": {
+        "fi": "Tutkimus hybridijärjestelmien indivisible-käyttäytymisestä Jacob Barandes'in teorian pohjalta",
+        "en": "Research on hybrid systems indivisible behavior based on Jacob Barandes' theory"
+      },
+      "status": "active",
+      "created": "2025-01-25",
+      "tags": ["quantum-mechanics", "stochastic-processes", "hybrid-systems", "barandes-theory"],
+      "languages": ["fi", "en"],
+      "categories": {
+        "fi": ["articles", "documentation", "code", "results", "downloads"],
+        "en": ["articles", "documentation", "code", "results", "downloads"]
+      },
+      "summary": {
+        "fi": "Kolmivaiheinen tutkimus joka testaa voivatko hybridijärjestelmät (RMT + fraktaalit + perkolaatio) tuottaa Jacob Barandes'in kuvaamia indivisible stochastic process -ominaisuuksia.",
+        "en": "Three-phase research testing whether hybrid systems (RMT + fractals + percolation) can produce the indivisible stochastic process properties described by Jacob Barandes."
+      },
+      "key_findings": {
+        "fi": [
+          "Binary satunnaisuus (±1) osoittautui optimaaliseksi",
+          "Division events ~10% frekvenssi kriittinen", 
+          "Triple hybrid malli saavutti 0.959 indivisible score",
+          "Kompleksiluvut emergentit, ei fundamentaalit"
+        ],
+        "en": [
+          "Binary randomness (±1) proved optimal",
+          "Division events ~10% frequency critical",
+          "Triple hybrid model achieved 0.959 indivisible score", 
+          "Complex numbers emergent, not fundamental"
+        ]
+      }
+    }
+  ],
+  "site_config": {
+    "default_language": "fi",
+    "available_themes": ["light", "dark"],
+    "default_theme": "light",
+    "features": {
+      "markdown_processing": true,
+      "latex_rendering": true,
+      "code_highlighting": true,
+      "pdf_generation": true,
+      "zip_downloads": true,
+      "debug_mode": true
+    }
+  },
+  "file_types": {
+    "supported_markdown": [".md", ".markdown"],
+    "supported_code": [".py", ".js", ".r", ".html", ".css", ".json"],
+    "supported_data": [".json", ".csv", ".txt", ".pkl", ".png", ".jpg", ".gif"],
+    "supported_documents": [".pdf", ".docx", ".doc"],
+    "downloadable": [".zip", ".tar.gz", ".pdf", ".docx", ".pkl", ".json", ".csv"]
+  },
+  "categories_definition": {
+    "fi": {
+      "articles": {
+        "name": "Artikkelit",
+        "description": "Tieteelliset artikkelit ja julkaisut",
+        "icon": "📄"
+      },
+      "documentation": {
+        "name": "Dokumentaatio", 
+        "description": "Projektidokumentaatio ja ohjeet",
+        "icon": "📚"
+      },
+      "code": {
+        "name": "Koodi",
+        "description": "Ohjelmointikoodi ja skriptit",
+        "icon": "💻"
+      },
+      "results": {
+        "name": "Tulokset",
+        "description": "Tutkimustulokset ja data-analyysi",
+        "icon": "📊"
+      },
+      "downloads": {
+        "name": "Lataukset",
+        "description": "Valmiit PDF ja Word -dokumentit",
+        "icon": "📥"
+      }
+    },
+    "en": {
+      "articles": {
+        "name": "Articles",
+        "description": "Scientific articles and publications", 
+        "icon": "📄"
+      },
+      "documentation": {
+        "name": "Documentation",
+        "description": "Project documentation and guides",
+        "icon": "📚"
+      },
+      "code": {
+        "name": "Code", 
+        "description": "Programming code and scripts",
+        "icon": "💻"
+      },
+      "results": {
+        "name": "Results",
+        "description": "Research results and data analysis",
+        "icon": "📊"
+      },
+      "downloads": {
+        "name": "Downloads",
+        "description": "Ready PDF and Word documents",
+        "icon": "📥"
+      }
+    }
+  },
+  "naming_conventions": {
+    "documentation": {
+      "overview": "overview_*.md",
+      "phases": "documentation_phase*.md", 
+      "guidelines": "guidelines_*.md",
+      "roadmap": "roadmap_*.md"
+    },
+    "code": {
+      "modules": "code_module*.py",
+      "analysis": "analysis_*.py",
+      "utilities": "utils_*.py"
+    },
+    "results": {
+      "data": "*_results.json",
+      "analysis": "*_analysis.md",
+      "figures": "*_figure_*.png"
+    },
+    "articles": {
+      "research": "research_*.md",
+      "conclusions": "conclusions_*.md",
+      "methodology": "methodology_*.md"
+    }
+  },
+  "external_dependencies": {
+    "cdn_libraries": {
+      "marked": "https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js",
+      "mathjax": "https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js",
+      "prism": "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js",
+      "jspdf": "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
+      "jszip": "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
+      "feather": "https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"
+    }
+  },
+  "debug_info": {
+    "creation_date": "2025-01-25",
+    "created_for": "GitHub Pages static hosting",
+    "limitations": [
+      "No server-side processing",
+      "No automatic directory listing", 
+      "Client-side file processing only",
+      "Limited PDF conversion capabilities"
+    ],
+    "workarounds": [
+      "Manifest-based file listing",
+      "Client-side ZIP generation",
+      "CDN-based external libraries",
+      "LocalStorage for user preferences"
+    ]
+  }
+}
