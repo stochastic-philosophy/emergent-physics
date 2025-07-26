@@ -159,15 +159,23 @@ body.theme-light {
     border-color: var(--border-color);
 }
 
-.theme-light .back-to-home-btn {
-    color: var(--text-secondary);
-    border-color: var(--border-color);
+/* Back button styling - multiple selectors for specificity */
+.theme-light .back-to-home-btn,
+.theme-light button.back-to-home-btn,
+body.theme-light .back-to-home-btn,
+body.theme-light button.back-to-home-btn {
+    color: var(--text-secondary) !important;
+    border-color: var(--border-color) !important;
+    background: transparent !important;
 }
 
-.theme-light .back-to-home-btn:hover {
-    background-color: var(--primary-color);
-    color: var(--primary-text);
-    border-color: var(--primary-color);
+.theme-light .back-to-home-btn:hover,
+.theme-light button.back-to-home-btn:hover,
+body.theme-light .back-to-home-btn:hover,
+body.theme-light button.back-to-home-btn:hover {
+    background-color: var(--primary-color) !important;
+    color: var(--primary-text) !important;
+    border-color: var(--primary-color) !important;
 }
 
 .theme-light .file-item {
