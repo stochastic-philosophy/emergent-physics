@@ -138,7 +138,7 @@ window.App = {
             this.state.projects = [{
                 id: 'indivisible-stochastic-processes',
                 name: {
-                    fi: 'Indivisible Stochastic Processes',
+                    fi: 'Indivisible Stochastic Processes 1',
                     en: 'Indivisible Stochastic Processes'
                 },
                 description: {
