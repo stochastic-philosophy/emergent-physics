@@ -129,6 +129,21 @@ window.App = {
             this.showLoading();
             this.state.currentProject = projectId;
             
+            // Update project item highlighting
+            const projectItems = document.querySelectorAll('.project-item');
+            projectItems.forEach(item => {
+                item.classList.remove('active');
+                // Check if this project item corresponds to the selected project
+                const projectTitle = item.querySelector('.project-title');
+                if (projectTitle) {
+                    const currentLang = ThemeManager.getLanguage();
+                    const project = this.state.projects.find(p => p.id === projectId);
+                    if (project && projectTitle.textContent.trim() === (project.name[currentLang] || project.name.fi)) {
+                        item.classList.add('active');
+                    }
+                }
+            });
+            
             // Load project structure
             await this.loadProjectStructure(projectId);
             
@@ -180,6 +195,16 @@ window.App = {
         if (!contentArea) return;
         
         let html = `<div class="project-content">`;
+        
+        // Add back to home navigation
+        html += `
+            <nav class="project-navigation">
+                <button class="back-to-home-btn" onclick="App.goBackToHome()">
+                    ← Takaisin etusivulle
+                </button>
+            </nav>
+        `;
+        
         html += `<h1>${manifest.name || 'Project'}</h1>`;
         
         if (manifest.categories) {
@@ -213,6 +238,16 @@ window.App = {
         ];
         
         let html = `<div class="project-content">`;
+        
+        // Add back to home navigation
+        html += `
+            <nav class="project-navigation">
+                <button class="back-to-home-btn" onclick="App.goBackToHome()">
+                    ← ${currentLang === 'fi' ? 'Takaisin etusivulle' : 'Back to Home'}
+                </button>
+            </nav>
+        `;
+        
         html += `<h1>${projectName}</h1>`;
         html += `<p class="project-loading">Loading project files...</p>`;
         
@@ -422,6 +457,63 @@ window.App = {
     downloadFile: function(filePath) {
         DEBUG.info(`Downloading file: ${filePath}`);
         // This will be implemented in file-manager.js
+    },
+    
+    /**
+     * Go back to home/welcome screen
+     */
+    goBackToHome: function() {
+        DEBUG.info('Navigating back to home');
+        
+        // Clear current project state
+        this.state.currentProject = null;
+        this.state.currentFile = null;
+        
+        // Reset URL
+        const url = new URL(window.location);
+        url.searchParams.delete('project');
+        url.searchParams.delete('file');
+        window.history.pushState({}, '', url.toString());
+        
+        // Show welcome screen
+        const contentArea = document.getElementById('main-content');
+        if (contentArea) {
+            const currentLang = ThemeManager.getLanguage();
+            const welcomeTitle = currentLang === 'fi' ? 'Tervetuloa tutkimusalustalle' : 'Welcome to Research Platform';
+            const welcomeDesc = currentLang === 'fi' ? 
+                'Valitse vasemmalta projekti aloittaaksesi tutustumisen tutkimustuloksiin.' :
+                'Select a project from the left to start exploring research results.';
+            const statusTheme = currentLang === 'fi' ? 'Teema' : 'Theme';
+            const statusLang = currentLang === 'fi' ? 'Kieli' : 'Language';
+            const currentTheme = currentLang === 'fi' ? 
+                (ThemeManager.getTheme() === 'light' ? 'Vaalea' : 'Tumma') :
+                (ThemeManager.getTheme() === 'light' ? 'Light' : 'Dark');
+            const currentLanguage = currentLang === 'fi' ? 'Suomi' : 'English';
+            
+            contentArea.innerHTML = `
+                <div class="welcome-screen">
+                    <h1>${welcomeTitle}</h1>
+                    <p>${welcomeDesc}</p>
+                    
+                    <div class="status-indicator">
+                        <div class="status-item">
+                            <span>${statusTheme}:</span>
+                            <span id="current-theme-display">${currentTheme}</span>
+                        </div>
+                        <div class="status-item">
+                            <span>${statusLang}:</span>
+                            <span id="current-language-display">${currentLanguage}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Update project list highlighting
+        const projectItems = document.querySelectorAll('.project-item');
+        projectItems.forEach(item => {
+            item.classList.remove('active');
+        });
     }
 };
 
