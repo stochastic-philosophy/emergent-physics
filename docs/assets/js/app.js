@@ -1,9 +1,9 @@
 /**
- * Main Application Logic
- * Handles SPA routing, project loading, and overall app coordination
+ * Main Application Logic (Modularized)
+ * Handles SPA coordination and delegates to specialized modules
  */
 
-// Ensure DEBUG is available (fallback if debug-logger.js fails)
+// Ensure DEBUG is available (fallback)
 if (typeof DEBUG === 'undefined') {
     window.DEBUG = {
         info: function(msg) { console.log('[INFO]', msg); },
@@ -36,36 +36,50 @@ window.App = {
      * Initialize the application
      */
     init: function() {
-        DEBUG.info('Initializing App...');
+        DEBUG.info('=== INITIALIZING APP ===');
         
         try {
-            // Wait for theme manager to be ready
-            if (typeof ThemeManager === 'undefined') {
-                DEBUG.warn('ThemeManager not ready, retrying in 100ms...');
+            // Check for required dependencies
+            if (!this.checkDependencies()) {
+                DEBUG.warn('Dependencies not ready, retrying in 100ms...');
                 setTimeout(() => this.init(), 100);
                 return;
             }
             
-            DEBUG.success('ThemeManager found, proceeding with initialization');
+            DEBUG.success('All dependencies loaded, proceeding with initialization');
             
-            // Load manifest and projects
+            // Load manifest and set up app
             this.loadManifest()
                 .then(() => {
-                    DEBUG.info('Manifest loaded, setting up event listeners');
+                    DEBUG.info('Manifest loaded, setting up navigation');
                     this.setupEventListeners();
-                    DEBUG.info('Event listeners set up, handling initial route');
                     this.handleInitialRoute();
                     this.state.initialized = true;
-                    DEBUG.success('App initialized successfully');
+                    DEBUG.success('=== APP INITIALIZED SUCCESSFULLY ===');
                 })
                 .catch(error => {
                     DEBUG.reportError(error, 'App initialization failed');
-                    this.showErrorWithBackButton('Failed to initialize application');
+                    UI.showError('Failed to initialize application', false);
                 });
                 
         } catch (error) {
             DEBUG.reportError(error, 'Critical error during app initialization');
         }
+    },
+    
+    /**
+     * Check if all required dependencies are loaded
+     */
+    checkDependencies: function() {
+        const required = ['ThemeManager', 'Utils', 'Storage', 'UI'];
+        const missing = required.filter(dep => typeof window[dep] === 'undefined');
+        
+        if (missing.length > 0) {
+            DEBUG.warn('Missing dependencies:', missing.join(', '));
+            return false;
+        }
+        
+        return true;
     },
     
     /**
@@ -75,6 +89,15 @@ window.App = {
         DEBUG.info('Loading project manifest...');
         
         try {
+            // Try to load from cache first
+            const cached = Storage.getCachedProject('manifest');
+            if (cached) {
+                DEBUG.info('Using cached manifest');
+                this.state.projects = cached.projects || [];
+                this.renderProjectsList();
+                return;
+            }
+            
             const response = await fetch(this.config.manifestUrl);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -82,6 +105,9 @@ window.App = {
             
             const manifest = await response.json();
             this.state.projects = manifest.projects || [];
+            
+            // Cache the manifest
+            Storage.cacheProject('manifest', manifest, 60 * 60 * 1000); // 1 hour
             
             DEBUG.success(`Loaded ${this.state.projects.length} projects from manifest`);
             this.renderProjectsList();
@@ -110,28 +136,28 @@ window.App = {
      */
     renderProjectsList: function() {
         DEBUG.info('Rendering projects list...');
-        const projectsList = document.getElementById('projects-list');
+        const projectsList = document.querySelector(UI.selectors.projectsList);
         if (!projectsList) {
             DEBUG.error('Projects list element not found');
             return;
         }
         
-        const currentLang = ThemeManager ? ThemeManager.getLanguage() : 'fi';
-        
+        const currentLang = UI.getCurrentLanguage();
         projectsList.innerHTML = '';
         
         this.state.projects.forEach(project => {
-            const projectElement = document.createElement('div');
-            projectElement.className = 'project-item';
-            projectElement.innerHTML = `
-                <h3 class="project-title">${project.name[currentLang] || project.name.fi}</h3>
-                <p class="project-description">${project.description[currentLang] || project.description.fi}</p>
-            `;
-            
-            projectElement.addEventListener('click', () => {
-                DEBUG.info(`Project clicked: ${project.id}`);
-                this.selectProject(project.id);
-            });
+            const projectElement = UI.createElement('div', {
+                className: 'project-item',
+                'data-project-id': project.id,
+                onclick: () => this.selectProject(project.id)
+            }, [
+                UI.createElement('h3', {
+                    className: 'project-title'
+                }, [project.name[currentLang] || project.name.fi]),
+                UI.createElement('p', {
+                    className: 'project-description'
+                }, [project.description[currentLang] || project.description.fi])
+            ]);
             
             projectsList.appendChild(projectElement);
         });
@@ -146,42 +172,34 @@ window.App = {
         DEBUG.info(`=== SELECTING PROJECT: ${projectId} ===`);
         
         try {
-            this.showLoading();
+            UI.showLoading();
             this.state.currentProject = projectId;
             
-            DEBUG.info('Updating project highlighting...');
+            // Update project highlighting
+            UI.highlightActiveProject(projectId);
             
-            // Update project item highlighting
-            const projectItems = document.querySelectorAll('.project-item');
-            projectItems.forEach(item => {
-                item.classList.remove('active');
-                // Check if this project item corresponds to the selected project
-                const projectTitle = item.querySelector('.project-title');
-                if (projectTitle) {
-                    const currentLang = ThemeManager.getLanguage();
-                    const project = this.state.projects.find(p => p.id === projectId);
-                    if (project && projectTitle.textContent.trim() === (project.name[currentLang] || project.name.fi)) {
-                        item.classList.add('active');
-                        DEBUG.info(`Highlighted project: ${project.name[currentLang] || project.name.fi}`);
-                    }
-                }
-            });
-            
-            DEBUG.info('Starting project structure loading...');
+            // Add to recent projects
+            const project = this.state.projects.find(p => p.id === projectId);
+            if (project) {
+                const currentLang = UI.getCurrentLanguage();
+                Storage.addRecentProject(projectId, project.name[currentLang] || project.name.fi);
+            }
             
             // Load project structure
             await this.loadProjectStructure(projectId);
             
-            // Update URL without reload
+            // Update URL and page title
             this.updateUrl(projectId);
+            const projectName = project ? (project.name[UI.getCurrentLanguage()] || project.name.fi) : projectId;
+            UI.updatePageTitle(projectName);
             
-            this.hideLoading();
+            UI.hideLoading();
             DEBUG.success(`Project ${projectId} loaded successfully`);
             
         } catch (error) {
             DEBUG.reportError(error, `Failed to load project: ${projectId}`);
-            this.showErrorWithBackButton(`Failed to load project: ${projectId}`);
-            this.hideLoading();
+            UI.showError(`Failed to load project: ${projectId}`, true);
+            UI.hideLoading();
         }
     },
     
@@ -189,25 +207,17 @@ window.App = {
      * Load project file structure
      */
     loadProjectStructure: async function(projectId) {
-        DEBUG.info(`Starting to load project structure for: ${projectId}`);
+        DEBUG.info(`Loading project structure for: ${projectId}`);
         
-        // Ensure ThemeManager is available
-        if (typeof ThemeManager === 'undefined' || !ThemeManager.getLanguage) {
-            DEBUG.error('ThemeManager not available during project loading');
-            this.showErrorWithBackButton('ThemeManager not ready');
-            return;
-        }
-        
-        const currentLang = ThemeManager.getLanguage();
+        const currentLang = UI.getCurrentLanguage();
         const projectPath = `${this.config.projectsBasePath}${projectId}/${currentLang}/`;
         
-        DEBUG.info(`Loading project structure from: ${projectPath}`);
-        DEBUG.info(`Current language: ${currentLang}`);
+        DEBUG.info(`Project path: ${projectPath}`);
         
         try {
             // Try to load project-specific manifest
             const projectManifestUrl = `${projectPath}manifest.json`;
-            DEBUG.info(`Attempting to fetch: ${projectManifestUrl}`);
+            DEBUG.info(`Fetching: ${projectManifestUrl}`);
             
             const response = await fetch(projectManifestUrl);
             
@@ -231,48 +241,22 @@ window.App = {
      */
     renderProjectContent: function(manifest, basePath) {
         DEBUG.info('Rendering project content from manifest');
-        const contentArea = document.getElementById('main-content');
+        const contentArea = document.querySelector(UI.selectors.mainContent);
         if (!contentArea) {
             DEBUG.error('Content area not found!');
             return;
         }
         
-        const currentLang = ThemeManager ? ThemeManager.getLanguage() : 'fi';
+        const currentLang = UI.getCurrentLanguage();
         const backText = currentLang === 'fi' ? '← Takaisin etusivulle' : '← Back to Home';
         
         let html = `<div class="project-content">`;
-        
-        // Add back to home navigation with inline styles as backup
         html += `
             <nav class="project-navigation">
-                <button 
-                    class="back-to-home-btn" 
-                    onclick="App.goBackToHome()"
-                    style="
-                        background: transparent;
-                        border: 1px solid #e5e7eb;
-                        color: #6b7280;
-                        padding: 0.75rem 1.5rem;
-                        border-radius: 6px;
-                        cursor: pointer;
-                        font-size: 0.875rem;
-                        font-weight: 500;
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 0.5rem;
-                        font-family: inherit;
-                        text-decoration: none;
-                        transition: all 0.3s ease;
-                    "
-                    onmouseover="this.style.background='#2563eb'; this.style.color='#ffffff'; this.style.borderColor='#2563eb';"
-                    onmouseout="this.style.background='transparent'; this.style.color='#6b7280'; this.style.borderColor='#e5e7eb';"
-                >
-                    ${backText}
-                </button>
+                ${UI.createBackButton(backText)}
             </nav>
         `;
-        
-        html += `<h1>${manifest.name || 'Project'}</h1>`;
+        html += `<h1>${Utils.escapeHtml(manifest.name || 'Project')}</h1>`;
         
         if (manifest.categories) {
             Object.entries(manifest.categories).forEach(([category, files]) => {
@@ -284,18 +268,23 @@ window.App = {
         contentArea.innerHTML = html;
         
         DEBUG.success('Project content rendered successfully');
-        this.setupFileClickHandlers();
     },
     
     /**
      * Render basic project structure (fallback)
      */
     renderBasicProjectStructure: function(projectId, basePath) {
-        const contentArea = document.getElementById('main-content');
-        if (!contentArea) return;
+        DEBUG.info('Rendering basic project structure (fallback)');
+        const contentArea = document.querySelector(UI.selectors.mainContent);
+        if (!contentArea) {
+            DEBUG.error('Content area not found!');
+            return;
+        }
         
-        const currentLang = ThemeManager.getLanguage();
-        const projectName = this.state.projects.find(p => p.id === projectId)?.name[currentLang] || projectId;
+        const currentLang = UI.getCurrentLanguage();
+        const project = this.state.projects.find(p => p.id === projectId);
+        const projectName = project ? (project.name[currentLang] || project.name.fi) : projectId;
+        const backText = currentLang === 'fi' ? '← Takaisin etusivulle' : '← Back to Home';
         
         const categories = [
             { key: 'articles', name: currentLang === 'fi' ? 'Artikkelit' : 'Articles' },
@@ -306,23 +295,18 @@ window.App = {
         ];
         
         let html = `<div class="project-content">`;
-        
-        // Add back to home navigation
         html += `
             <nav class="project-navigation">
-                <button class="back-to-home-btn" onclick="App.goBackToHome()">
-                    ← ${currentLang === 'fi' ? 'Takaisin etusivulle' : 'Back to Home'}
-                </button>
+                ${UI.createBackButton(backText)}
             </nav>
         `;
-        
-        html += `<h1>${projectName}</h1>`;
+        html += `<h1>${Utils.escapeHtml(projectName)}</h1>`;
         html += `<p class="project-loading">Loading project files...</p>`;
         
         categories.forEach(category => {
             html += `
                 <div class="category-section">
-                    <h2>${category.name}</h2>
+                    <h2>${Utils.escapeHtml(category.name)}</h2>
                     <div class="files-list" data-category="${category.key}" data-path="${basePath}${category.key}/">
                         <div class="loading-files">Loading files...</div>
                     </div>
@@ -333,43 +317,7 @@ window.App = {
         html += `</div>`;
         contentArea.innerHTML = html;
         
-        // Try to load files for each category
-        this.loadCategoryFiles(basePath);
-    },
-    
-    /**
-     * Load files for each category
-     */
-    loadCategoryFiles: async function(basePath) {
-        const categories = document.querySelectorAll('.files-list[data-category]');
-        
-        for (const categoryElement of categories) {
-            const category = categoryElement.getAttribute('data-category');
-            const categoryPath = categoryElement.getAttribute('data-path');
-            
-            try {
-                await this.loadFilesForCategory(categoryElement, categoryPath);
-            } catch (error) {
-                DEBUG.warn(`Failed to load files for category: ${category}`);
-                categoryElement.innerHTML = '<p class="no-files">No files found in this category.</p>';
-            }
-        }
-    },
-    
-    /**
-     * Load files for a specific category (this is a simulation - real implementation would need server support)
-     */
-    loadFilesForCategory: async function(categoryElement, categoryPath) {
-        // Since we can't list directory contents on static GitHub Pages,
-        // we'll need to rely on manifest files or predefined file lists
-        
-        // For now, show placeholder
-        categoryElement.innerHTML = `
-            <p class="category-placeholder">
-                Files in this category will be loaded dynamically.<br>
-                <small>Path: ${categoryPath}</small>
-            </p>
-        `;
+        DEBUG.success('Basic project structure rendered successfully');
     },
     
     /**
@@ -377,23 +325,29 @@ window.App = {
      */
     renderCategory: function(categoryName, files, basePath) {
         let html = `<div class="category-section">`;
-        html += `<h2>${categoryName}</h2>`;
+        html += `<h2>${Utils.escapeHtml(categoryName)}</h2>`;
         html += `<div class="files-list">`;
         
-        files.forEach(file => {
-            const fileName = file.name || file;
-            const filePath = `${basePath}${file.path || file}`;
-            
-            html += `
-                <div class="file-item" data-file-path="${filePath}">
-                    <span class="file-name">${fileName}</span>
-                    <div class="file-actions">
-                        <button class="view-btn" onclick="App.viewFile('${filePath}')">View</button>
-                        <button class="download-btn" onclick="App.downloadFile('${filePath}')">Download</button>
+        if (files && files.files) {
+            files.files.forEach(file => {
+                const fileName = file.name || file.filename || file;
+                const filePath = `${basePath}${file.filename || file}`;
+                
+                html += `
+                    <div class="file-item" data-file-path="${filePath}">
+                        <span class="file-name">${Utils.escapeHtml(fileName)}</span>
+                        <div class="file-actions">
+                            <button class="view-btn" onclick="App.viewFile('${filePath}')">
+                                ${UI.getCurrentLanguage() === 'fi' ? 'Katso' : 'View'}
+                            </button>
+                            <button class="download-btn" onclick="App.downloadFile('${filePath}')">
+                                ${UI.getCurrentLanguage() === 'fi' ? 'Lataa' : 'Download'}
+                            </button>
+                        </div>
                     </div>
-                </div>
-            `;
-        });
+                `;
+            });
+        }
         
         html += `</div></div>`;
         return html;
@@ -405,221 +359,49 @@ window.App = {
     setupEventListeners: function() {
         // Handle browser back/forward buttons
         window.addEventListener('popstate', (e) => {
-            this.handlePopState(e);
-        });
-        
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            this.handleResize();
+            if (e.state && e.state.project) {
+                this.selectProject(e.state.project);
+            } else {
+                this.goBackToHome();
+            }
         });
         
         DEBUG.info('Event listeners set up');
     },
     
     /**
-     * Setup file click handlers
-     */
-    setupFileClickHandlers: function() {
-        // This will be called after rendering content with file links
-        DEBUG.info('File click handlers set up');
-    },
-    
-    /**
-     * Handle initial route
+     * Handle initial route on page load
      */
     handleInitialRoute: function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const project = urlParams.get('project');
+        const params = Utils.parseQueryString();
+        const project = params.project;
         
         DEBUG.info(`Handling initial route. Project parameter: ${project}`);
         
         if (project) {
-            // Small delay to ensure everything is loaded
             setTimeout(() => {
                 this.selectProject(project);
             }, 200);
         } else {
-            // Show welcome screen
-            DEBUG.info('Showing welcome screen');
-            this.showWelcomeScreen();
+            UI.showWelcomeScreen();
         }
-    },
-    
-    /**
-     * Handle popstate (back/forward navigation)
-     */
-    handlePopState: function(event) {
-        if (event.state) {
-            this.selectProject(event.state.project);
-        }
-    },
-    
-    /**
-     * Handle window resize
-     */
-    handleResize: function() {
-        // Responsive adjustments if needed
     },
     
     /**
      * Update URL without page reload
      */
     updateUrl: function(projectId, fileId = null) {
-        const url = new URL(window.location);
-        url.searchParams.set('project', projectId);
+        const params = { project: projectId };
+        if (fileId) params.file = fileId;
         
-        if (fileId) {
-            url.searchParams.set('file', fileId);
-        } else {
-            url.searchParams.delete('file');
-        }
+        const queryString = Utils.buildQueryString(params);
+        const url = `${window.location.pathname}?${queryString}`;
         
         window.history.pushState(
             { project: projectId, file: fileId },
             '',
-            url.toString()
+            url
         );
-    },
-    
-    /**
-     * Show loading overlay
-     */
-    showLoading: function() {
-        const overlay = document.getElementById('loading-overlay');
-        if (overlay) {
-            overlay.style.display = 'flex';
-        }
-    },
-    
-    /**
-     * Hide loading overlay
-     */
-    hideLoading: function() {
-        const overlay = document.getElementById('loading-overlay');
-        if (overlay) {
-            overlay.style.display = 'none';
-        }
-    },
-    
-    /**
-     * Show welcome screen
-     */
-    showWelcomeScreen: function() {
-        DEBUG.info('Displaying welcome screen');
-        const contentArea = document.getElementById('main-content');
-        if (!contentArea) {
-            DEBUG.error('Content area not found for welcome screen!');
-            return;
-        }
-        
-        const currentLang = ThemeManager && ThemeManager.getLanguage ? ThemeManager.getLanguage() : 'fi';
-        const welcomeTitle = currentLang === 'fi' ? 'Tervetuloa tutkimusalustalle' : 'Welcome to Research Platform';
-        const welcomeDesc = currentLang === 'fi' ? 
-            'Valitse vasemmalta projekti aloittaaksesi tutustumisen tutkimustuloksiin.' :
-            'Select a project from the left to start exploring research results.';
-        const statusTheme = currentLang === 'fi' ? 'Teema' : 'Theme';
-        const statusLang = currentLang === 'fi' ? 'Kieli' : 'Language';
-        
-        let currentTheme = 'Unknown';
-        let currentLanguage = 'Unknown';
-        
-        if (ThemeManager && ThemeManager.getTheme) {
-            const theme = ThemeManager.getTheme();
-            currentTheme = currentLang === 'fi' ? 
-                (theme === 'light' ? 'Vaalea' : 'Tumma') :
-                (theme === 'light' ? 'Light' : 'Dark');
-        }
-        
-        if (currentLang) {
-            currentLanguage = currentLang === 'fi' ? 'Suomi' : 'English';
-        }
-        
-        contentArea.innerHTML = `
-            <div class="welcome-screen">
-                <h1 data-key="welcome_title">${welcomeTitle}</h1>
-                <p data-key="welcome_description">${welcomeDesc}</p>
-                
-                <div class="status-indicator">
-                    <div class="status-item">
-                        <span data-key="status_theme">${statusTheme}:</span>
-                        <span id="current-theme-display">${currentTheme}</span>
-                    </div>
-                    <div class="status-item">
-                        <span data-key="status_language">${statusLang}:</span>
-                        <span id="current-language-display">${currentLanguage}</span>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        DEBUG.success('Welcome screen displayed successfully');
-    },
-    
-    /**
-     * Show error with back button
-     */
-    showErrorWithBackButton: function(message) {
-        const contentArea = document.getElementById('main-content');
-        if (!contentArea) return;
-        
-        const currentLang = ThemeManager ? ThemeManager.getLanguage() : 'fi';
-        const backText = currentLang === 'fi' ? '← Takaisin etusivulle' : '← Back to Home';
-        const errorTitle = currentLang === 'fi' ? 'Virhe' : 'Error';
-        const reloadText = currentLang === 'fi' ? 'Päivitä sivu' : 'Reload Page';
-        
-        contentArea.innerHTML = `
-            <div class="project-content">
-                <nav class="project-navigation">
-                    <button 
-                        class="back-to-home-btn" 
-                        onclick="App.goBackToHome()"
-                        style="
-                            background: transparent;
-                            border: 1px solid #e5e7eb;
-                            color: #6b7280;
-                            padding: 0.75rem 1.5rem;
-                            border-radius: 6px;
-                            cursor: pointer;
-                            font-size: 0.875rem;
-                            font-weight: 500;
-                            display: inline-flex;
-                            align-items: center;
-                            gap: 0.5rem;
-                            font-family: inherit;
-                            text-decoration: none;
-                            transition: all 0.3s ease;
-                        "
-                        onmouseover="this.style.background='#2563eb'; this.style.color='#ffffff'; this.style.borderColor='#2563eb';"
-                        onmouseout="this.style.background='transparent'; this.style.color='#6b7280'; this.style.borderColor='#e5e7eb';"
-                    >
-                        ${backText}
-                    </button>
-                </nav>
-                <div class="error-message">
-                    <h2>${errorTitle}</h2>
-                    <p>${message}</p>
-                    <button onclick="location.reload()">${reloadText}</button>
-                </div>
-            </div>
-        `;
-        
-        DEBUG.error(`Error displayed: ${message}`);
-    },
-    
-    /**
-     * View file (placeholder - will be implemented in file manager)
-     */
-    viewFile: function(filePath) {
-        DEBUG.info(`Viewing file: ${filePath}`);
-        // This will be implemented in file-manager.js
-    },
-    
-    /**
-     * Download file (placeholder)
-     */
-    downloadFile: function(filePath) {
-        DEBUG.info(`Downloading file: ${filePath}`);
-        // This will be implemented in file-manager.js
     },
     
     /**
@@ -628,55 +410,43 @@ window.App = {
     goBackToHome: function() {
         DEBUG.info('Navigating back to home');
         
-        // Clear current project state
         this.state.currentProject = null;
         this.state.currentFile = null;
         
         // Reset URL
-        const url = new URL(window.location);
-        url.searchParams.delete('project');
-        url.searchParams.delete('file');
-        window.history.pushState({}, '', url.toString());
+        const url = window.location.pathname;
+        window.history.pushState({}, '', url);
         
         // Show welcome screen
-        const contentArea = document.getElementById('main-content');
-        if (contentArea) {
-            const currentLang = ThemeManager.getLanguage();
-            const welcomeTitle = currentLang === 'fi' ? 'Tervetuloa tutkimusalustalle' : 'Welcome to Research Platform';
-            const welcomeDesc = currentLang === 'fi' ? 
-                'Valitse vasemmalta projekti aloittaaksesi tutustumisen tutkimustuloksiin.' :
-                'Select a project from the left to start exploring research results.';
-            const statusTheme = currentLang === 'fi' ? 'Teema' : 'Theme';
-            const statusLang = currentLang === 'fi' ? 'Kieli' : 'Language';
-            const currentTheme = currentLang === 'fi' ? 
-                (ThemeManager.getTheme() === 'light' ? 'Vaalea' : 'Tumma') :
-                (ThemeManager.getTheme() === 'light' ? 'Light' : 'Dark');
-            const currentLanguage = currentLang === 'fi' ? 'Suomi' : 'English';
-            
-            contentArea.innerHTML = `
-                <div class="welcome-screen">
-                    <h1>${welcomeTitle}</h1>
-                    <p>${welcomeDesc}</p>
-                    
-                    <div class="status-indicator">
-                        <div class="status-item">
-                            <span>${statusTheme}:</span>
-                            <span id="current-theme-display">${currentTheme}</span>
-                        </div>
-                        <div class="status-item">
-                            <span>${statusLang}:</span>
-                            <span id="current-language-display">${currentLanguage}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
+        UI.showWelcomeScreen();
+        UI.updatePageTitle(null);
         
-        // Update project list highlighting
+        // Remove project highlighting
         const projectItems = document.querySelectorAll('.project-item');
-        projectItems.forEach(item => {
-            item.classList.remove('active');
-        });
+        projectItems.forEach(item => item.classList.remove('active'));
+    },
+    
+    /**
+     * View file (placeholder - will be implemented in file manager)
+     */
+    viewFile: function(filePath) {
+        DEBUG.info(`Viewing file: ${filePath}`);
+        UI.showNotification('File viewing will be implemented in next phase', 'info');
+    },
+    
+    /**
+     * Download file (placeholder)
+     */
+    downloadFile: function(filePath) {
+        DEBUG.info(`Downloading file: ${filePath}`);
+        UI.showNotification('File downloading will be implemented in next phase', 'info');
+    }
+};
+
+// Create global reference for Navigation (backward compatibility)
+window.Navigation = {
+    goBackToHome: function() {
+        App.goBackToHome();
     }
 };
 
@@ -684,7 +454,7 @@ window.App = {
  * Initialize app when DOM is ready
  */
 document.addEventListener('DOMContentLoaded', function() {
-    // Small delay to ensure other managers are ready
+    // Small delay to ensure other modules are ready
     setTimeout(() => {
         App.init();
     }, 200);
