@@ -168,6 +168,16 @@ a {
     border-color: var(--primary-color);
 }
 
+.project-item.active {
+    background: var(--hover-background);
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.project-item.active .project-title {
+    color: var(--primary-color);
+}
+
 .project-title {
     font-size: 1rem;
     margin-bottom: 0.5rem;
@@ -230,6 +240,34 @@ a {
 /* Project content */
 .project-content {
     max-width: none;
+}
+
+.project-navigation {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.back-to-home-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.back-to-home-btn:hover {
+    background: var(--primary-color);
+    color: var(--primary-text);
+    border-color: var(--primary-color);
+    transform: translateX(-2px);
 }
 
 .category-section {
