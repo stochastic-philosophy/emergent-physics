@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergent Physics Research</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/themes-light.css" id="theme-css">
+    
+    <!-- External Libraries (CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+    
+    <!-- Debug mode indicator -->
+    <script>
+        window.DEBUG_MODE = localStorage.getItem('debug_mode') === 'true';
+        if (window.DEBUG_MODE) {
+            document.documentElement.classList.add('debug-mode');
+        }
+    </script>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-left">
+                <h1 class="site-title">
+                    <span data-key="site_title">Emergent Physics Research</span>
+                </h1>
+            </div>
+            
+            <div class="header-right">
+                <!-- Language Switcher -->
+                <div class="language-switcher">
+                    <button id="lang-fi" class="lang-btn active" data-lang="fi">FI</button>
+                    <button id="lang-en" class="lang-btn" data-lang="en">EN</button>
+                </div>
+                
+                <!-- Theme Switcher -->
+                <div class="theme-switcher">
+                    <button id="theme-toggle" class="theme-btn" title="Toggle theme">
+                        <i data-feather="sun" class="theme-icon"></i>
+                    </button>
+                </div>
+                
+                <!-- Debug Toggle (only in development) -->
+                <div class="debug-toggle" style="display: none;">
+                    <button id="debug-toggle" class="debug-btn" title="Toggle debug mode">
+                        <i data-feather="bug" class="debug-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <nav class="main-navigation">
+                <h2 data-key="nav_projects">Projektit</h2>
+                <div id="projects-list" class="projects-list">
+                    <!-- Projects will be loaded here dynamically -->
+                    <div class="loading">
+                        <span data-key="loading">Ladataan...</span>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Content Area -->
+        <section class="content-area">
+            <div id="main-content" class="main-content-inner">
+                <!-- Welcome screen -->
+                <div class="welcome-screen">
+                    <h1 data-key="welcome_title">Tervetuloa tutkimusalustalle</h1>
+                    <p data-key="welcome_description">
+                        Valitse vasemmalta projekti aloittaaksesi tutustumisen tutkimustuloksiin.
+                    </p>
+                    
+                    <!-- Status indicator -->
+                    <div class="status-indicator">
+                        <div class="status-item">
+                            <span data-key="status_theme">Teema:</span>
+                            <span id="current-theme-display">Vaalea</span>
+                        </div>
+                        <div class="status-item">
+                            <span data-key="status_language">Kieli:</span>
+                            <span id="current-language-display">Suomi</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <p data-key="footer_text">
+                &copy; 2025 Emergent Physics Research. 
+                <a href="debug.html" target="_blank" data-key="debug_link">Debug Tools</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p data-key="loading_content">Ladataan sisältöä...</p>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="assets/js/debug-logger.js"></script>
+    <script src="assets/js/theme-manager.js"></script>
+    <script src="assets/js/app.js"></script>
+    
+    <!-- Initialize Feather Icons -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
+        });
+    </script>
+</body>
+</html>
