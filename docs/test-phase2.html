@@ -135,32 +135,46 @@
         function diagnose() {
             var currentUrl = window.location.href;
             var isGitHubPages = currentUrl.includes('.github.io');
-            var isInDocs = currentUrl.includes('/docs/');
             var isLocalFile = currentUrl.startsWith('file://');
+            
+            // GitHub Pages behavior: when serving from docs/, the /docs/ part is removed from URL
+            var isServingFromDocs = isGitHubPages && !currentUrl.includes('/docs/');
             
             var info = 'Nykyinen URL: ' + currentUrl + '\n';
             info += 'GitHub Pages: ' + (isGitHubPages ? 'Kyllä' : 'Ei') + '\n';
-            info += 'Docs-kansiossa: ' + (isInDocs ? 'Kyllä' : 'Ei') + '\n';
+            info += 'Servaa docs-kansiosta: ' + (isServingFromDocs ? 'Kyllä (oikein!)' : 'Ei') + '\n';
             info += 'Paikallinen tiedosto: ' + (isLocalFile ? 'Kyllä' : 'Ei') + '\n\n';
             
             if (isLocalFile) {
                 info += 'ONGELMA: Avaat tiedoston suoraan koneelta.\n';
                 info += 'RATKAISU: Lataa GitHubiin ja aktivoi GitHub Pages.';
                 showResult('diagnose-result', false, 'Setup-ongelma löydetty', info);
-            } else if (isGitHubPages && !isInDocs) {
-                info += 'VAROITUS: Et ole docs-kansiossa.\n';
-                info += 'SUOSITUS: Siirrä tiedosto docs-kansioon.';
-                showResult('diagnose-result', true, 'Setup näyttää OK, mutta...', info);
+            } else if (isGitHubPages && isServingFromDocs) {
+                info += 'HYVÄ: GitHub Pages servaa docs-kansiosta!\n';
+                info += 'Tiedostopolut: assets/js/, manifest.json (ei docs/ prefiksiä)';
+                showResult('diagnose-result', true, 'Setup on täydellinen!', info);
+            } else if (isGitHubPages) {
+                info += 'VAROITUS: GitHub Pages ei käytä docs-kansiota.\n';
+                info += 'TARKISTA: Repository Settings → Pages → Source: docs';
+                showResult('diagnose-result', true, 'GitHub Pages OK, mutta...', info);
             } else {
-                info += 'Setup näyttää hyvältä!';
-                showResult('diagnose-result', true, 'Ei ilmeisiä ongelmia', info);
+                info += 'Ei GitHub Pages - vaikea sanoa polkuja.';
+                showResult('diagnose-result', true, 'Tuntematon ympäristö', info);
             }
         }
 
         // Test modules
         function testModules() {
             var currentUrl = window.location.href;
-            var basePath = currentUrl.includes('/docs/') ? '' : 'docs/';
+            var isGitHubPages = currentUrl.includes('.github.io');
+            var isServingFromDocs = isGitHubPages && !currentUrl.includes('/docs/');
+            
+            // Determine correct path based on setup
+            var basePath = '';
+            if (!isGitHubPages || !isServingFromDocs) {
+                // If not GitHub Pages serving from docs, try docs/ prefix
+                basePath = 'docs/';
+            }
             
             showResult('modules-result', false, 'Testaa...', 'Yritetään ladata JavaScript-tiedostoja...');
             
@@ -182,7 +196,8 @@
                 info += 'Tarkista että:\n';
                 info += '1. Tiedostot ovat GitHubissa\n';
                 info += '2. GitHub Pages on aktivoitu\n';
-                info += '3. Tiedostot ovat docs/assets/js/ kansiossa';
+                info += '3. Tiedostot ovat docs/assets/js/ kansiossa\n';
+                info += '4. GitHub Pages servaa docs-kansiosta (Settings → Pages)';
                 
                 testResults.modules = false;
                 showResult('modules-result', false, 'Moduulien lataus epäonnistui', info);
@@ -194,7 +209,14 @@
         // Test files
         function testFiles() {
             var currentUrl = window.location.href;
-            var manifestPath = currentUrl.includes('/docs/') ? 'manifest.json' : 'docs/manifest.json';
+            var isGitHubPages = currentUrl.includes('.github.io');
+            var isServingFromDocs = isGitHubPages && !currentUrl.includes('/docs/');
+            
+            // Determine correct path
+            var manifestPath = 'manifest.json';
+            if (!isGitHubPages || !isServingFromDocs) {
+                manifestPath = 'docs/manifest.json';
+            }
             
             showResult('files-result', false, 'Testaa...', 'Yritetään ladata manifest.json...');
             
@@ -208,7 +230,8 @@
                 .then(function(data) {
                     var info = 'Manifest ladattu: ' + manifestPath + '\n';
                     info += 'Projekteja: ' + (data.projects ? data.projects.length : 0) + '\n';
-                    info += 'JSON koko: ' + JSON.stringify(data).length + ' merkkiä';
+                    info += 'JSON koko: ' + JSON.stringify(data).length + ' merkkiä\n';
+                    info += 'GitHub Pages servaa docs-kansiosta: ' + (isServingFromDocs ? 'Kyllä' : 'Ei');
                     
                     testResults.files = true;
                     showResult('files-result', true, 'Tiedostot löytyvät', info);
@@ -216,9 +239,10 @@
                 .catch(function(error) {
                     var info = 'Manifest ei löydy: ' + manifestPath + '\n';
                     info += 'Virhe: ' + error.message + '\n';
+                    info += 'GitHub Pages setup: ' + (isServingFromDocs ? 'Docs-kansio (oikein)' : 'Ei docs') + '\n';
                     info += 'Tarkista että:\n';
-                    info += '1. manifest.json on docs-kansiossa\n';
-                    info += '2. GitHub Pages on aktivoitu\n';
+                    info += '1. manifest.json on docs-kansiossa GitHubissa\n';
+                    info += '2. GitHub Pages: Settings → Pages → Source: docs\n';
                     info += '3. Tiedosto on validi JSON';
                     
                     testResults.files = false;
