@@ -1,0 +1,44 @@
+{
+  "site": {
+    "title": "Emergent Physics Research",
+    "description": "Indivisible Stochastic Processes tutkimus",
+    "version": "1.0.0",
+    "languages": ["fi", "en"],
+    "default_language": "fi",
+    "themes": ["light", "dark"],
+    "default_theme": "light"
+  },
+  "projects": {
+    "indivisible-stochastic": {
+      "title": {
+        "fi": "Indivisible Stochastic Processes",
+        "en": "Indivisible Stochastic Processes"
+      },
+      "description": {
+        "fi": "Hybridijärjestelmien kvanttimaisen käyttäytymisen tutkimus",
+        "en": "Research on quantum-like behavior in hybrid systems"
+      },
+      "files": {
+        "fi": [
+          "overview.md",
+          "documentation.md", 
+          "nextsteps.md",
+          "phase1_documentation.md",
+          "phase2_documentation.md",
+          "phase3_documentation.md"
+        ],
+        "en": [
+          "overview_en.md"
+        ]
+      },
+      "categories": {
+        "overview": { "fi": "Yleiskatsaus", "en": "Overview" },
+        "documentation": { "fi": "Dokumentaatio", "en": "Documentation" },
+        "nextsteps": { "fi": "Seuraavat vaiheet", "en": "Next Steps" },
+        "phase1": { "fi": "Vaihe 1", "en": "Phase 1" },
+        "phase2": { "fi": "Vaihe 2", "en": "Phase 2" },
+        "phase3": { "fi": "Vaihe 3", "en": "Phase 3" }
+      }
+    }
+  }
+}
