@@ -132,21 +132,33 @@ window.ThemeManager = {
      */
     applyTheme: function(theme) {
         try {
+            DEBUG.info(`Applying theme: ${theme}`);
+            
             // Update theme CSS file
             const themeCSS = document.getElementById('theme-css');
             if (themeCSS) {
                 themeCSS.href = `assets/css/themes-${theme}.css`;
+                DEBUG.info(`Updated theme CSS file: themes-${theme}.css`);
+            } else {
+                DEBUG.warn('Theme CSS element not found');
             }
             
-            // Update body class
+            // Update body class - CRITICAL for styling
             document.body.className = document.body.className.replace(/theme-\w+/g, '');
             document.body.classList.add(`theme-${theme}`);
+            DEBUG.info(`Added body class: theme-${theme}`);
+            
+            // Also update html element for good measure
+            document.documentElement.className = document.documentElement.className.replace(/theme-\w+/g, '');
+            document.documentElement.classList.add(`theme-${theme}`);
             
             // Update theme toggle icon
             this.updateThemeIcon(theme);
             
             // Update status display
             this.updateStatusDisplay();
+            
+            DEBUG.success(`Theme ${theme} applied successfully`);
             
         } catch (error) {
             DEBUG.reportError(error, 'Failed to apply theme');
