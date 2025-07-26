@@ -242,10 +242,31 @@ window.App = {
         
         let html = `<div class="project-content">`;
         
-        // Add back to home navigation
+        // Add back to home navigation with inline styles as backup
         html += `
             <nav class="project-navigation">
-                <button class="back-to-home-btn" onclick="App.goBackToHome()">
+                <button 
+                    class="back-to-home-btn" 
+                    onclick="App.goBackToHome()"
+                    style="
+                        background: transparent;
+                        border: 1px solid #e5e7eb;
+                        color: #6b7280;
+                        padding: 0.75rem 1.5rem;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-size: 0.875rem;
+                        font-weight: 500;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        font-family: inherit;
+                        text-decoration: none;
+                        transition: all 0.3s ease;
+                    "
+                    onmouseover="this.style.background='#2563eb'; this.style.color='#ffffff'; this.style.borderColor='#2563eb';"
+                    onmouseout="this.style.background='transparent'; this.style.color='#6b7280'; this.style.borderColor='#e5e7eb';"
+                >
                     ${backText}
                 </button>
             </nav>
@@ -549,7 +570,28 @@ window.App = {
         contentArea.innerHTML = `
             <div class="project-content">
                 <nav class="project-navigation">
-                    <button class="back-to-home-btn" onclick="App.goBackToHome()">
+                    <button 
+                        class="back-to-home-btn" 
+                        onclick="App.goBackToHome()"
+                        style="
+                            background: transparent;
+                            border: 1px solid #e5e7eb;
+                            color: #6b7280;
+                            padding: 0.75rem 1.5rem;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            font-size: 0.875rem;
+                            font-weight: 500;
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 0.5rem;
+                            font-family: inherit;
+                            text-decoration: none;
+                            transition: all 0.3s ease;
+                        "
+                        onmouseover="this.style.background='#2563eb'; this.style.color='#ffffff'; this.style.borderColor='#2563eb';"
+                        onmouseout="this.style.background='transparent'; this.style.color='#6b7280'; this.style.borderColor='#e5e7eb';"
+                    >
                         ${backText}
                     </button>
                 </nav>
