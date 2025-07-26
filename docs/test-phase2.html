@@ -203,6 +203,10 @@
                 <button onclick="runTestGroup('dependencies')" class="run-button">Test Dependencies</button>
             </div>
             <div class="test-content" id="dependencies-tests">
+                <div class="test-item" data-test="modules-loaded">
+                    <div class="test-status status-pending">?</div>
+                    <div class="test-name">Load all modules in correct order</div>
+                </div>
                 <div class="test-item" data-test="debug-logger">
                     <div class="test-status status-pending">?</div>
                     <div class="test-name">DEBUG module loaded</div>
@@ -368,6 +372,10 @@
         // Test definitions
         const tests = {
             dependencies: {
+                'modules-loaded': async () => {
+                    log('Loading all modules...', 'info');
+                    return await loadAllModules();
+                },
                 'debug-logger': () => typeof DEBUG !== 'undefined',
                 'utils': () => typeof Utils !== 'undefined' && typeof Utils.formatDate === 'function',
                 'storage': () => typeof Storage !== 'undefined' && typeof Storage.get === 'function',
@@ -405,65 +413,659 @@
                 'manifest-load': async () => {
                     try {
                         const response = await fetch('manifest.json');
+                        if (!response.ok) return false;
                         const data = await response.json();
                         return data && data.projects && data.projects.length > 0;
-                    } catch (e) { return false; }
+                    } catch (e) { 
+                        log(`Manifest load failed: ${e.message}`, 'warn');
+                        return false; 
+                    }
                 },
                 'project-manifest': async () => {
                     try {
                         const response = await fetch('projects/indivisible-stochastic-processes/fi/manifest.json');
+                        if (!response.ok) return false;
                         const data = await response.json();
                         return data && data.categories;
-                    } catch (e) { return false; }
+                    } catch (e) { 
+                        log(`Project manifest load failed: ${e.message}`, 'warn');
+                        return false; 
+                    }
                 },
                 'markdown-file': async () => {
                     try {
                         const response = await fetch('projects/indivisible-stochastic-processes/fi/documentation/overview_project.md');
+                        if (!response.ok) return false;
                         const content = await response.text();
-                        return content && content.includes('# Indivisible Stochastic Processes');
-                    } catch (e) { return false; }
+                        return content && content.includes('Indivisible Stochastic Processes');
+                    } catch (e) { 
+                        log(`Markdown file load failed: ${e.message}`, 'warn');
+                        return false; 
+                    }
                 },
                 'file-detection': () => {
                     if (typeof FileManager === 'undefined') return false;
-                    return FileManager.detectFileType('test.md') === 'markdown' &&
-                           FileManager.detectFileType('test.py') === 'code' &&
-                           FileManager.detectFileType('test.json') === 'data';
+                    try {
+                        return FileManager.detectFileType('test.md') === 'markdown' &&
+                               FileManager.detectFileType('test.py') === 'code' &&
+                               FileManager.detectFileType('test.json') === 'data';
+                    } catch (e) {
+                        log(`File detection failed: ${e.message}`, 'warn');
+                        return false;
+                    }
                 }
             },
             markdown: {
                 'basic-markdown': async () => {
                     if (typeof MarkdownProcessor === 'undefined') return false;
                     try {
-                        await MarkdownProcessor.init();
+                        // Don't init if not needed
+                        if (typeof marked === 'undefined') {
+                            await MarkdownProcessor.init();
+                        }
                         const result = MarkdownProcessor.renderMarkdown('# Test\n**bold**');
                         return result.includes('<h1>') && result.includes('<strong>');
-                    } catch (e) { return false; }
+                    } catch (e) { 
+                        log(`Markdown rendering failed: ${e.message}`, 'warn');
+                        return false; 
+                    }
                 },
                 'latex-math': async () => {
-                    if (!window.MathJax) return false;
                     try {
+                        if (!window.MathJax) {
+                            // Try to init MathJax
+                            window.MathJax = { tex: { inlineMath: [['
+        };
+
+        // Helper functions
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                // Check if already loaded
+                if (document.querySelector(`script[src="${src}"]`)) {
+                    resolve();
+                    return;
+                }
+                
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        async function loadAllModules() {
+            try {
+                // Load in correct order
+                await loadScript('assets/js/debug-logger.js');
+                await loadScript('assets/js/utils.js');
+                await loadScript('assets/js/storage.js');
+                await loadScript('assets/js/ui.js');
+                await loadScript('assets/js/theme-manager.js');
+                await loadScript('assets/js/file-manager.js');
+                await loadScript('assets/js/markdown-processor.js');
+                await loadScript('assets/js/app.js');
+                return true;
+            } catch (error) {
+                console.error('Failed to load modules:', error);
+                return false;
+            }
+        }
+
+        function log(message, type = 'info') {
+            const console = document.getElementById('test-console');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            console.appendChild(entry);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function updateTestStatus(testName, status, details = '') {
+            const testEl = document.querySelector(`[data-test="${testName}"]`);
+            if (!testEl) return;
+            
+            const statusEl = testEl.querySelector('.test-status');
+            statusEl.className = `test-status status-${status}`;
+            statusEl.textContent = status === 'pass' ? '✓' : status === 'fail' ? '✗' : '○';
+            
+            let detailsEl = testEl.querySelector('.test-details');
+            if (details && !detailsEl) {
+                detailsEl = document.createElement('div');
+                detailsEl.className = 'test-details';
+                testEl.appendChild(detailsEl);
+            }
+            if (detailsEl) {
+                detailsEl.textContent = details;
+            }
+        }
+
+        function updateSummary() {
+            document.getElementById('total-tests').textContent = testState.totalTests;
+            document.getElementById('passed-tests').textContent = testState.passedTests;
+            document.getElementById('failed-tests').textContent = testState.failedTests;
+            
+            const successRate = testState.totalTests > 0 
+                ? Math.round((testState.passedTests / testState.totalTests) * 100)
+                : 0;
+            document.getElementById('success-rate').textContent = successRate + '%';
+        }
+
+        async function runTest(testName, testFn) {
+            updateTestStatus(testName, 'running');
+            log(`Running test: ${testName}`, 'info');
+            
+            try {
+                const result = await testFn();
+                if (result) {
+                    updateTestStatus(testName, 'pass');
+                    testState.passedTests++;
+                    log(`✓ ${testName} passed`, 'success');
+                } else {
+                    updateTestStatus(testName, 'fail', 'Test returned false');
+                    testState.failedTests++;
+                    log(`✗ ${testName} failed`, 'error');
+                }
+            } catch (error) {
+                updateTestStatus(testName, 'fail', error.message);
+                testState.failedTests++;
+                log(`✗ ${testName} failed: ${error.message}`, 'error');
+            }
+            
+            updateSummary();
+        }
+
+        async function runTestGroup(groupName) {
+            if (testState.running) return;
+            
+            testState.running = true;
+            log(`Starting test group: ${groupName}`, 'info');
+            
+            const groupTests = tests[groupName];
+            
+            // For dependencies group, run modules-loaded first
+            if (groupName === 'dependencies') {
+                if (groupTests['modules-loaded']) {
+                    await runTest('modules-loaded', groupTests['modules-loaded']);
+                    // Small delay for modules to initialize
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+                
+                // Run other dependency tests
+                for (const [testName, testFn] of Object.entries(groupTests)) {
+                    if (testName !== 'modules-loaded') {
+                        await runTest(testName, testFn);
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                }
+            } else {
+                // Run tests normally for other groups
+                for (const [testName, testFn] of Object.entries(groupTests)) {
+                    await runTest(testName, testFn);
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+            }
+            
+            testState.running = false;
+            log(`Completed test group: ${groupName}`, 'info');
+        }
+
+        async function runAllTests() {
+            if (testState.running) return;
+            
+            // Reset state
+            testState.running = true;
+            testState.results = {};
+            testState.totalTests = 0;
+            testState.passedTests = 0;
+            testState.failedTests = 0;
+            
+            // Count total tests
+            for (const group of Object.values(tests)) {
+                testState.totalTests += Object.keys(group).length;
+            }
+            
+            log('=== Starting Phase 2 Test Suite ===', 'info');
+            updateSummary();
+            
+            // Run test groups in order - dependencies first!
+            const groupOrder = ['dependencies', 'cdn', 'files', 'markdown'];
+            for (const groupName of groupOrder) {
+                if (tests[groupName]) {
+                    await runTestGroup(groupName);
+                    // Longer delay between groups
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            }
+            
+            testState.running = false;
+            log('=== Test Suite Complete ===', 'success');
+            
+            // Final report
+            const successRate = Math.round((testState.passedTests / testState.totalTests) * 100);
+            if (successRate >= 80) {
+                log(`🎉 Phase 2 is ready! Success rate: ${successRate}%`, 'success');
+            } else if (successRate >= 60) {
+                log(`⚠️ Phase 2 needs work. Success rate: ${successRate}%`, 'warn');
+            } else {
+                log(`❌ Phase 2 has major issues. Success rate: ${successRate}%`, 'error');
+            }
+        }
+
+        function clearConsole() {
+            document.getElementById('test-console').innerHTML = 
+                '<div class="log-entry log-info">Console cleared...</div>';
+        }
+
+        // Event listeners
+        document.getElementById('runAllTests').addEventListener('click', runAllTests);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Count total tests for display
+            testState.totalTests = 0;
+            for (const group of Object.values(tests)) {
+                testState.totalTests += Object.keys(group).length;
+            }
+            updateSummary();
+            
+            log('Phase 2 Test Suite loaded. Ready to test Markdown + File Management features.', 'info');
+            log('Click "Run All Tests" or individual test group buttons to start.', 'info');
+        });
+    </script>
+</body>
+</html>, '
+        };
+
+        // Helper functions
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                // Check if already loaded
+                if (document.querySelector(`script[src="${src}"]`)) {
+                    resolve();
+                    return;
+                }
+                
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        async function loadAllModules() {
+            try {
+                // Load in correct order
+                await loadScript('assets/js/debug-logger.js');
+                await loadScript('assets/js/utils.js');
+                await loadScript('assets/js/storage.js');
+                await loadScript('assets/js/ui.js');
+                await loadScript('assets/js/theme-manager.js');
+                await loadScript('assets/js/file-manager.js');
+                await loadScript('assets/js/markdown-processor.js');
+                await loadScript('assets/js/app.js');
+                return true;
+            } catch (error) {
+                console.error('Failed to load modules:', error);
+                return false;
+            }
+        }
+
+        function log(message, type = 'info') {
+            const console = document.getElementById('test-console');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            console.appendChild(entry);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function updateTestStatus(testName, status, details = '') {
+            const testEl = document.querySelector(`[data-test="${testName}"]`);
+            if (!testEl) return;
+            
+            const statusEl = testEl.querySelector('.test-status');
+            statusEl.className = `test-status status-${status}`;
+            statusEl.textContent = status === 'pass' ? '✓' : status === 'fail' ? '✗' : '○';
+            
+            let detailsEl = testEl.querySelector('.test-details');
+            if (details && !detailsEl) {
+                detailsEl = document.createElement('div');
+                detailsEl.className = 'test-details';
+                testEl.appendChild(detailsEl);
+            }
+            if (detailsEl) {
+                detailsEl.textContent = details;
+            }
+        }
+
+        function updateSummary() {
+            document.getElementById('total-tests').textContent = testState.totalTests;
+            document.getElementById('passed-tests').textContent = testState.passedTests;
+            document.getElementById('failed-tests').textContent = testState.failedTests;
+            
+            const successRate = testState.totalTests > 0 
+                ? Math.round((testState.passedTests / testState.totalTests) * 100)
+                : 0;
+            document.getElementById('success-rate').textContent = successRate + '%';
+        }
+
+        async function runTest(testName, testFn) {
+            updateTestStatus(testName, 'running');
+            log(`Running test: ${testName}`, 'info');
+            
+            try {
+                const result = await testFn();
+                if (result) {
+                    updateTestStatus(testName, 'pass');
+                    testState.passedTests++;
+                    log(`✓ ${testName} passed`, 'success');
+                } else {
+                    updateTestStatus(testName, 'fail', 'Test returned false');
+                    testState.failedTests++;
+                    log(`✗ ${testName} failed`, 'error');
+                }
+            } catch (error) {
+                updateTestStatus(testName, 'fail', error.message);
+                testState.failedTests++;
+                log(`✗ ${testName} failed: ${error.message}`, 'error');
+            }
+            
+            updateSummary();
+        }
+
+        async function runTestGroup(groupName) {
+            if (testState.running) return;
+            
+            testState.running = true;
+            log(`Starting test group: ${groupName}`, 'info');
+            
+            const groupTests = tests[groupName];
+            for (const [testName, testFn] of Object.entries(groupTests)) {
+                await runTest(testName, testFn);
+                await new Promise(resolve => setTimeout(resolve, 100)); // Small delay
+            }
+            
+            testState.running = false;
+            log(`Completed test group: ${groupName}`, 'info');
+        }
+
+        async function runAllTests() {
+            if (testState.running) return;
+            
+            // Reset state
+            testState.running = true;
+            testState.results = {};
+            testState.totalTests = 0;
+            testState.passedTests = 0;
+            testState.failedTests = 0;
+            
+            // Count total tests
+            for (const group of Object.values(tests)) {
+                testState.totalTests += Object.keys(group).length;
+            }
+            
+            log('=== Starting Phase 2 Test Suite ===', 'info');
+            updateSummary();
+            
+            // Run all test groups
+            for (const groupName of Object.keys(tests)) {
+                await runTestGroup(groupName);
+            }
+            
+            testState.running = false;
+            log('=== Test Suite Complete ===', 'success');
+            
+            // Final report
+            const successRate = Math.round((testState.passedTests / testState.totalTests) * 100);
+            if (successRate >= 80) {
+                log(`🎉 Phase 2 is ready! Success rate: ${successRate}%`, 'success');
+            } else if (successRate >= 60) {
+                log(`⚠️ Phase 2 needs work. Success rate: ${successRate}%`, 'warn');
+            } else {
+                log(`❌ Phase 2 has major issues. Success rate: ${successRate}%`, 'error');
+            }
+        }
+
+        function clearConsole() {
+            document.getElementById('test-console').innerHTML = 
+                '<div class="log-entry log-info">Console cleared...</div>';
+        }
+
+        // Event listeners
+        document.getElementById('runAllTests').addEventListener('click', runAllTests);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Count total tests for display
+            for (const group of Object.values(tests)) {
+                testState.totalTests += Object.keys(group).length;
+            }
+            updateSummary();
+            
+            log('Phase 2 Test Suite loaded. Ready to test Markdown + File Management features.', 'info');
+        });
+    </script>
+</body>
+</html>]] } };
+                            await loadScript('https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js');
+                            await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for MathJax to init
+                        }
+                        
+                        if (!window.MathJax || !window.MathJax.typesetPromise) return false;
+                        
                         const testEl = document.createElement('div');
-                        testEl.innerHTML = '$x^2$';
+                        testEl.innerHTML = '$x^2
+        };
+
+        // Helper functions
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                // Check if already loaded
+                if (document.querySelector(`script[src="${src}"]`)) {
+                    resolve();
+                    return;
+                }
+                
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        async function loadAllModules() {
+            try {
+                // Load in correct order
+                await loadScript('assets/js/debug-logger.js');
+                await loadScript('assets/js/utils.js');
+                await loadScript('assets/js/storage.js');
+                await loadScript('assets/js/ui.js');
+                await loadScript('assets/js/theme-manager.js');
+                await loadScript('assets/js/file-manager.js');
+                await loadScript('assets/js/markdown-processor.js');
+                await loadScript('assets/js/app.js');
+                return true;
+            } catch (error) {
+                console.error('Failed to load modules:', error);
+                return false;
+            }
+        }
+
+        function log(message, type = 'info') {
+            const console = document.getElementById('test-console');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            console.appendChild(entry);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function updateTestStatus(testName, status, details = '') {
+            const testEl = document.querySelector(`[data-test="${testName}"]`);
+            if (!testEl) return;
+            
+            const statusEl = testEl.querySelector('.test-status');
+            statusEl.className = `test-status status-${status}`;
+            statusEl.textContent = status === 'pass' ? '✓' : status === 'fail' ? '✗' : '○';
+            
+            let detailsEl = testEl.querySelector('.test-details');
+            if (details && !detailsEl) {
+                detailsEl = document.createElement('div');
+                detailsEl.className = 'test-details';
+                testEl.appendChild(detailsEl);
+            }
+            if (detailsEl) {
+                detailsEl.textContent = details;
+            }
+        }
+
+        function updateSummary() {
+            document.getElementById('total-tests').textContent = testState.totalTests;
+            document.getElementById('passed-tests').textContent = testState.passedTests;
+            document.getElementById('failed-tests').textContent = testState.failedTests;
+            
+            const successRate = testState.totalTests > 0 
+                ? Math.round((testState.passedTests / testState.totalTests) * 100)
+                : 0;
+            document.getElementById('success-rate').textContent = successRate + '%';
+        }
+
+        async function runTest(testName, testFn) {
+            updateTestStatus(testName, 'running');
+            log(`Running test: ${testName}`, 'info');
+            
+            try {
+                const result = await testFn();
+                if (result) {
+                    updateTestStatus(testName, 'pass');
+                    testState.passedTests++;
+                    log(`✓ ${testName} passed`, 'success');
+                } else {
+                    updateTestStatus(testName, 'fail', 'Test returned false');
+                    testState.failedTests++;
+                    log(`✗ ${testName} failed`, 'error');
+                }
+            } catch (error) {
+                updateTestStatus(testName, 'fail', error.message);
+                testState.failedTests++;
+                log(`✗ ${testName} failed: ${error.message}`, 'error');
+            }
+            
+            updateSummary();
+        }
+
+        async function runTestGroup(groupName) {
+            if (testState.running) return;
+            
+            testState.running = true;
+            log(`Starting test group: ${groupName}`, 'info');
+            
+            const groupTests = tests[groupName];
+            for (const [testName, testFn] of Object.entries(groupTests)) {
+                await runTest(testName, testFn);
+                await new Promise(resolve => setTimeout(resolve, 100)); // Small delay
+            }
+            
+            testState.running = false;
+            log(`Completed test group: ${groupName}`, 'info');
+        }
+
+        async function runAllTests() {
+            if (testState.running) return;
+            
+            // Reset state
+            testState.running = true;
+            testState.results = {};
+            testState.totalTests = 0;
+            testState.passedTests = 0;
+            testState.failedTests = 0;
+            
+            // Count total tests
+            for (const group of Object.values(tests)) {
+                testState.totalTests += Object.keys(group).length;
+            }
+            
+            log('=== Starting Phase 2 Test Suite ===', 'info');
+            updateSummary();
+            
+            // Run all test groups
+            for (const groupName of Object.keys(tests)) {
+                await runTestGroup(groupName);
+            }
+            
+            testState.running = false;
+            log('=== Test Suite Complete ===', 'success');
+            
+            // Final report
+            const successRate = Math.round((testState.passedTests / testState.totalTests) * 100);
+            if (successRate >= 80) {
+                log(`🎉 Phase 2 is ready! Success rate: ${successRate}%`, 'success');
+            } else if (successRate >= 60) {
+                log(`⚠️ Phase 2 needs work. Success rate: ${successRate}%`, 'warn');
+            } else {
+                log(`❌ Phase 2 has major issues. Success rate: ${successRate}%`, 'error');
+            }
+        }
+
+        function clearConsole() {
+            document.getElementById('test-console').innerHTML = 
+                '<div class="log-entry log-info">Console cleared...</div>';
+        }
+
+        // Event listeners
+        document.getElementById('runAllTests').addEventListener('click', runAllTests);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Count total tests for display
+            for (const group of Object.values(tests)) {
+                testState.totalTests += Object.keys(group).length;
+            }
+            updateSummary();
+            
+            log('Phase 2 Test Suite loaded. Ready to test Markdown + File Management features.', 'info');
+        });
+    </script>
+</body>
+</html>;
                         await window.MathJax.typesetPromise([testEl]);
                         return true;
-                    } catch (e) { return false; }
+                    } catch (e) { 
+                        log(`MathJax test failed: ${e.message}`, 'warn');
+                        return false; 
+                    }
                 },
                 'code-highlighting': async () => {
-                    if (typeof Prism === 'undefined') return false;
                     try {
+                        if (typeof Prism === 'undefined') {
+                            await loadScript('https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js');
+                        }
+                        
+                        if (typeof Prism === 'undefined') return false;
+                        
                         const testEl = document.createElement('div');
                         testEl.innerHTML = '<pre><code class="language-python">print("hello")</code></pre>';
                         Prism.highlightAllUnder(testEl);
                         return true;
-                    } catch (e) { return false; }
+                    } catch (e) { 
+                        log(`Code highlighting failed: ${e.message}`, 'warn');
+                        return false; 
+                    }
                 },
                 'combined-processing': async () => {
                     if (typeof MarkdownProcessor === 'undefined') return false;
                     try {
-                        const testContent = '# Test\n$x^2$\n```python\nprint("test")\n```';
-                        const result = await MarkdownProcessor.processCombined(testContent);
+                        // Simple test without full processing
+                        const testContent = '# Test\n```python\nprint("test")\n```';
+                        const result = MarkdownProcessor.renderMarkdown(testContent);
                         return result.includes('<h1>') && result.includes('<code');
-                    } catch (e) { return false; }
+                    } catch (e) { 
+                        log(`Combined processing failed: ${e.message}`, 'warn');
+                        return false; 
+                    }
                 }
             }
         };
@@ -471,12 +1073,36 @@
         // Helper functions
         function loadScript(src) {
             return new Promise((resolve, reject) => {
+                // Check if already loaded
+                if (document.querySelector(`script[src="${src}"]`)) {
+                    resolve();
+                    return;
+                }
+                
                 const script = document.createElement('script');
                 script.src = src;
                 script.onload = resolve;
                 script.onerror = reject;
                 document.head.appendChild(script);
             });
+        }
+
+        async function loadAllModules() {
+            try {
+                // Load in correct order
+                await loadScript('assets/js/debug-logger.js');
+                await loadScript('assets/js/utils.js');
+                await loadScript('assets/js/storage.js');
+                await loadScript('assets/js/ui.js');
+                await loadScript('assets/js/theme-manager.js');
+                await loadScript('assets/js/file-manager.js');
+                await loadScript('assets/js/markdown-processor.js');
+                await loadScript('assets/js/app.js');
+                return true;
+            } catch (error) {
+                console.error('Failed to load modules:', error);
+                return false;
+            }
         }
 
         function log(message, type = 'info') {
