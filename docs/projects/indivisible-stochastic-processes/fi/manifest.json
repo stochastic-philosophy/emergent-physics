@@ -13,14 +13,14 @@
       "files": [
         {
           "name": "Tutkimuksen metodologia",
-          "filename": "methodology_indivisible_processes.md",
+          "filename": "articles/methodology_indivisible_processes.md",
           "description": "Tutkimusmenetelmien kuvaus ja perustelu",
           "tags": ["metodologia", "barandes", "hybrid-systems"],
           "created": "2025-01-25"
         },
         {
           "name": "Lopulliset johtopäätökset", 
-          "filename": "conclusions_final_analysis.md",
+          "filename": "articles/conclusions_final_analysis.md",
           "description": "Tutkimuksen keskeiset löydökset ja implikaatiot",
           "tags": ["johtopäätökset", "digital-physics", "complex-numbers"],
           "created": "2025-01-25"
@@ -34,49 +34,49 @@
       "files": [
         {
           "name": "Projektin yleiskuvaus",
-          "filename": "overview_project.md", 
+          "filename": "documentation/overview_project.md", 
           "description": "Kokonaisvaltainen kuvaus tutkimusprojektista",
           "tags": ["overview", "introduction"],
           "created": "2025-01-25"
         },
         {
           "name": "Tutkimusohjelma",
-          "filename": "overview_research_program.md",
+          "filename": "documentation/overview_research_program.md",
           "description": "Laaja tutkimusohjelma ja jatkosuunnitelmat", 
           "tags": ["roadmap", "future-research"],
           "created": "2025-01-25"
         },
         {
           "name": "Vaihe 1: Validointi",
-          "filename": "documentation_phase1_validation.md",
+          "filename": "documentation/documentation_phase1_validation.md",
           "description": "Mittareiden validoinnin dokumentaatio",
           "tags": ["phase1", "validation", "metrics"],
           "created": "2025-01-25"
         },
         {
           "name": "Vaihe 2: Satunnaisuusanalyysi", 
-          "filename": "documentation_phase2_randomness.md",
+          "filename": "documentation/documentation_phase2_randomness.md",
           "description": "Satunnaisuustyyppien systemaattinen testaus",
           "tags": ["phase2", "randomness", "monte-carlo"],
           "created": "2025-01-25"
         },
         {
           "name": "Vaihe 3: Hybridimallit",
-          "filename": "documentation_phase3_hybrids.md", 
+          "filename": "documentation/documentation_phase3_hybrids.md", 
           "description": "Edistyneiden hybridimallien kehitys",
           "tags": ["phase3", "hybrid-models", "optimization"],
           "created": "2025-01-25"
         },
         {
           "name": "Koodausohjeet",
-          "filename": "guidelines_coding_standards.md",
+          "filename": "documentation/guidelines_coding_standards.md",
           "description": "Dokumentointistandardit ja koodausohjeet",
           "tags": ["guidelines", "documentation", "standards"],
           "created": "2025-01-25"
         },
         {
           "name": "Seuraavat vaiheet",
-          "filename": "roadmap_next_steps.md",
+          "filename": "documentation/roadmap_next_steps.md",
           "description": "Jatkotutkimussuunnitelmat ja prioriteetit",
           "tags": ["roadmap", "future", "extensions"],
           "created": "2025-01-25"
@@ -90,28 +90,28 @@
       "files": [
         {
           "name": "Moduuli 1: Alustus ja referenssit",
-          "filename": "code_module01_setup.py",
+          "filename": "code/code_module01_setup.py",
           "description": "Perusasetukset ja referenssiprosessit",
           "tags": ["phase1", "setup", "reference-processes"],
           "created": "2025-01-25"
         },
         {
           "name": "Moduuli 2: Division Events",
-          "filename": "code_module02_division_detector.py", 
+          "filename": "code/code_module02_division_detector.py", 
           "description": "Division events tunnistusalgoritmit",
           "tags": ["phase1", "division-events", "detection"],
           "created": "2025-01-25"
         },
         {
           "name": "Moduuli 8: Hybridimallit",
-          "filename": "code_module08_advanced_models.py",
+          "filename": "code/code_module08_advanced_models.py",
           "description": "RMT + fraktaalit + perkolaatio hybridimallit", 
           "tags": ["phase3", "hybrid-models", "rmt", "fractals"],
           "created": "2025-01-25"
         },
         {
           "name": "Apufunktiot",
-          "filename": "utils_helper_functions.py",
+          "filename": "code/utils_helper_functions.py",
           "description": "Yleiset apufunktiot ja työkalut",
           "tags": ["utilities", "helpers"],
           "created": "2025-01-25"
@@ -125,28 +125,28 @@
       "files": [
         {
           "name": "Vaihe 1 tulokset",
-          "filename": "results_phase1_validation.json",
+          "filename": "results/results_phase1_validation.json",
           "description": "Validointitestien tulokset ja mittarit",
           "tags": ["phase1", "validation", "metrics"],
           "created": "2025-01-25"
         },
         {
           "name": "Vaihe 2 analyysi",
-          "filename": "results_phase2_randomness_analysis.json", 
+          "filename": "results/results_phase2_randomness_analysis.json", 
           "description": "Satunnaisuustyyppien vertailu ja ranking",
           "tags": ["phase2", "randomness", "analysis"],
           "created": "2025-01-25"
         },
         {
           "name": "Lopullinen raportti",
-          "filename": "results_final_report.json",
+          "filename": "results/results_final_report.json",
           "description": "Kattava tutkimusraportti kaikkine tuloksineen",
           "tags": ["final", "comprehensive", "report"],
           "created": "2025-01-25"
         },
         {
           "name": "Visualisoinnit", 
-          "filename": "figures_summary_plots.png",
+          "filename": "results/figures_summary_plots.png",
           "description": "Keskeiset kuvaajat ja visualisoinnit",
           "tags": ["figures", "plots", "visualization"],
           "created": "2025-01-25"
@@ -160,21 +160,21 @@
       "files": [
         {
           "name": "Tutkimusraportti (PDF)",
-          "filename": "indivisible_processes_report_fi.pdf",
+          "filename": "downloads/indivisible_processes_report_fi.pdf",
           "description": "Täydellinen tutkimusraportti PDF-muodossa",
           "tags": ["pdf", "report", "complete"],
           "created": "2025-01-25"
         },
         {
           "name": "Metodologia (Word)", 
-          "filename": "methodology_document_fi.docx",
+          "filename": "downloads/methodology_document_fi.docx",
           "description": "Metodologia-dokumentti Word-muodossa",
           "tags": ["docx", "methodology"],
           "created": "2025-01-25"
         },
         {
           "name": "Kaikki tiedostot (ZIP)",
-          "filename": "indivisible_processes_complete_fi.zip",
+          "filename": "downloads/indivisible_processes_complete_fi.zip",
           "description": "Kaikki projektin tiedostot pakattuna",
           "tags": ["zip", "complete", "archive"],
           "generated": true
@@ -193,22 +193,22 @@
   },
   
   "tags_index": {
-    "phase1": ["code_module01_setup.py", "code_module02_division_detector.py", "documentation_phase1_validation.md"],
-    "phase2": ["documentation_phase2_randomness.md", "results_phase2_randomness_analysis.json"],
-    "phase3": ["documentation_phase3_hybrids.md", "code_module08_advanced_models.py"],
-    "barandes": ["methodology_indivisible_processes.md", "overview_project.md"],
-    "hybrid-models": ["code_module08_advanced_models.py", "documentation_phase3_hybrids.md"],
-    "digital-physics": ["conclusions_final_analysis.md", "results_final_report.json"]
+    "phase1": ["code/code_module01_setup.py", "code/code_module02_division_detector.py", "documentation/documentation_phase1_validation.md"],
+    "phase2": ["documentation/documentation_phase2_randomness.md", "results/results_phase2_randomness_analysis.json"],
+    "phase3": ["documentation/documentation_phase3_hybrids.md", "code/code_module08_advanced_models.py"],
+    "barandes": ["articles/methodology_indivisible_processes.md", "documentation/overview_project.md"],
+    "hybrid-models": ["code/code_module08_advanced_models.py", "documentation/documentation_phase3_hybrids.md"],
+    "digital-physics": ["articles/conclusions_final_analysis.md", "results/results_final_report.json"]
   },
   
   "navigation_order": [
-    "overview_project.md",
-    "methodology_indivisible_processes.md", 
-    "documentation_phase1_validation.md",
-    "documentation_phase2_randomness.md",
-    "documentation_phase3_hybrids.md",
-    "conclusions_final_analysis.md",
-    "roadmap_next_steps.md"
+    "documentation/overview_project.md",
+    "articles/methodology_indivisible_processes.md", 
+    "documentation/documentation_phase1_validation.md",
+    "documentation/documentation_phase2_randomness.md",
+    "documentation/documentation_phase3_hybrids.md",
+    "articles/conclusions_final_analysis.md",
+    "documentation/roadmap_next_steps.md"
   ],
   
   "conversion_info": {
