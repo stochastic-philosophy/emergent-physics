@@ -113,9 +113,18 @@
         </div>
     </div>
 
-    <!-- JavaScript -->
+    <!-- JavaScript Modules (load order is important) -->
+    
+    <!-- Core utilities first -->
     <script src="assets/js/debug-logger.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/storage.js"></script>
+    
+    <!-- UI and theme management -->
+    <script src="assets/js/ui.js"></script>
     <script src="assets/js/theme-manager.js"></script>
+    
+    <!-- Main application (uses all modules above) -->
     <script src="assets/js/app.js"></script>
     
     <!-- Initialize Feather Icons -->
