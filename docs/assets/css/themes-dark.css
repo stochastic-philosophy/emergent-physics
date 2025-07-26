@@ -162,15 +162,23 @@ body.theme-dark {
     border-color: var(--border-color);
 }
 
-.theme-dark .back-to-home-btn {
-    color: var(--text-secondary);
-    border-color: var(--border-color);
+/* Back button styling - multiple selectors for specificity */
+.theme-dark .back-to-home-btn,
+.theme-dark button.back-to-home-btn,
+body.theme-dark .back-to-home-btn,
+body.theme-dark button.back-to-home-btn {
+    color: var(--text-secondary) !important;
+    border-color: var(--border-color) !important;
+    background: transparent !important;
 }
 
-.theme-dark .back-to-home-btn:hover {
-    background-color: var(--primary-color);
-    color: var(--primary-text);
-    border-color: var(--primary-color);
+.theme-dark .back-to-home-btn:hover,
+.theme-dark button.back-to-home-btn:hover,
+body.theme-dark .back-to-home-btn:hover,
+body.theme-dark button.back-to-home-btn:hover {
+    background-color: var(--primary-color) !important;
+    color: var(--primary-text) !important;
+    border-color: var(--primary-color) !important;
 }
 
 .theme-dark .file-item {
