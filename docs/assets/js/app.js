@@ -1,5 +1,5 @@
 /**
- * Main Application Logic (Modularized)
+ * Main Application Logic (Modularized + Phase 2 File Management)
  * Handles SPA coordination and delegates to specialized modules
  */
 
@@ -36,10 +36,10 @@ window.App = {
      * Initialize the application
      */
     init: function() {
-        DEBUG.info('=== INITIALIZING APP ===');
+        DEBUG.info('=== INITIALIZING APP (Phase 2) ===');
         
         try {
-            // Check for required dependencies
+            // Check for required dependencies (including new Phase 2 modules)
             if (!this.checkDependencies()) {
                 DEBUG.warn('Dependencies not ready, retrying in 100ms...');
                 setTimeout(() => this.init(), 100);
@@ -48,14 +48,18 @@ window.App = {
             
             DEBUG.success('All dependencies loaded, proceeding with initialization');
             
-            // Load manifest and set up app
-            this.loadManifest()
+            // Preload Markdown Processor libraries
+            this.preloadLibraries()
+                .then(() => {
+                    DEBUG.info('CDN libraries preloaded');
+                    return this.loadManifest();
+                })
                 .then(() => {
                     DEBUG.info('Manifest loaded, setting up navigation');
                     this.setupEventListeners();
                     this.handleInitialRoute();
                     this.state.initialized = true;
-                    DEBUG.success('=== APP INITIALIZED SUCCESSFULLY ===');
+                    DEBUG.success('=== APP INITIALIZED SUCCESSFULLY (Phase 2) ===');
                 })
                 .catch(error => {
                     DEBUG.reportError(error, 'App initialization failed');
@@ -68,10 +72,10 @@ window.App = {
     },
     
     /**
-     * Check if all required dependencies are loaded
+     * Check if all required dependencies are loaded (Phase 2)
      */
     checkDependencies: function() {
-        const required = ['ThemeManager', 'Utils', 'Storage', 'UI'];
+        const required = ['ThemeManager', 'Utils', 'Storage', 'UI', 'FileManager', 'MarkdownProcessor'];
         const missing = required.filter(dep => typeof window[dep] === 'undefined');
         
         if (missing.length > 0) {
@@ -80,6 +84,22 @@ window.App = {
         }
         
         return true;
+    },
+    
+    /**
+     * Preload CDN libraries for better performance
+     */
+    preloadLibraries: async function() {
+        DEBUG.info('Preloading CDN libraries...');
+        
+        try {
+            // Initialize MarkdownProcessor (loads Marked, MathJax, Prism)
+            await MarkdownProcessor.init();
+            DEBUG.success('Markdown processor libraries loaded');
+        } catch (error) {
+            DEBUG.warn('Failed to preload some libraries:', error);
+            // Continue anyway - libraries will load on demand
+        }
     },
     
     /**
@@ -174,6 +194,7 @@ window.App = {
         try {
             UI.showLoading();
             this.state.currentProject = projectId;
+            this.state.currentFile = null; // Reset file state
             
             // Update project highlighting
             UI.highlightActiveProject(projectId);
@@ -258,9 +279,13 @@ window.App = {
         `;
         html += `<h1>${Utils.escapeHtml(manifest.name || 'Project')}</h1>`;
         
+        if (manifest.description) {
+            html += `<p class="project-description">${Utils.escapeHtml(manifest.description)}</p>`;
+        }
+        
         if (manifest.categories) {
-            Object.entries(manifest.categories).forEach(([category, files]) => {
-                html += this.renderCategory(category, files, basePath);
+            Object.entries(manifest.categories).forEach(([categoryKey, categoryData]) => {
+                html += this.renderCategory(categoryKey, categoryData, basePath);
             });
         }
         
@@ -268,6 +293,83 @@ window.App = {
         contentArea.innerHTML = html;
         
         DEBUG.success('Project content rendered successfully');
+        
+        // Load file lists for each category
+        this.loadCategoryFiles(manifest, basePath);
+    },
+    
+    /**
+     * Load files for each category using FileManager
+     */
+    loadCategoryFiles: async function(manifest, basePath) {
+        if (!manifest.categories) return;
+        
+        for (const [categoryKey, categoryData] of Object.entries(manifest.categories)) {
+            try {
+                const categoryElement = document.querySelector(`[data-category="${categoryKey}"]`);
+                if (categoryElement) {
+                    categoryElement.innerHTML = '<div class="loading-files">Loading files...</div>';
+                    
+                    const filesList = await FileManager.listCategoryFiles(basePath, categoryKey, manifest);
+                    this.renderCategoryFiles(categoryElement, filesList, basePath);
+                }
+            } catch (error) {
+                DEBUG.error(`Failed to load files for category ${categoryKey}:`, error);
+                const categoryElement = document.querySelector(`[data-category="${categoryKey}"]`);
+                if (categoryElement) {
+                    categoryElement.innerHTML = '<div class="error-loading">Failed to load files</div>';
+                }
+            }
+        }
+    },
+    
+    /**
+     * Render files for a category
+     */
+    renderCategoryFiles: function(categoryElement, filesList, basePath) {
+        if (!filesList || !filesList.files || filesList.files.length === 0) {
+            categoryElement.innerHTML = '<div class="no-files">No files available</div>';
+            return;
+        }
+        
+        const currentLang = UI.getCurrentLanguage();
+        let html = '';
+        
+        filesList.files.forEach(file => {
+            const fileName = file.filename || file.name;
+            const displayName = file.name || Utils.filenameToDisplayName(fileName);
+            const description = file.description || '';
+            const filePath = file.path || `${basePath}${fileName}`;
+            const fileType = file.type || FileManager.detectFileType(fileName);
+            
+            html += `
+                <div class="file-item" data-file-path="${filePath}">
+                    <div class="file-info">
+                        <div class="file-header">
+                            <span class="file-name">${Utils.escapeHtml(displayName)}</span>
+                            <span class="file-type-badge file-type-${fileType}">${fileType}</span>
+                        </div>
+                        ${description ? `<div class="file-description">${Utils.escapeHtml(description)}</div>` : ''}
+                        ${file.tags && file.tags.length > 0 ? `<div class="file-tags">${file.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>` : ''}
+                    </div>
+                    <div class="file-actions">
+                        ${FileManager.isViewable(fileName) ? `
+                            <button class="view-btn" onclick="App.viewFile('${filePath}')">
+                                ${currentLang === 'fi' ? '👁️ Katso' : '👁️ View'}
+                            </button>
+                        ` : ''}
+                        ${FileManager.isDownloadable(fileName) ? `
+                            <button class="download-btn" onclick="App.downloadFile('${filePath}')">
+                                ${currentLang === 'fi' ? '📥 Lataa' : '📥 Download'}
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        });
+        
+        categoryElement.innerHTML = html;
+        DEBUG.info(`Rendered ${filesList.files.length} files for category`);
     },
     
     /**
@@ -323,34 +425,190 @@ window.App = {
     /**
      * Render a category section
      */
-    renderCategory: function(categoryName, files, basePath) {
-        let html = `<div class="category-section">`;
-        html += `<h2>${Utils.escapeHtml(categoryName)}</h2>`;
-        html += `<div class="files-list">`;
+    renderCategory: function(categoryName, categoryData, basePath) {
+        const displayName = categoryData.name || Utils.filenameToDisplayName(categoryName);
+        const description = categoryData.description || '';
         
-        if (files && files.files) {
-            files.files.forEach(file => {
-                const fileName = file.name || file.filename || file;
-                const filePath = `${basePath}${file.filename || file}`;
-                
-                html += `
-                    <div class="file-item" data-file-path="${filePath}">
-                        <span class="file-name">${Utils.escapeHtml(fileName)}</span>
-                        <div class="file-actions">
-                            <button class="view-btn" onclick="App.viewFile('${filePath}')">
-                                ${UI.getCurrentLanguage() === 'fi' ? 'Katso' : 'View'}
-                            </button>
-                            <button class="download-btn" onclick="App.downloadFile('${filePath}')">
-                                ${UI.getCurrentLanguage() === 'fi' ? 'Lataa' : 'Download'}
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
+        let html = `<div class="category-section">`;
+        html += `<div class="category-header">`;
+        html += `<h2>${Utils.escapeHtml(displayName)}</h2>`;
+        if (description) {
+            html += `<p class="category-description">${Utils.escapeHtml(description)}</p>`;
+        }
+        html += `</div>`;
+        html += `<div class="files-list" data-category="${categoryName}" data-path="${basePath}${categoryName}/">`;
+        html += `<div class="loading-files">Loading files...</div>`;
+        html += `</div></div>`;
+        
+        return html;
+    },
+    
+    /**
+     * View file content (NEW in Phase 2)
+     */
+    viewFile: async function(filePath) {
+        DEBUG.info(`=== VIEWING FILE: ${filePath} ===`);
+        
+        try {
+            UI.showLoading('Loading file content...');
+            
+            // Detect file type
+            const fileType = FileManager.detectFileType(filePath);
+            DEBUG.info(`File type detected: ${fileType}`);
+            
+            // Check if file is viewable
+            if (!FileManager.isViewable(filePath)) {
+                UI.hideLoading();
+                UI.showError(`File type not supported for viewing: ${fileType}`, true);
+                return;
+            }
+            
+            // Load file content
+            const content = await FileManager.loadFile(filePath);
+            
+            // Update state
+            this.state.currentFile = filePath;
+            
+            // Render content based on file type
+            await this.renderFileContent(content, fileType, filePath);
+            
+            // Update URL
+            const projectId = this.state.currentProject;
+            const fileName = filePath.split('/').pop();
+            this.updateUrl(projectId, fileName);
+            
+            // Update page title
+            const displayName = Utils.filenameToDisplayName(fileName);
+            UI.updatePageTitle(`${displayName} - ${projectId}`);
+            
+            UI.hideLoading();
+            DEBUG.success(`File viewing completed: ${filePath}`);
+            
+        } catch (error) {
+            DEBUG.reportError(error, `Failed to view file: ${filePath}`);
+            UI.hideLoading();
+            UI.showError(`Failed to load file: ${error.message}`, true);
+        }
+    },
+    
+    /**
+     * Render file content based on type (NEW in Phase 2)
+     */
+    renderFileContent: async function(content, fileType, filePath) {
+        const contentArea = document.querySelector(UI.selectors.mainContent);
+        if (!contentArea) {
+            throw new Error('Content area not found');
         }
         
-        html += `</div></div>`;
-        return html;
+        const currentLang = UI.getCurrentLanguage();
+        const backText = currentLang === 'fi' ? '← Takaisin projektiin' : '← Back to Project';
+        const fileName = filePath.split('/').pop();
+        const displayName = Utils.filenameToDisplayName(fileName);
+        
+        let html = `<div class="file-content">`;
+        html += `
+            <nav class="file-navigation">
+                ${UI.createBackButton(backText)}
+                <div class="file-info">
+                    <h1>${Utils.escapeHtml(displayName)}</h1>
+                    <span class="file-type-badge">${fileType}</span>
+                </div>
+                <div class="file-actions">
+                    <button onclick="App.downloadFile('${filePath}')" class="download-file-btn">
+                        ${currentLang === 'fi' ? '📥 Lataa' : '📥 Download'}
+                    </button>
+                </div>
+            </nav>
+        `;
+        
+        // Render content based on file type
+        switch (fileType) {
+            case 'markdown':
+                html += '<div class="markdown-content">';
+                html += await MarkdownProcessor.processCombined(content);
+                html += '</div>';
+                break;
+                
+            case 'code':
+                const language = this.detectCodeLanguage(fileName);
+                html += `<div class="code-content">`;
+                html += `<pre class="language-${language}"><code class="language-${language}">${Utils.escapeHtml(content)}</code></pre>`;
+                html += `</div>`;
+                break;
+                
+            case 'data':
+                if (fileName.endsWith('.json')) {
+                    try {
+                        const jsonData = typeof content === 'string' ? JSON.parse(content) : content;
+                        html += `<div class="json-content">`;
+                        html += `<pre class="language-json"><code class="language-json">${Utils.escapeHtml(JSON.stringify(jsonData, null, 2))}</code></pre>`;
+                        html += `</div>`;
+                    } catch (e) {
+                        html += `<div class="text-content"><pre>${Utils.escapeHtml(content)}</pre></div>`;
+                    }
+                } else {
+                    html += `<div class="text-content"><pre>${Utils.escapeHtml(content)}</pre></div>`;
+                }
+                break;
+                
+            default:
+                html += `<div class="text-content"><pre>${Utils.escapeHtml(content)}</pre></div>`;
+        }
+        
+        html += `</div>`;
+        
+        contentArea.innerHTML = html;
+        
+        // Apply syntax highlighting if needed
+        if (fileType === 'code' || (fileType === 'data' && fileName.endsWith('.json'))) {
+            MarkdownProcessor.highlightCode(contentArea);
+        }
+        
+        // Scroll to top
+        window.scrollTo(0, 0);
+    },
+    
+    /**
+     * Detect programming language from filename
+     */
+    detectCodeLanguage: function(fileName) {
+        const extension = Utils.getFileExtension(fileName);
+        const languageMap = {
+            'py': 'python',
+            'js': 'javascript',
+            'r': 'r',
+            'html': 'html',
+            'css': 'css',
+            'json': 'json',
+            'md': 'markdown',
+            'sh': 'bash',
+            'txt': 'text'
+        };
+        
+        return languageMap[extension] || 'text';
+    },
+    
+    /**
+     * Download file (NEW in Phase 2)
+     */
+    downloadFile: async function(filePath) {
+        DEBUG.info(`=== DOWNLOADING FILE: ${filePath} ===`);
+        
+        try {
+            // Check if file is downloadable
+            if (!FileManager.isDownloadable(filePath)) {
+                const fileName = filePath.split('/').pop();
+                UI.showNotification(`File type not supported for download: ${Utils.getFileExtension(fileName)}`, 'warning');
+                return;
+            }
+            
+            await FileManager.downloadFile(filePath);
+            DEBUG.success(`File download completed: ${filePath}`);
+            
+        } catch (error) {
+            DEBUG.reportError(error, `Failed to download file: ${filePath}`);
+            UI.showNotification('Failed to download file', 'error');
+        }
     },
     
     /**
@@ -375,16 +633,44 @@ window.App = {
     handleInitialRoute: function() {
         const params = Utils.parseQueryString();
         const project = params.project;
+        const file = params.file;
         
-        DEBUG.info(`Handling initial route. Project parameter: ${project}`);
+        DEBUG.info(`Handling initial route. Project: ${project}, File: ${file}`);
         
         if (project) {
             setTimeout(() => {
-                this.selectProject(project);
+                this.selectProject(project).then(() => {
+                    if (file) {
+                        // Try to find and view the file
+                        const filePath = this.findFileInProject(file);
+                        if (filePath) {
+                            this.viewFile(filePath);
+                        }
+                    }
+                });
             }, 200);
         } else {
             UI.showWelcomeScreen();
         }
+    },
+    
+    /**
+     * Find file in current project
+     */
+    findFileInProject: function(fileName) {
+        // This is a simple implementation - could be improved
+        const currentLang = UI.getCurrentLanguage();
+        const projectPath = `${this.config.projectsBasePath}${this.state.currentProject}/${currentLang}/`;
+        
+        // Try common paths
+        const commonPaths = [
+            `${projectPath}documentation/${fileName}`,
+            `${projectPath}articles/${fileName}`,
+            `${projectPath}code/${fileName}`,
+            `${projectPath}results/${fileName}`
+        ];
+        
+        return commonPaths[0]; // Return first guess for now
     },
     
     /**
@@ -405,11 +691,19 @@ window.App = {
     },
     
     /**
-     * Go back to home/welcome screen
+     * Go back to home/welcome screen or previous level
      */
     goBackToHome: function() {
-        DEBUG.info('Navigating back to home');
+        DEBUG.info('Navigating back');
         
+        // If viewing a file, go back to project
+        if (this.state.currentFile && this.state.currentProject) {
+            this.state.currentFile = null;
+            this.selectProject(this.state.currentProject);
+            return;
+        }
+        
+        // Otherwise go to home
         this.state.currentProject = null;
         this.state.currentFile = null;
         
@@ -424,22 +718,6 @@ window.App = {
         // Remove project highlighting
         const projectItems = document.querySelectorAll('.project-item');
         projectItems.forEach(item => item.classList.remove('active'));
-    },
-    
-    /**
-     * View file (placeholder - will be implemented in file manager)
-     */
-    viewFile: function(filePath) {
-        DEBUG.info(`Viewing file: ${filePath}`);
-        UI.showNotification('File viewing will be implemented in next phase', 'info');
-    },
-    
-    /**
-     * Download file (placeholder)
-     */
-    downloadFile: function(filePath) {
-        DEBUG.info(`Downloading file: ${filePath}`);
-        UI.showNotification('File downloading will be implemented in next phase', 'info');
     }
 };
 
