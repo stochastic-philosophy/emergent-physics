@@ -1,6 +1,6 @@
 /**
- * Main Application Logic (Modularized + Phase 2 File Management)
- * Handles SPA coordination and delegates to specialized modules
+ * Main Application Logic (Refactored)
+ * Coordinates between specialized modules and provides global state management
  */
 
 // Ensure DEBUG is available (fallback)
@@ -17,724 +17,384 @@ if (typeof DEBUG === 'undefined') {
 }
 
 window.App = {
-    // Application state
+    // Global application state
     state: {
         currentProject: null,
         currentFile: null,
-        projects: [],
-        initialized: false
+        initialized: false,
+        modules: {
+            projectManager: false,
+            contentRenderer: false,
+            navigationManager: false,
+            markdownProcessor: false,
+            fileManager: false,
+            themeManager: false,
+            ui: false,
+            storage: false,
+            utils: false
+        }
     },
     
-    // Configuration
+    // Application configuration
     config: {
-        manifestUrl: 'manifest.json',
-        projectsBasePath: 'projects/',
-        defaultProject: 'indivisible-stochastic-processes'
+        version: '2.0.0',
+        phase: 'Phase 2 - Refactored',
+        debug: localStorage.getItem('debug_mode') === 'true',
+        initTimeout: 10000, // 10 seconds
+        retryAttempts: 3
     },
     
     /**
      * Initialize the application
      */
-    init: function() {
-        DEBUG.info('=== INITIALIZING APP (Phase 2) ===');
+    init: async function() {
+        DEBUG.info('=== INITIALIZING APP (Refactored v2.0) ===');
         
         try {
-            // Check for required dependencies (including new Phase 2 modules)
+            // Check for required dependencies
             if (!this.checkDependencies()) {
-                DEBUG.warn('Dependencies not ready, retrying in 100ms...');
-                setTimeout(() => this.init(), 100);
+                DEBUG.warn('Dependencies not ready, retrying...');
+                await this.retryInitialization();
                 return;
             }
             
             DEBUG.success('All dependencies loaded, proceeding with initialization');
             
-            // Preload Markdown Processor libraries
-            this.preloadLibraries()
-                .then(() => {
-                    DEBUG.info('CDN libraries preloaded');
-                    return this.loadManifest();
-                })
-                .then(() => {
-                    DEBUG.info('Manifest loaded, setting up navigation');
-                    this.setupEventListeners();
-                    this.handleInitialRoute();
-                    this.state.initialized = true;
-                    DEBUG.success('=== APP INITIALIZED SUCCESSFULLY (Phase 2) ===');
-                })
-                .catch(error => {
-                    DEBUG.reportError(error, 'App initialization failed');
-                    UI.showError('Failed to initialize application', false);
-                });
-                
+            // Initialize in order: libraries → modules → navigation
+            await this.initializeLibraries();
+            await this.initializeModules(); 
+            await this.initializeNavigation();
+            
+            // Mark as initialized
+            this.state.initialized = true;
+            DEBUG.success('=== APP INITIALIZED SUCCESSFULLY (Refactored v2.0) ===');
+            
         } catch (error) {
-            DEBUG.reportError(error, 'Critical error during app initialization');
+            DEBUG.reportError(error, 'App initialization failed');
+            this.handleInitializationError(error);
         }
     },
     
     /**
-     * Check if all required dependencies are loaded (Phase 2)
+     * Check if all required dependencies are loaded
      */
     checkDependencies: function() {
-        const required = ['ThemeManager', 'Utils', 'Storage', 'UI', 'FileManager', 'MarkdownProcessor'];
-        const missing = required.filter(dep => typeof window[dep] === 'undefined');
+        const requiredModules = [
+            'ThemeManager', 'Utils', 'Storage', 'UI', 
+            'FileManager', 'MarkdownProcessor',
+            'ProjectManager', 'ContentRenderer', 'NavigationManager'
+        ];
+        
+        const missing = requiredModules.filter(dep => typeof window[dep] === 'undefined');
         
         if (missing.length > 0) {
             DEBUG.warn('Missing dependencies:', missing.join(', '));
             return false;
         }
         
+        // Update module states
+        this.updateModuleStates();
         return true;
     },
     
     /**
-     * Preload CDN libraries for better performance
+     * Update module availability states
      */
-    preloadLibraries: async function() {
-        DEBUG.info('Preloading CDN libraries...');
+    updateModuleStates: function() {
+        this.state.modules = {
+            projectManager: typeof ProjectManager !== 'undefined',
+            contentRenderer: typeof ContentRenderer !== 'undefined', 
+            navigationManager: typeof NavigationManager !== 'undefined',
+            markdownProcessor: typeof MarkdownProcessor !== 'undefined',
+            fileManager: typeof FileManager !== 'undefined',
+            themeManager: typeof ThemeManager !== 'undefined',
+            ui: typeof UI !== 'undefined',
+            storage: typeof Storage !== 'undefined',
+            utils: typeof Utils !== 'undefined'
+        };
+    },
+    
+    /**
+     * Retry initialization with backoff
+     */
+    retryInitialization: async function() {
+        for (let attempt = 1; attempt <= this.config.retryAttempts; attempt++) {
+            const delay = 100 * Math.pow(2, attempt - 1); // Exponential backoff
+            DEBUG.info(`Initialization attempt ${attempt}/${this.config.retryAttempts} in ${delay}ms...`);
+            
+            await Utils.sleep(delay);
+            
+            if (this.checkDependencies()) {
+                await this.init();
+                return;
+            }
+        }
+        
+        throw new Error('Failed to initialize after retries - dependencies not available');
+    },
+    
+    /**
+     * Initialize external libraries
+     */
+    initializeLibraries: async function() {
+        DEBUG.info('Initializing external libraries...');
         
         try {
-            // Initialize MarkdownProcessor (loads Marked, MathJax, Prism)
-            await MarkdownProcessor.init();
-            DEBUG.success('Markdown processor libraries loaded');
+            // Initialize MarkdownProcessor (loads CDN libraries)
+            if (MarkdownProcessor && MarkdownProcessor.init) {
+                await MarkdownProcessor.init();
+                DEBUG.success('Markdown processor libraries loaded');
+            }
         } catch (error) {
-            DEBUG.warn('Failed to preload some libraries:', error);
+            DEBUG.warn('Some libraries failed to load:', error);
             // Continue anyway - libraries will load on demand
         }
     },
     
     /**
-     * Load manifest.json with projects list
+     * Initialize application modules
      */
-    loadManifest: async function() {
-        DEBUG.info('Loading project manifest...');
+    initializeModules: async function() {
+        DEBUG.info('Initializing application modules...');
         
         try {
-            // Try to load from cache first
-            const cached = Storage.getCachedProject('manifest');
-            if (cached) {
-                DEBUG.info('Using cached manifest');
-                this.state.projects = cached.projects || [];
-                this.renderProjectsList();
-                return;
+            // Initialize modules in dependency order
+            if (ThemeManager && ThemeManager.init) {
+                ThemeManager.init();
             }
             
-            const response = await fetch(this.config.manifestUrl);
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            if (ProjectManager && ProjectManager.init) {
+                ProjectManager.init();
             }
             
-            const manifest = await response.json();
-            this.state.projects = manifest.projects || [];
+            if (ContentRenderer && ContentRenderer.init) {
+                ContentRenderer.init();
+            }
             
-            // Cache the manifest
-            Storage.cacheProject('manifest', manifest, 60 * 60 * 1000); // 1 hour
-            
-            DEBUG.success(`Loaded ${this.state.projects.length} projects from manifest`);
-            this.renderProjectsList();
-            
+            DEBUG.success('Application modules initialized');
         } catch (error) {
-            DEBUG.error('Failed to load manifest, using fallback');
-            // Fallback: use default project structure
-            this.state.projects = [{
-                id: 'indivisible-stochastic-processes',
-                name: {
-                    fi: 'Indivisible Stochastic Processes 1',
-                    en: 'Indivisible Stochastic Processes'
-                },
-                description: {
-                    fi: 'Tutkimus hybridijärjestelmien indivisible-käyttäytymisestä',
-                    en: 'Research on hybrid systems indivisible behavior'
-                }
-            }];
-            DEBUG.info('Using fallback project list');
-            this.renderProjectsList();
+            DEBUG.reportError(error, 'Module initialization failed');
+            throw error;
         }
     },
     
     /**
-     * Render projects list in navigation
+     * Initialize navigation
      */
-    renderProjectsList: function() {
-        DEBUG.info('Rendering projects list...');
-        const projectsList = document.querySelector(UI.selectors.projectsList);
-        if (!projectsList) {
-            DEBUG.error('Projects list element not found');
-            return;
-        }
-        
-        const currentLang = UI.getCurrentLanguage();
-        projectsList.innerHTML = '';
-        
-        this.state.projects.forEach(project => {
-            const projectElement = UI.createElement('div', {
-                className: 'project-item',
-                'data-project-id': project.id,
-                onclick: () => this.selectProject(project.id)
-            }, [
-                UI.createElement('h3', {
-                    className: 'project-title'
-                }, [project.name[currentLang] || project.name.fi]),
-                UI.createElement('p', {
-                    className: 'project-description'
-                }, [project.description[currentLang] || project.description.fi])
-            ]);
-            
-            projectsList.appendChild(projectElement);
-        });
-        
-        DEBUG.success(`Rendered ${this.state.projects.length} projects in navigation`);
-    },
-    
-    /**
-     * Select and load a project
-     */
-    selectProject: async function(projectId) {
-        DEBUG.info(`=== SELECTING PROJECT: ${projectId} ===`);
+    initializeNavigation: async function() {
+        DEBUG.info('Initializing navigation...');
         
         try {
-            UI.showLoading();
-            this.state.currentProject = projectId;
-            this.state.currentFile = null; // Reset file state
-            
-            // Update project highlighting
-            UI.highlightActiveProject(projectId);
-            
-            // Add to recent projects
-            const project = this.state.projects.find(p => p.id === projectId);
-            if (project) {
-                const currentLang = UI.getCurrentLanguage();
-                Storage.addRecentProject(projectId, project.name[currentLang] || project.name.fi);
+            if (NavigationManager && NavigationManager.init) {
+                NavigationManager.init();
             }
             
-            // Load project structure
-            await this.loadProjectStructure(projectId);
-            
-            // Update URL and page title
-            this.updateUrl(projectId);
-            const projectName = project ? (project.name[UI.getCurrentLanguage()] || project.name.fi) : projectId;
-            UI.updatePageTitle(projectName);
-            
-            UI.hideLoading();
-            DEBUG.success(`Project ${projectId} loaded successfully`);
-            
+            DEBUG.success('Navigation initialized');
         } catch (error) {
-            DEBUG.reportError(error, `Failed to load project: ${projectId}`);
-            UI.showError(`Failed to load project: ${projectId}`, true);
-            UI.hideLoading();
+            DEBUG.reportError(error, 'Navigation initialization failed');
+            throw error;
         }
     },
     
     /**
-     * Load project file structure
+     * Handle initialization errors
      */
-    loadProjectStructure: async function(projectId) {
-        DEBUG.info(`Loading project structure for: ${projectId}`);
+    handleInitializationError: function(error) {
+        DEBUG.error('Critical initialization error:', error);
         
-        const currentLang = UI.getCurrentLanguage();
-        const projectPath = `${this.config.projectsBasePath}${projectId}/${currentLang}/`;
-        
-        DEBUG.info(`Project path: ${projectPath}`);
-        
-        try {
-            // Try to load project-specific manifest
-            const projectManifestUrl = `${projectPath}manifest.json`;
-            DEBUG.info(`Fetching: ${projectManifestUrl}`);
-            
-            const response = await fetch(projectManifestUrl);
-            
-            if (response.ok) {
-                DEBUG.success('Project manifest loaded successfully');
-                const projectManifest = await response.json();
-                this.renderProjectContent(projectManifest, projectPath);
-            } else {
-                DEBUG.warn(`Project manifest not found (${response.status}), using basic structure`);
-                this.renderBasicProjectStructure(projectId, projectPath);
-            }
-            
-        } catch (error) {
-            DEBUG.error(`Error loading project manifest: ${error.message}`);
-            this.renderBasicProjectStructure(projectId, projectPath);
-        }
-    },
-    
-    /**
-     * Render project content from manifest
-     */
-    renderProjectContent: function(manifest, basePath) {
-        DEBUG.info('Rendering project content from manifest');
-        const contentArea = document.querySelector(UI.selectors.mainContent);
-        if (!contentArea) {
-            DEBUG.error('Content area not found!');
-            return;
-        }
-        
-        const currentLang = UI.getCurrentLanguage();
-        const backText = currentLang === 'fi' ? '← Takaisin etusivulle' : '← Back to Home';
-        
-        let html = `<div class="project-content">`;
-        html += `
-            <nav class="project-navigation">
-                ${UI.createBackButton(backText)}
-            </nav>
-        `;
-        html += `<h1>${Utils.escapeHtml(manifest.name || 'Project')}</h1>`;
-        
-        if (manifest.description) {
-            html += `<p class="project-description">${Utils.escapeHtml(manifest.description)}</p>`;
-        }
-        
-        if (manifest.categories) {
-            Object.entries(manifest.categories).forEach(([categoryKey, categoryData]) => {
-                html += this.renderCategory(categoryKey, categoryData, basePath);
-            });
-        }
-        
-        html += `</div>`;
-        contentArea.innerHTML = html;
-        
-        DEBUG.success('Project content rendered successfully');
-        
-        // Load file lists for each category
-        this.loadCategoryFiles(manifest, basePath);
-    },
-    
-    /**
-     * Load files for each category using FileManager
-     */
-    loadCategoryFiles: async function(manifest, basePath) {
-        if (!manifest.categories) return;
-        
-        for (const [categoryKey, categoryData] of Object.entries(manifest.categories)) {
-            try {
-                const categoryElement = document.querySelector(`[data-category="${categoryKey}"]`);
-                if (categoryElement) {
-                    categoryElement.innerHTML = '<div class="loading-files">Loading files...</div>';
-                    
-                    const filesList = await FileManager.listCategoryFiles(basePath, categoryKey, manifest);
-                    this.renderCategoryFiles(categoryElement, filesList, basePath);
-                }
-            } catch (error) {
-                DEBUG.error(`Failed to load files for category ${categoryKey}:`, error);
-                const categoryElement = document.querySelector(`[data-category="${categoryKey}"]`);
-                if (categoryElement) {
-                    categoryElement.innerHTML = '<div class="error-loading">Failed to load files</div>';
-                }
-            }
-        }
-    },
-    
-    /**
-     * Render files for a category
-     */
-    renderCategoryFiles: function(categoryElement, filesList, basePath) {
-        if (!filesList || !filesList.files || filesList.files.length === 0) {
-            categoryElement.innerHTML = '<div class="no-files">No files available</div>';
-            return;
-        }
-        
-        const currentLang = UI.getCurrentLanguage();
-        let html = '';
-        
-        filesList.files.forEach(file => {
-            const fileName = file.filename || file.name;
-            const displayName = file.name || Utils.filenameToDisplayName(fileName);
-            const description = file.description || '';
-            const filePath = file.path || `${basePath}${fileName}`;
-            const fileType = file.type || FileManager.detectFileType(fileName);
-            
-            html += `
-                <div class="file-item" data-file-path="${filePath}">
-                    <div class="file-info">
-                        <div class="file-header">
-                            <span class="file-name">${Utils.escapeHtml(displayName)}</span>
-                            <span class="file-type-badge file-type-${fileType}">${fileType}</span>
-                        </div>
-                        ${description ? `<div class="file-description">${Utils.escapeHtml(description)}</div>` : ''}
-                        ${file.tags && file.tags.length > 0 ? `<div class="file-tags">${file.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>` : ''}
-                    </div>
-                    <div class="file-actions">
-                        ${FileManager.isViewable(fileName) ? `
-                            <button class="view-btn" onclick="App.viewFile('${filePath}')">
-                                ${currentLang === 'fi' ? '👁️ Katso' : '👁️ View'}
-                            </button>
-                        ` : ''}
-                        ${FileManager.isDownloadable(fileName) ? `
-                            <button class="download-btn" onclick="App.downloadFile('${filePath}')">
-                                ${currentLang === 'fi' ? '📥 Lataa' : '📥 Download'}
-                            </button>
-                        ` : ''}
-                    </div>
+        if (UI && UI.showError) {
+            UI.showError('Failed to initialize application. Please refresh the page.', false);
+        } else {
+            // Fallback error display
+            document.body.innerHTML = `
+                <div style="padding: 2rem; text-align: center; color: #dc2626;">
+                    <h1>Application Error</h1>
+                    <p>Failed to initialize. Please refresh the page.</p>
+                    <pre style="margin-top: 1rem; padding: 1rem; background: #f5f5f5; border-radius: 4px;">
+                        ${error.message}
+                    </pre>
                 </div>
             `;
-        });
-        
-        categoryElement.innerHTML = html;
-        DEBUG.info(`Rendered ${filesList.files.length} files for category`);
+        }
     },
     
     /**
-     * Render basic project structure (fallback)
+     * Get current application state
      */
-    renderBasicProjectStructure: function(projectId, basePath) {
-        DEBUG.info('Rendering basic project structure (fallback)');
-        const contentArea = document.querySelector(UI.selectors.mainContent);
-        if (!contentArea) {
-            DEBUG.error('Content area not found!');
-            return;
+    getState: function() {
+        return {
+            ...this.state,
+            currentProject: ProjectManager ? ProjectManager.getCurrentProject() : null,
+            currentFile: ContentRenderer ? ContentRenderer.getCurrentFile() : null
+        };
+    },
+    
+    /**
+     * Set application state
+     */
+    setState: function(newState) {
+        Object.assign(this.state, newState);
+        
+        // Sync with individual modules
+        if (newState.currentProject && ProjectManager) {
+            ProjectManager.state.currentProject = newState.currentProject;
         }
         
-        const currentLang = UI.getCurrentLanguage();
-        const project = this.state.projects.find(p => p.id === projectId);
-        const projectName = project ? (project.name[currentLang] || project.name.fi) : projectId;
-        const backText = currentLang === 'fi' ? '← Takaisin etusivulle' : '← Back to Home';
-        
-        const categories = [
-            { key: 'articles', name: currentLang === 'fi' ? 'Artikkelit' : 'Articles' },
-            { key: 'documentation', name: currentLang === 'fi' ? 'Dokumentaatio' : 'Documentation' },
-            { key: 'code', name: currentLang === 'fi' ? 'Koodi' : 'Code' },
-            { key: 'results', name: currentLang === 'fi' ? 'Tulokset' : 'Results' },
-            { key: 'downloads', name: currentLang === 'fi' ? 'Lataukset' : 'Downloads' }
-        ];
-        
-        let html = `<div class="project-content">`;
-        html += `
-            <nav class="project-navigation">
-                ${UI.createBackButton(backText)}
-            </nav>
-        `;
-        html += `<h1>${Utils.escapeHtml(projectName)}</h1>`;
-        html += `<p class="project-loading">Loading project files...</p>`;
-        
-        categories.forEach(category => {
-            html += `
-                <div class="category-section">
-                    <h2>${Utils.escapeHtml(category.name)}</h2>
-                    <div class="files-list" data-category="${category.key}" data-path="${basePath}${category.key}/">
-                        <div class="loading-files">Loading files...</div>
-                    </div>
-                </div>
-            `;
-        });
-        
-        html += `</div>`;
-        contentArea.innerHTML = html;
-        
-        DEBUG.success('Basic project structure rendered successfully');
-    },
-    
-    /**
-     * Render a category section
-     */
-    renderCategory: function(categoryName, categoryData, basePath) {
-        const displayName = categoryData.name || Utils.filenameToDisplayName(categoryName);
-        const description = categoryData.description || '';
-        
-        let html = `<div class="category-section">`;
-        html += `<div class="category-header">`;
-        html += `<h2>${Utils.escapeHtml(displayName)}</h2>`;
-        if (description) {
-            html += `<p class="category-description">${Utils.escapeHtml(description)}</p>`;
+        if (newState.currentFile && ContentRenderer) {
+            ContentRenderer.state.currentFile = newState.currentFile;
         }
-        html += `</div>`;
-        html += `<div class="files-list" data-category="${categoryName}" data-path="${basePath}${categoryName}/">`;
-        html += `<div class="loading-files">Loading files...</div>`;
-        html += `</div></div>`;
         
-        return html;
+        DEBUG.info('App state updated:', newState);
     },
     
     /**
-     * View file content (NEW in Phase 2)
+     * Get module status
      */
-    viewFile: async function(filePath) {
-        DEBUG.info(`=== VIEWING FILE: ${filePath} ===`);
+    getModuleStatus: function() {
+        this.updateModuleStates();
+        return this.state.modules;
+    },
+    
+    /**
+     * Check if app is ready
+     */
+    isReady: function() {
+        return this.state.initialized && this.checkDependencies();
+    },
+    
+    /**
+     * Get app information
+     */
+    getInfo: function() {
+        return {
+            version: this.config.version,
+            phase: this.config.phase,
+            initialized: this.state.initialized,
+            modules: this.getModuleStatus(),
+            state: this.getState()
+        };
+    },
+    
+    /**
+     * Restart application
+     */
+    restart: async function() {
+        DEBUG.info('Restarting application...');
         
         try {
-            UI.showLoading('Loading file content...');
+            // Reset state
+            this.state.initialized = false;
+            this.state.currentProject = null;
+            this.state.currentFile = null;
             
-            // Detect file type
-            const fileType = FileManager.detectFileType(filePath);
-            DEBUG.info(`File type detected: ${fileType}`);
-            
-            // Check if file is viewable
-            if (!FileManager.isViewable(filePath)) {
-                UI.hideLoading();
-                UI.showError(`File type not supported for viewing: ${fileType}`, true);
-                return;
+            // Clear module states
+            if (ProjectManager) {
+                ProjectManager.state.currentProject = null;
+            }
+            if (ContentRenderer) {
+                ContentRenderer.clearCurrentFile();
             }
             
-            // Load file content
-            const content = await FileManager.loadFile(filePath);
+            // Show loading
+            if (UI) UI.showLoading('Restarting application...');
             
-            // Update state
-            this.state.currentFile = filePath;
+            // Re-initialize
+            await this.init();
             
-            // Render content based on file type
-            await this.renderFileContent(content, fileType, filePath);
+            // Hide loading
+            if (UI) UI.hideLoading();
             
-            // Update URL
-            const projectId = this.state.currentProject;
-            const fileName = filePath.split('/').pop();
-            this.updateUrl(projectId, fileName);
-            
-            // Update page title
-            const displayName = Utils.filenameToDisplayName(fileName);
-            UI.updatePageTitle(`${displayName} - ${projectId}`);
-            
-            UI.hideLoading();
-            DEBUG.success(`File viewing completed: ${filePath}`);
+            DEBUG.success('Application restarted successfully');
             
         } catch (error) {
-            DEBUG.reportError(error, `Failed to view file: ${filePath}`);
-            UI.hideLoading();
-            UI.showError(`Failed to load file: ${error.message}`, true);
+            DEBUG.reportError(error, 'Application restart failed');
+            this.handleInitializationError(error);
         }
     },
     
     /**
-     * Render file content based on type (NEW in Phase 2)
+     * Enable/disable debug mode
      */
-    renderFileContent: async function(content, fileType, filePath) {
-        const contentArea = document.querySelector(UI.selectors.mainContent);
-        if (!contentArea) {
-            throw new Error('Content area not found');
+    setDebugMode: function(enabled) {
+        this.config.debug = enabled;
+        localStorage.setItem('debug_mode', enabled.toString());
+        
+        if (DEBUG && DEBUG.setEnabled) {
+            DEBUG.setEnabled(enabled);
         }
         
-        const currentLang = UI.getCurrentLanguage();
-        const backText = currentLang === 'fi' ? '← Takaisin projektiin' : '← Back to Project';
-        const fileName = filePath.split('/').pop();
-        const displayName = Utils.filenameToDisplayName(fileName);
-        
-        let html = `<div class="file-content">`;
-        html += `
-            <nav class="file-navigation">
-                ${UI.createBackButton(backText)}
-                <div class="file-info">
-                    <h1>${Utils.escapeHtml(displayName)}</h1>
-                    <span class="file-type-badge">${fileType}</span>
-                </div>
-                <div class="file-actions">
-                    <button onclick="App.downloadFile('${filePath}')" class="download-file-btn">
-                        ${currentLang === 'fi' ? '📥 Lataa' : '📥 Download'}
-                    </button>
-                </div>
-            </nav>
-        `;
-        
-        // Render content based on file type
-        switch (fileType) {
-            case 'markdown':
-                html += '<div class="markdown-content">';
-                html += await MarkdownProcessor.processCombined(content);
-                html += '</div>';
-                break;
-                
-            case 'code':
-                const language = this.detectCodeLanguage(fileName);
-                html += `<div class="code-content">`;
-                html += `<pre class="language-${language}"><code class="language-${language}">${Utils.escapeHtml(content)}</code></pre>`;
-                html += `</div>`;
-                break;
-                
-            case 'data':
-                if (fileName.endsWith('.json')) {
-                    try {
-                        const jsonData = typeof content === 'string' ? JSON.parse(content) : content;
-                        html += `<div class="json-content">`;
-                        html += `<pre class="language-json"><code class="language-json">${Utils.escapeHtml(JSON.stringify(jsonData, null, 2))}</code></pre>`;
-                        html += `</div>`;
-                    } catch (e) {
-                        html += `<div class="text-content"><pre>${Utils.escapeHtml(content)}</pre></div>`;
-                    }
-                } else {
-                    html += `<div class="text-content"><pre>${Utils.escapeHtml(content)}</pre></div>`;
-                }
-                break;
-                
-            default:
-                html += `<div class="text-content"><pre>${Utils.escapeHtml(content)}</pre></div>`;
-        }
-        
-        html += `</div>`;
-        
-        contentArea.innerHTML = html;
-        
-        // Apply syntax highlighting if needed
-        if (fileType === 'code' || (fileType === 'data' && fileName.endsWith('.json'))) {
-            MarkdownProcessor.highlightCode(contentArea);
-        }
-        
-        // Scroll to top
-        window.scrollTo(0, 0);
+        DEBUG.info(`Debug mode ${enabled ? 'enabled' : 'disabled'}`);
     },
     
     /**
-     * Detect programming language from filename
+     * Get debug information
      */
-    detectCodeLanguage: function(fileName) {
-        const extension = Utils.getFileExtension(fileName);
-        const languageMap = {
-            'py': 'python',
-            'js': 'javascript',
-            'r': 'r',
-            'html': 'html',
-            'css': 'css',
-            'json': 'json',
-            'md': 'markdown',
-            'sh': 'bash',
-            'txt': 'text'
+    getDebugInfo: function() {
+        return {
+            config: this.config,
+            state: this.getState(),
+            modules: this.getModuleStatus(),
+            performance: {
+                loadTime: Date.now() - (window.performance.timing.navigationStart || 0),
+                memory: window.performance.memory ? {
+                    used: window.performance.memory.usedJSHeapSize,
+                    total: window.performance.memory.totalJSHeapSize,
+                    limit: window.performance.memory.jsHeapSizeLimit
+                } : null
+            },
+            storage: Storage ? Storage.getUsageInfo() : null,
+            cache: FileManager ? FileManager.getCacheStats() : null
+        };
+    },
+    
+    /**
+     * Export app state for debugging
+     */
+    exportState: function() {
+        const state = {
+            app: this.getDebugInfo(),
+            timestamp: new Date().toISOString(),
+            url: window.location.href,
+            userAgent: navigator.userAgent
         };
         
-        return languageMap[extension] || 'text';
+        return JSON.stringify(state, null, 2);
     },
     
     /**
-     * Download file (NEW in Phase 2)
+     * Handle global errors
      */
-    downloadFile: async function(filePath) {
-        DEBUG.info(`=== DOWNLOADING FILE: ${filePath} ===`);
+    handleGlobalError: function(error, source = 'unknown') {
+        DEBUG.reportError(error, `Global error from ${source}`);
         
-        try {
-            // Check if file is downloadable
-            if (!FileManager.isDownloadable(filePath)) {
-                const fileName = filePath.split('/').pop();
-                UI.showNotification(`File type not supported for download: ${Utils.getFileExtension(fileName)}`, 'warning');
-                return;
-            }
-            
-            await FileManager.downloadFile(filePath);
-            DEBUG.success(`File download completed: ${filePath}`);
-            
-        } catch (error) {
-            DEBUG.reportError(error, `Failed to download file: ${filePath}`);
-            UI.showNotification('Failed to download file', 'error');
+        // Don't show error UI if we're not initialized yet
+        if (!this.state.initialized) return;
+        
+        if (UI && UI.showNotification) {
+            UI.showNotification('An error occurred. Check debug tools for details.', 'error');
         }
-    },
-    
-    /**
-     * Setup event listeners
-     */
-    setupEventListeners: function() {
-        // Handle browser back/forward buttons
-        window.addEventListener('popstate', (e) => {
-            if (e.state && e.state.project) {
-                this.selectProject(e.state.project);
-            } else {
-                this.goBackToHome();
-            }
-        });
-        
-        DEBUG.info('Event listeners set up');
-    },
-    
-    /**
-     * Handle initial route on page load
-     */
-    handleInitialRoute: function() {
-        const params = Utils.parseQueryString();
-        const project = params.project;
-        const file = params.file;
-        
-        DEBUG.info(`Handling initial route. Project: ${project}, File: ${file}`);
-        
-        if (project) {
-            setTimeout(() => {
-                this.selectProject(project).then(() => {
-                    if (file) {
-                        // Try to find and view the file
-                        const filePath = this.findFileInProject(file);
-                        if (filePath) {
-                            this.viewFile(filePath);
-                        }
-                    }
-                });
-            }, 200);
-        } else {
-            UI.showWelcomeScreen();
-        }
-    },
-    
-    /**
-     * Find file in current project
-     */
-    findFileInProject: function(fileName) {
-        // This is a simple implementation - could be improved
-        const currentLang = UI.getCurrentLanguage();
-        const projectPath = `${this.config.projectsBasePath}${this.state.currentProject}/${currentLang}/`;
-        
-        // Try common paths
-        const commonPaths = [
-            `${projectPath}documentation/${fileName}`,
-            `${projectPath}articles/${fileName}`,
-            `${projectPath}code/${fileName}`,
-            `${projectPath}results/${fileName}`
-        ];
-        
-        return commonPaths[0]; // Return first guess for now
-    },
-    
-    /**
-     * Update URL without page reload
-     */
-    updateUrl: function(projectId, fileId = null) {
-        const params = { project: projectId };
-        if (fileId) params.file = fileId;
-        
-        const queryString = Utils.buildQueryString(params);
-        const url = `${window.location.pathname}?${queryString}`;
-        
-        window.history.pushState(
-            { project: projectId, file: fileId },
-            '',
-            url
-        );
-    },
-    
-    /**
-     * Go back to home/welcome screen or previous level
-     */
-    goBackToHome: function() {
-        DEBUG.info('Navigating back');
-        
-        // If viewing a file, go back to project
-        if (this.state.currentFile && this.state.currentProject) {
-            this.state.currentFile = null;
-            this.selectProject(this.state.currentProject);
-            return;
-        }
-        
-        // Otherwise go to home
-        this.state.currentProject = null;
-        this.state.currentFile = null;
-        
-        // Reset URL
-        const url = window.location.pathname;
-        window.history.pushState({}, '', url);
-        
-        // Show welcome screen
-        UI.showWelcomeScreen();
-        UI.updatePageTitle(null);
-        
-        // Remove project highlighting
-        const projectItems = document.querySelectorAll('.project-item');
-        projectItems.forEach(item => item.classList.remove('active'));
     }
 };
 
-// Create global reference for Navigation (backward compatibility)
-window.Navigation = {
-    goBackToHome: function() {
-        App.goBackToHome();
-    }
-};
+// Global error handlers
+window.addEventListener('error', function(e) {
+    App.handleGlobalError(e.error || e, 'window.error');
+});
+
+window.addEventListener('unhandledrejection', function(e) {
+    App.handleGlobalError(e.reason, 'unhandledrejection');
+    e.preventDefault(); // Prevent console spam
+});
 
 /**
  * Initialize app when DOM is ready
  */
 document.addEventListener('DOMContentLoaded', function() {
-    // Small delay to ensure other modules are ready
+    // Small delay to ensure other modules are loaded
     setTimeout(() => {
-        App.init();
+        App.init().catch(error => {
+            DEBUG.reportError(error, 'Failed to initialize app from DOMContentLoaded');
+        });
     }, 200);
 });
 
@@ -742,3 +402,10 @@ document.addEventListener('DOMContentLoaded', function() {
  * Make App globally available
  */
 window.App = App;
+
+/**
+ * Export for Node.js compatibility
+ */
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = App;
+}
