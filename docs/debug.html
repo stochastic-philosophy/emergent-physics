@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Tools - Emergent Physics Research</title>
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            line-height: 1.4;
+        }
+        
+        .debug-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .debug-header {
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ff6b35;
+        }
+        
+        .debug-header h1 {
+            color: #ff6b35;
+            margin-bottom: 10px;
+        }
+        
+        .debug-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .debug-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .debug-panel {
+            background: #2d2d2d;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #404040;
+        }
+        
+        .debug-panel-header {
+            background: #3d3d3d;
+            padding: 15px;
+            font-weight: bold;
+            color: #4CAF50;
+            border-bottom: 1px solid #404040;
+        }
+        
+        .debug-panel-content {
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .debug-console {
+            background: #1a1a1a;
+            border: 1px solid #404040;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .debug-log {
+            margin-bottom: 5px;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        .debug-info {
+            color: #2196F3;
+            background: rgba(33, 150, 243, 0.1);
+        }
+        
+        .debug-warn {
+            color: #FF9800;
+            background: rgba(255, 152, 0, 0.1);
+        }
+        
+        .debug-error {
+            color: #f44336;
+            background: rgba(244, 67, 54, 0.1);
+            font-weight: bold;
+        }
+        
+        .debug-success {
+            color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+        
+        .test-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .test-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+        
+        .test-btn:hover {
+            background: #45a049;
+        }
+        
+        .test-btn.warning {
+            background: #FF9800;
+        }
+        
+        .test-btn.warning:hover {
+            background: #e68900;
+        }
+        
+        .test-btn.danger {
+            background: #f44336;
+        }
+        
+        .test-btn.danger:hover {
+            background: #da190b;
+        }
+        
+        .storage-viewer {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .storage-item {
+            margin-bottom: 8px;
+            padding: 5px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 3px;
+        }
+        
+        .storage-key {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .storage-value {
+            color: #e0e0e0;
+            margin-left: 10px;
+        }
+        
+        .clear-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        
+        .network-log {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .network-request {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-radius: 3px;
+            background: rgba(33, 150, 243, 0.1);
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #4CAF50;
+            text-decoration: none;
+            padding: 10px 15px;
+            background: #2d2d2d;
+            border-radius: 4px;
+            border: 1px solid #4CAF50;
+        }
+        
+        .back-link:hover {
+            background: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <div class="debug-header">
+            <h1>🐛 Debug Tools</h1>
+            <p>Tablet-ystävällinen virheenhallinta ja testaustyökalut</p>
+        </div>
+
+        <div class="debug-grid">
+            <!-- Console Output -->
+            <div class="debug-panel">
+                <div class="debug-panel-header">
+                    📝 Console Output
+                </div>
+                <div class="debug-panel-content">
+                    <div class="test-buttons">
+                        <button class="test-btn" onclick="debugTest('info')">Test Info</button>
+                        <button class="test-btn warning" onclick="debugTest('warn')">Test Warning</button>
+                        <button class="test-btn danger" onclick="debugTest('error')">Test Error</button>
+                        <button class="test-btn" onclick="clearConsole()">Clear Console</button>
+                    </div>
+                    <div id="debug-console" class="debug-console">
+                        <div class="debug-info">Debug tools initialized...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LocalStorage Viewer -->
+            <div class="debug-panel">
+                <div class="debug-panel-header">
+                    💾 LocalStorage
+                </div>
+                <div class="debug-panel-content">
+                    <div class="test-buttons">
+                        <button class="test-btn" onclick="refreshStorage()">Refresh</button>
+                        <button class="test-btn warning" onclick="testStorage()">Test Storage</button>
+                        <button class="test-btn danger" onclick="clearStorage()">Clear All</button>
+                    </div>
+                    <div id="storage-viewer" class="storage-viewer">
+                        <!-- Storage contents will be shown here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Network Monitor -->
+            <div class="debug-panel">
+                <div class="debug-panel-header">
+                    🌐 Network Monitor
+                </div>
+                <div class="debug-panel-content">
+                    <div class="test-buttons">
+                        <button class="test-btn" onclick="testNetworkRequest()">Test Request</button>
+                        <button class="test-btn" onclick="clearNetworkLog()">Clear Log</button>
+                    </div>
+                    <div id="network-log" class="network-log">
+                        <div class="debug-info">Network monitoring active...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Function Tests -->
+            <div class="debug-panel">
+                <div class="debug-panel-header">
+                    ⚙️ Function Tests
+                </div>
+                <div class="debug-panel-content">
+                    <div class="test-buttons">
+                        <button class="test-btn" onclick="testThemeManager()">Theme Manager</button>
+                        <button class="test-btn" onclick="testLanguageManager()">Language Manager</button>
+                        <button class="test-btn" onclick="testFileManager()">File Manager</button>
+                        <button class="test-btn warning" onclick="simulateError()">Simulate Error</button>
+                    </div>
+                    <div id="function-test-results" class="debug-console">
+                        <!-- Function test results will appear here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a href="index.html" class="back-link">← Takaisin pääsivulle</a>
+    </div>
+
+    <script>
+        // Global debug logger
+        window.DEBUG = {
+            log: function(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const logElement = document.createElement('div');
+                logElement.className = `debug-log debug-${type}`;
+                logElement.innerHTML = `[${timestamp}] ${message}`;
+                
+                const console = document.getElementById('debug-console');
+                console.appendChild(logElement);
+                console.scrollTop = console.scrollHeight;
+                
+                // Also log to browser console
+                console[type] ? console[type](message) : console.log(message);
+            },
+            
+            info: function(message) { this.log(message, 'info'); },
+            warn: function(message) { this.log(message, 'warn'); },
+            error: function(message) { this.log(message, 'error'); },
+            success: function(message) { this.log(message, 'success'); }
+        };
+
+        // Capture all errors
+        window.addEventListener('error', function(e) {
+            DEBUG.error(`Global Error: ${e.message} at ${e.filename}:${e.lineno}`);
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            DEBUG.error(`Unhandled Promise Rejection: ${e.reason}`);
+        });
+
+        // Override console methods to capture them
+        const originalConsole = {
+            log: console.log,
+            warn: console.warn,
+            error: console.error,
+            info: console.info
+        };
+
+        console.log = function(...args) {
+            DEBUG.info(args.join(' '));
+            originalConsole.log.apply(console, args);
+        };
+
+        console.warn = function(...args) {
+            DEBUG.warn(args.join(' '));
+            originalConsole.warn.apply(console, args);
+        };
+
+        console.error = function(...args) {
+            DEBUG.error(args.join(' '));
+            originalConsole.error.apply(console, args);
+        };
+
+        console.info = function(...args) {
+            DEBUG.info(args.join(' '));
+            originalConsole.info.apply(console, args);
+        };
+
+        // Debug test functions
+        function debugTest(type) {
+            const messages = {
+                info: 'This is a test info message',
+                warn: 'This is a test warning message', 
+                error: 'This is a test error message'
+            };
+            DEBUG[type](messages[type]);
+        }
+
+        function clearConsole() {
+            document.getElementById('debug-console').innerHTML = 
+                '<div class="debug-info">Console cleared...</div>';
+        }
+
+        function refreshStorage() {
+            const viewer = document.getElementById('storage-viewer');
+            viewer.innerHTML = '';
+            
+            if (localStorage.length === 0) {
+                viewer.innerHTML = '<div class="debug-info">LocalStorage is empty</div>';
+                return;
+            }
+
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                
+                const item = document.createElement('div');
+                item.className = 'storage-item';
+                item.innerHTML = `
+                    <span class="storage-key">${key}:</span>
+                    <span class="storage-value">${value}</span>
+                `;
+                viewer.appendChild(item);
+            }
+        }
+
+        function testStorage() {
+            const testKey = 'debug_test_' + Date.now();
+            const testValue = 'Test value: ' + new Date().toISOString();
+            
+            try {
+                localStorage.setItem(testKey, testValue);
+                const retrieved = localStorage.getItem(testKey);
+                localStorage.removeItem(testKey);
+                
+                if (retrieved === testValue) {
+                    DEBUG.success('LocalStorage test passed');
+                } else {
+                    DEBUG.error('LocalStorage test failed - value mismatch');
+                }
+            } catch (e) {
+                DEBUG.error(`LocalStorage test failed: ${e.message}`);
+            }
+            
+            refreshStorage();
+        }
+
+        function clearStorage() {
+            if (confirm('Are you sure you want to clear all localStorage?')) {
+                localStorage.clear();
+                DEBUG.warn('LocalStorage cleared');
+                refreshStorage();
+            }
+        }
+
+        function testNetworkRequest() {
+            const testUrl = 'manifest.json'; // Test if manifest exists
+            
+            DEBUG.info(`Testing network request to: ${testUrl}`);
+            
+            fetch(testUrl)
+                .then(response => {
+                    logNetworkRequest('GET', testUrl, response.status, 'success');
+                    return response.text();
+                })
+                .then(data => {
+                    DEBUG.success(`Network request successful. Data length: ${data.length} chars`);
+                })
+                .catch(error => {
+                    logNetworkRequest('GET', testUrl, 'error', 'failed');
+                    DEBUG.error(`Network request failed: ${error.message}`);
+                });
+        }
+
+        function logNetworkRequest(method, url, status, result) {
+            const log = document.getElementById('network-log');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            const request = document.createElement('div');
+            request.className = 'network-request';
+            request.innerHTML = `[${timestamp}] ${method} ${url} - ${status} (${result})`;
+            
+            log.appendChild(request);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function clearNetworkLog() {
+            document.getElementById('network-log').innerHTML = 
+                '<div class="debug-info">Network monitoring active...</div>';
+        }
+
+        function testThemeManager() {
+            const results = document.getElementById('function-test-results');
+            
+            try {
+                // Test if theme-manager.js functions exist
+                if (typeof window.ThemeManager !== 'undefined') {
+                    DEBUG.success('ThemeManager is loaded');
+                } else {
+                    DEBUG.error('ThemeManager is not loaded');
+                }
+            } catch (e) {
+                DEBUG.error(`Theme Manager test failed: ${e.message}`);
+            }
+        }
+
+        function testLanguageManager() {
+            try {
+                // Test language functionality when available
+                DEBUG.info('Language Manager test - checking if functions exist...');
+                // Will be implemented when language manager is created
+                DEBUG.warn('Language Manager not yet implemented');
+            } catch (e) {
+                DEBUG.error(`Language Manager test failed: ${e.message}`);
+            }
+        }
+
+        function testFileManager() {
+            try {
+                DEBUG.info('File Manager test - checking if functions exist...');
+                // Will be implemented when file manager is created
+                DEBUG.warn('File Manager not yet implemented');
+            } catch (e) {
+                DEBUG.error(`File Manager test failed: ${e.message}`);
+            }
+        }
+
+        function simulateError() {
+            try {
+                // Intentionally throw an error to test error handling
+                throw new Error('This is a simulated error for testing purposes');
+            } catch (e) {
+                DEBUG.error(`Simulated error caught: ${e.message}`);
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            DEBUG.success('Debug tools loaded successfully');
+            refreshStorage();
+            
+            // Monitor fetch requests
+            const originalFetch = window.fetch;
+            window.fetch = function(...args) {
+                const url = args[0];
+                DEBUG.info(`Fetch request: ${url}`);
+                
+                return originalFetch.apply(this, args)
+                    .then(response => {
+                        logNetworkRequest('FETCH', url, response.status, 
+                            response.ok ? 'success' : 'error');
+                        return response;
+                    })
+                    .catch(error => {
+                        logNetworkRequest('FETCH', url, 'error', 'failed');
+                        throw error;
+                    });
+            };
+        });
+    </script>
+</body>
+</html>
