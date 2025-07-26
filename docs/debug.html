@@ -288,6 +288,14 @@
     </div>
 
     <script>
+        // Store original console methods BEFORE any modifications
+        const originalConsole = {
+            log: console.log.bind(console),
+            warn: console.warn.bind(console), 
+            error: console.error.bind(console),
+            info: console.info.bind(console)
+        };
+
         // Global debug logger
         window.DEBUG = {
             log: function(message, type = 'info') {
@@ -296,12 +304,18 @@
                 logElement.className = `debug-log debug-${type}`;
                 logElement.innerHTML = `[${timestamp}] ${message}`;
                 
-                const console = document.getElementById('debug-console');
-                console.appendChild(logElement);
-                console.scrollTop = console.scrollHeight;
+                const debugConsole = document.getElementById('debug-console');
+                if (debugConsole) {
+                    debugConsole.appendChild(logElement);
+                    debugConsole.scrollTop = debugConsole.scrollHeight;
+                }
                 
-                // Also log to browser console
-                console[type] ? console[type](message) : console.log(message);
+                // Use original console methods safely
+                if (originalConsole[type]) {
+                    originalConsole[type](message);
+                } else {
+                    originalConsole.log(`[${type.toUpperCase()}] ${message}`);
+                }
             },
             
             info: function(message) { this.log(message, 'info'); },
@@ -319,32 +333,25 @@
             DEBUG.error(`Unhandled Promise Rejection: ${e.reason}`);
         });
 
-        // Override console methods to capture them
-        const originalConsole = {
-            log: console.log,
-            warn: console.warn,
-            error: console.error,
-            info: console.info
-        };
-
+        // Override console methods safely to capture them
         console.log = function(...args) {
             DEBUG.info(args.join(' '));
-            originalConsole.log.apply(console, args);
+            originalConsole.log.apply(originalConsole, args);
         };
 
         console.warn = function(...args) {
             DEBUG.warn(args.join(' '));
-            originalConsole.warn.apply(console, args);
+            originalConsole.warn.apply(originalConsole, args);
         };
 
         console.error = function(...args) {
             DEBUG.error(args.join(' '));
-            originalConsole.error.apply(console, args);
+            originalConsole.error.apply(originalConsole, args);
         };
 
         console.info = function(...args) {
             DEBUG.info(args.join(' '));
-            originalConsole.info.apply(console, args);
+            originalConsole.info.apply(originalConsole, args);
         };
 
         // Debug test functions
@@ -451,8 +458,6 @@
         }
 
         function testThemeManager() {
-            const results = document.getElementById('function-test-results');
-            
             try {
                 // Test if theme-manager.js functions exist
                 if (typeof window.ThemeManager !== 'undefined') {
