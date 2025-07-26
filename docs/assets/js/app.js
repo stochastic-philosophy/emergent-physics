@@ -3,6 +3,19 @@
  * Handles SPA routing, project loading, and overall app coordination
  */
 
+// Ensure DEBUG is available (fallback if debug-logger.js fails)
+if (typeof DEBUG === 'undefined') {
+    window.DEBUG = {
+        info: function(msg) { console.log('[INFO]', msg); },
+        warn: function(msg) { console.warn('[WARN]', msg); },
+        error: function(msg) { console.error('[ERROR]', msg); },
+        success: function(msg) { console.log('[SUCCESS]', msg); },
+        reportError: function(error, context) { 
+            console.error('[ERROR]', context, error); 
+        }
+    };
+}
+
 window.App = {
     // Application state
     state: {
@@ -28,22 +41,26 @@ window.App = {
         try {
             // Wait for theme manager to be ready
             if (typeof ThemeManager === 'undefined') {
-                DEBUG.warn('ThemeManager not ready, retrying...');
+                DEBUG.warn('ThemeManager not ready, retrying in 100ms...');
                 setTimeout(() => this.init(), 100);
                 return;
             }
             
+            DEBUG.success('ThemeManager found, proceeding with initialization');
+            
             // Load manifest and projects
             this.loadManifest()
                 .then(() => {
+                    DEBUG.info('Manifest loaded, setting up event listeners');
                     this.setupEventListeners();
+                    DEBUG.info('Event listeners set up, handling initial route');
                     this.handleInitialRoute();
                     this.state.initialized = true;
                     DEBUG.success('App initialized successfully');
                 })
                 .catch(error => {
                     DEBUG.reportError(error, 'App initialization failed');
-                    this.showError('Failed to initialize application');
+                    this.showErrorWithBackButton('Failed to initialize application');
                 });
                 
         } catch (error) {
@@ -83,6 +100,7 @@ window.App = {
                     en: 'Research on hybrid systems indivisible behavior'
                 }
             }];
+            DEBUG.info('Using fallback project list');
             this.renderProjectsList();
         }
     },
@@ -91,13 +109,14 @@ window.App = {
      * Render projects list in navigation
      */
     renderProjectsList: function() {
+        DEBUG.info('Rendering projects list...');
         const projectsList = document.getElementById('projects-list');
         if (!projectsList) {
             DEBUG.error('Projects list element not found');
             return;
         }
         
-        const currentLang = ThemeManager.getLanguage();
+        const currentLang = ThemeManager ? ThemeManager.getLanguage() : 'fi';
         
         projectsList.innerHTML = '';
         
@@ -110,24 +129,27 @@ window.App = {
             `;
             
             projectElement.addEventListener('click', () => {
+                DEBUG.info(`Project clicked: ${project.id}`);
                 this.selectProject(project.id);
             });
             
             projectsList.appendChild(projectElement);
         });
         
-        DEBUG.info(`Rendered ${this.state.projects.length} projects`);
+        DEBUG.success(`Rendered ${this.state.projects.length} projects in navigation`);
     },
     
     /**
      * Select and load a project
      */
     selectProject: async function(projectId) {
-        DEBUG.info(`Selecting project: ${projectId}`);
+        DEBUG.info(`=== SELECTING PROJECT: ${projectId} ===`);
         
         try {
             this.showLoading();
             this.state.currentProject = projectId;
+            
+            DEBUG.info('Updating project highlighting...');
             
             // Update project item highlighting
             const projectItems = document.querySelectorAll('.project-item');
@@ -140,9 +162,12 @@ window.App = {
                     const project = this.state.projects.find(p => p.id === projectId);
                     if (project && projectTitle.textContent.trim() === (project.name[currentLang] || project.name.fi)) {
                         item.classList.add('active');
+                        DEBUG.info(`Highlighted project: ${project.name[currentLang] || project.name.fi}`);
                     }
                 }
             });
+            
+            DEBUG.info('Starting project structure loading...');
             
             // Load project structure
             await this.loadProjectStructure(projectId);
@@ -151,10 +176,11 @@ window.App = {
             this.updateUrl(projectId);
             
             this.hideLoading();
+            DEBUG.success(`Project ${projectId} loaded successfully`);
             
         } catch (error) {
             DEBUG.reportError(error, `Failed to load project: ${projectId}`);
-            this.showError(`Failed to load project: ${projectId}`);
+            this.showErrorWithBackButton(`Failed to load project: ${projectId}`);
             this.hideLoading();
         }
     },
@@ -163,26 +189,39 @@ window.App = {
      * Load project file structure
      */
     loadProjectStructure: async function(projectId) {
+        DEBUG.info(`Starting to load project structure for: ${projectId}`);
+        
+        // Ensure ThemeManager is available
+        if (typeof ThemeManager === 'undefined' || !ThemeManager.getLanguage) {
+            DEBUG.error('ThemeManager not available during project loading');
+            this.showErrorWithBackButton('ThemeManager not ready');
+            return;
+        }
+        
         const currentLang = ThemeManager.getLanguage();
         const projectPath = `${this.config.projectsBasePath}${projectId}/${currentLang}/`;
         
         DEBUG.info(`Loading project structure from: ${projectPath}`);
+        DEBUG.info(`Current language: ${currentLang}`);
         
         try {
             // Try to load project-specific manifest
             const projectManifestUrl = `${projectPath}manifest.json`;
+            DEBUG.info(`Attempting to fetch: ${projectManifestUrl}`);
+            
             const response = await fetch(projectManifestUrl);
             
             if (response.ok) {
+                DEBUG.success('Project manifest loaded successfully');
                 const projectManifest = await response.json();
                 this.renderProjectContent(projectManifest, projectPath);
             } else {
-                // Fallback: create basic structure
+                DEBUG.warn(`Project manifest not found (${response.status}), using basic structure`);
                 this.renderBasicProjectStructure(projectId, projectPath);
             }
             
         } catch (error) {
-            DEBUG.warn('Project manifest not found, using basic structure');
+            DEBUG.error(`Error loading project manifest: ${error.message}`);
             this.renderBasicProjectStructure(projectId, projectPath);
         }
     },
@@ -191,8 +230,15 @@ window.App = {
      * Render project content from manifest
      */
     renderProjectContent: function(manifest, basePath) {
+        DEBUG.info('Rendering project content from manifest');
         const contentArea = document.getElementById('main-content');
-        if (!contentArea) return;
+        if (!contentArea) {
+            DEBUG.error('Content area not found!');
+            return;
+        }
+        
+        const currentLang = ThemeManager ? ThemeManager.getLanguage() : 'fi';
+        const backText = currentLang === 'fi' ? '← Takaisin etusivulle' : '← Back to Home';
         
         let html = `<div class="project-content">`;
         
@@ -200,7 +246,7 @@ window.App = {
         html += `
             <nav class="project-navigation">
                 <button class="back-to-home-btn" onclick="App.goBackToHome()">
-                    ← Takaisin etusivulle
+                    ${backText}
                 </button>
             </nav>
         `;
@@ -216,6 +262,7 @@ window.App = {
         html += `</div>`;
         contentArea.innerHTML = html;
         
+        DEBUG.success('Project content rendered successfully');
         this.setupFileClickHandlers();
     },
     
@@ -363,11 +410,17 @@ window.App = {
         const urlParams = new URLSearchParams(window.location.search);
         const project = urlParams.get('project');
         
+        DEBUG.info(`Handling initial route. Project parameter: ${project}`);
+        
         if (project) {
-            this.selectProject(project);
+            // Small delay to ensure everything is loaded
+            setTimeout(() => {
+                this.selectProject(project);
+            }, 200);
         } else {
             // Show welcome screen
             DEBUG.info('Showing welcome screen');
+            this.showWelcomeScreen();
         }
     },
     
@@ -428,19 +481,87 @@ window.App = {
     },
     
     /**
-     * Show error message
+     * Show welcome screen
      */
-    showError: function(message) {
+    showWelcomeScreen: function() {
+        DEBUG.info('Displaying welcome screen');
         const contentArea = document.getElementById('main-content');
-        if (contentArea) {
-            contentArea.innerHTML = `
-                <div class="error-message">
-                    <h2>Error</h2>
-                    <p>${message}</p>
-                    <button onclick="location.reload()">Reload Page</button>
-                </div>
-            `;
+        if (!contentArea) {
+            DEBUG.error('Content area not found for welcome screen!');
+            return;
         }
+        
+        const currentLang = ThemeManager && ThemeManager.getLanguage ? ThemeManager.getLanguage() : 'fi';
+        const welcomeTitle = currentLang === 'fi' ? 'Tervetuloa tutkimusalustalle' : 'Welcome to Research Platform';
+        const welcomeDesc = currentLang === 'fi' ? 
+            'Valitse vasemmalta projekti aloittaaksesi tutustumisen tutkimustuloksiin.' :
+            'Select a project from the left to start exploring research results.';
+        const statusTheme = currentLang === 'fi' ? 'Teema' : 'Theme';
+        const statusLang = currentLang === 'fi' ? 'Kieli' : 'Language';
+        
+        let currentTheme = 'Unknown';
+        let currentLanguage = 'Unknown';
+        
+        if (ThemeManager && ThemeManager.getTheme) {
+            const theme = ThemeManager.getTheme();
+            currentTheme = currentLang === 'fi' ? 
+                (theme === 'light' ? 'Vaalea' : 'Tumma') :
+                (theme === 'light' ? 'Light' : 'Dark');
+        }
+        
+        if (currentLang) {
+            currentLanguage = currentLang === 'fi' ? 'Suomi' : 'English';
+        }
+        
+        contentArea.innerHTML = `
+            <div class="welcome-screen">
+                <h1 data-key="welcome_title">${welcomeTitle}</h1>
+                <p data-key="welcome_description">${welcomeDesc}</p>
+                
+                <div class="status-indicator">
+                    <div class="status-item">
+                        <span data-key="status_theme">${statusTheme}:</span>
+                        <span id="current-theme-display">${currentTheme}</span>
+                    </div>
+                    <div class="status-item">
+                        <span data-key="status_language">${statusLang}:</span>
+                        <span id="current-language-display">${currentLanguage}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        DEBUG.success('Welcome screen displayed successfully');
+    },
+    
+    /**
+     * Show error with back button
+     */
+    showErrorWithBackButton: function(message) {
+        const contentArea = document.getElementById('main-content');
+        if (!contentArea) return;
+        
+        const currentLang = ThemeManager ? ThemeManager.getLanguage() : 'fi';
+        const backText = currentLang === 'fi' ? '← Takaisin etusivulle' : '← Back to Home';
+        const errorTitle = currentLang === 'fi' ? 'Virhe' : 'Error';
+        const reloadText = currentLang === 'fi' ? 'Päivitä sivu' : 'Reload Page';
+        
+        contentArea.innerHTML = `
+            <div class="project-content">
+                <nav class="project-navigation">
+                    <button class="back-to-home-btn" onclick="App.goBackToHome()">
+                        ${backText}
+                    </button>
+                </nav>
+                <div class="error-message">
+                    <h2>${errorTitle}</h2>
+                    <p>${message}</p>
+                    <button onclick="location.reload()">${reloadText}</button>
+                </div>
+            </div>
+        `;
+        
+        DEBUG.error(`Error displayed: ${message}`);
     },
     
     /**
