@@ -60,9 +60,18 @@ window.ThemeManager = {
         DEBUG.info('Initializing ThemeManager...');
         
         try {
+            // Wait for Storage module if not ready
+            if (typeof Storage === 'undefined') {
+                DEBUG.warn('Storage module not ready, retrying in 50ms...');
+                setTimeout(() => this.init(), 50);
+                return;
+            }
+            
             // Load saved preferences or use defaults
-            this.current.theme = localStorage.getItem('theme') || this.defaults.theme;
-            this.current.language = localStorage.getItem('language') || this.defaults.language;
+            this.current.theme = Storage.getTheme();
+            this.current.language = Storage.getLanguage();
+            
+            DEBUG.info(`Loaded preferences: theme=${this.current.theme}, language=${this.current.language}`);
             
             // Apply initial theme and language
             this.applyTheme(this.current.theme);
@@ -121,9 +130,15 @@ window.ThemeManager = {
         }
         
         this.current.theme = theme;
-        localStorage.setItem('theme', theme);
-        this.applyTheme(theme);
         
+        // Use Storage module if available, fallback to localStorage
+        if (typeof Storage !== 'undefined') {
+            Storage.setTheme(theme);
+        } else {
+            localStorage.setItem('theme', theme);
+        }
+        
+        this.applyTheme(theme);
         DEBUG.info(`Theme changed to: ${theme}`);
     },
     
@@ -192,9 +207,15 @@ window.ThemeManager = {
         }
         
         this.current.language = language;
-        localStorage.setItem('language', language);
-        this.applyLanguage(language);
         
+        // Use Storage module if available, fallback to localStorage
+        if (typeof Storage !== 'undefined') {
+            Storage.setLanguage(language);
+        } else {
+            localStorage.setItem('language', language);
+        }
+        
+        this.applyLanguage(language);
         DEBUG.info(`Language changed to: ${language}`);
     },
     
