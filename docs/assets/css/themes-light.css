@@ -287,12 +287,25 @@ body.theme-light button.back-to-home-btn:hover {
     color: var(--text-secondary);
 }
 
-/* Code blocks and syntax highlighting */
-.theme-light pre,
-.theme-light code {
+/* Code blocks and syntax highlighting - FIXED */
+.theme-light pre {
     background-color: var(--code-background);
     border: 1px solid var(--code-border);
     color: var(--code-text);
+}
+
+/* Only inline code gets border, not code inside pre blocks */
+.theme-light code:not(pre code) {
+    background-color: var(--code-background);
+    border: 1px solid var(--code-border);
+    color: var(--code-text);
+}
+
+/* Code inside pre blocks should have no border or background */
+.theme-light pre code {
+    background: none !important;
+    border: none !important;
+    color: inherit;
 }
 
 .theme-light .hljs-comment {
