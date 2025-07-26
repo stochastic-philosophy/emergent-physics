@@ -1,8 +1,38 @@
 # Emergent Physics Research Platform
 
-## 🎯 Vaihe 1 valmis - Perusrakenne ja debug-työkalut
+## 🎯 Vaihe 1 valmis - Modularisaatio tehty
 
-Tämä on **Vaihe 1** implementation: minimaalinen SPA-runko debug-työkaluineen.
+Tämä on **Vaihe 1** implementation: modularisoitu SPA-runko debug-työkaluineen.
+
+## 🔧 v1.2 Modularisaatio (2025-01-25)
+
+### ✅ Uusi modulirakenne:
+- **🧩 Jaettu 6 moduuliin** - app.js lyheni ~80%
+- **📦 utils.js** - Apufunktiot ja työkalut
+- **💾 storage.js** - LocalStorage hallinta
+- **🎨 ui.js** - UI manipulaatio ja DOM-työkalut
+- **🎯 theme-manager.js** - Teema + kieli (parannettu)
+- **🐛 debug-logger.js** - Debug työkalut (säilynyt)
+- **🎮 app.js** - Pääorkestraatio (lyhennetty)
+
+### 📁 Uusi tiedostorakenne:
+```
+docs/assets/js/
+├── debug-logger.js     # Debug työkalut
+├── utils.js           # Apufunktiot (UUSI)
+├── storage.js         # LocalStorage (UUSI)  
+├── ui.js              # UI työkalut (UUSI)
+├── theme-manager.js   # Teema/kieli (parannettu)
+└── app.js             # Pääsovellus (lyhennetty 80%)
+```
+
+### 🔄 Latausjärjestys (index.html):
+1. **debug-logger.js** - Debug ensin
+2. **utils.js** - Apufunktiot
+3. **storage.js** - LocalStorage
+4. **ui.js** - UI työkalut
+5. **theme-manager.js** - Teemat (käyttää Storage)
+6. **app.js** - Pääsovellus (käyttää kaikkia)
 
 ## 🔧 Korjattu v1.1 (2025-01-25)
 
