@@ -120,35 +120,189 @@
     },
     
     "results": {
-      "name": "Tulokset", 
+      "name": "Tulokset",
       "description": "Tutkimustulokset ja data-analyysi",
       "files": [
         {
-          "name": "Vaihe 1 tulokset",
+          "name": "Referenssiprosessit - Setup",
+          "filename": "results/07251621_01_reference_summary.json",
+          "description": "Vaihe 1 moduuli 1: Referenssiprosessien määrittely ja validointi",
+          "tags": ["phase1", "reference", "markov", "indivisible"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Referenssiprosessit - Visualisointi",
+          "filename": "results/07251621_01_reference_processes.png",
+          "description": "Kuvaaja referenssiprosesseista ja niiden käyttäytymisestä",
+          "tags": ["phase1", "reference", "visualization", "plots"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Referenssiprosessit - Data",
+          "filename": "results/07251621_01_references.pkl",
+          "description": "Python pickle-tiedosto referenssiprosessien datasta",
+          "tags": ["phase1", "reference", "pickle", "binary"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Division Events Detection",
+          "filename": "results/07251621_02_division_detection.json",
+          "description": "Vaihe 1 moduuli 2: Division events tunnistusalgoritmin tulokset",
+          "tags": ["phase1", "division-events", "barandes", "detection"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Division Events - Visualisointi",
+          "filename": "results/07251621_02_division_events.png",
+          "description": "Division events tunnistuksen visualisointi prosesseittain",
+          "tags": ["phase1", "division-events", "visualization", "detection"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Memory Analysis",
+          "filename": "results/07251621_03_memory_analysis.json",
+          "description": "Vaihe 1 moduuli 3: Non-Markov muistin mittaus ja analyysi",
+          "tags": ["phase1", "memory", "non-markov", "analysis"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Memory Analysis - Visualisointi",
+          "filename": "results/07251621_03_memory_analysis.png",
+          "description": "Muistin syvyyden ja Markov-rikkomusten visualisointi",
+          "tags": ["phase1", "memory", "visualization", "markov-violations"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Vaihe 1 Validointi",
+          "filename": "results/07251621_04_phase1_validation.json",
+          "description": "Vaihe 1 moduuli 4: Kokonaisvaltainen validointi ja indivisible score",
+          "tags": ["phase1", "validation", "indivisible-score", "metrics"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Vaihe 1 Validointi - Visualisointi",
+          "filename": "results/07251621_04_phase1_validation.png",
+          "description": "Vaihe 1 validointitulosten kattava visualisointi",
+          "tags": ["phase1", "validation", "visualization", "summary"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Satunnaisuusgeneraattorit",
+          "filename": "results/07251621_05_randomness_testing.json",
+          "description": "Vaihe 2 moduuli 5: Satunnaisuustyyppien testaus ja hybridimallit",
+          "tags": ["phase2", "randomness", "generators", "testing"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Satunnaisuusesimerkit",
+          "filename": "results/07251621_05_randomness_examples.png",
+          "description": "Eri satunnaisuustyyppien visuaalisia esimerkkejä",
+          "tags": ["phase2", "randomness", "visualization", "examples"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Systemaattinen Testaus",
+          "filename": "results/07251621_06_systematic_testing.json",
+          "description": "Vaihe 2 moduuli 6: Monte Carlo -pohjainen systemaattinen testaus",
+          "tags": ["phase2", "systematic", "monte-carlo", "testing"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Vaihe 2 Lopputulokset",
+          "filename": "results/07251621_07_phase2_final.json",
+          "description": "Vaihe 2 moduuli 7: Satunnaisuusanalyysi ja ranking",
+          "tags": ["phase2", "final", "ranking", "analysis"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Satunnaisuusanalyysi - Visualisointi",
+          "filename": "results/07251621_07_randomness_analysis.png",
+          "description": "Satunnaisuustyyppien vertailu ja kategoriaanalyysi",
+          "tags": ["phase2", "randomness", "visualization", "ranking"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Advanced Hybrid Models - Data",
+          "filename": "results/07251621_08_advanced_models.pkl",
+          "description": "Vaihe 3 moduuli 8: Hybridimallien Python-funktiot pickle-muodossa",
+          "tags": ["phase3", "hybrid-models", "pickle", "binary"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Advanced Hybrid Models",
+          "filename": "results/07251621_08_advanced_testing.json",
+          "description": "Vaihe 3 moduuli 8: Advanced hybridimallien testaus ja tulokset",
+          "tags": ["phase3", "hybrid-models", "advanced", "testing"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Advanced Models - Visualisointi",
+          "filename": "results/07251621_08_advanced_models.png",
+          "description": "Advanced hybridimallien aikasarjojen visualisointi",
+          "tags": ["phase3", "hybrid-models", "visualization", "time-series"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Parameter Optimization",
+          "filename": "results/07251621_09_parameter_optimization.json",
+          "description": "Vaihe 3 moduuli 9: Grid search -parametrioptimointsi",
+          "tags": ["phase3", "optimization", "parameters", "grid-search"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Parameter Optimization - Visualisointi",
+          "filename": "results/07251621_09_parameter_optimization.png",
+          "description": "Parametrioptimointsin tulokset ja sensitivity analyysi",
+          "tags": ["phase3", "optimization", "visualization", "parameters"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Lopullinen Raportti",
+          "filename": "results/07251621_10_FINAL_REPORT.json",
+          "description": "Vaihe 3 moduuli 10: Kokonaisvaltainen lopullinen tutkimusraportti",
+          "tags": ["phase3", "final", "report", "comprehensive"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Lopullinen Yhteenveto",
+          "filename": "results/07251621_10_FINAL_SUMMARY.png",
+          "description": "Koko tutkimuksen visuaalinen yhteenveto ja score evolution",
+          "tags": ["phase3", "final", "visualization", "summary"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Session Timestamp",
+          "filename": "results/session_timestamp.txt",
+          "description": "Session 07251621 aikaleima toistettavuuden varmistamiseksi",
+          "tags": ["meta", "timestamp", "reproducibility"],
+          "created": "2025-07-25"
+        },
+        {
+          "name": "Kootut Vaihe 1 Tulokset",
           "filename": "results/results_phase1_validation.json",
-          "description": "Validointitestien tulokset ja mittarit",
-          "tags": ["phase1", "validation", "metrics"],
+          "description": "Vaihe 1 tulokset yhdistettynä (moduulit 1-4)",
+          "tags": ["phase1", "combined", "validation", "comprehensive"],
           "created": "2025-07-25"
         },
         {
-          "name": "Vaihe 2 analyysi",
-          "filename": "results/results_phase2_randomness_analysis.json", 
-          "description": "Satunnaisuustyyppien vertailu ja ranking",
-          "tags": ["phase2", "randomness", "analysis"],
+          "name": "Kootut Vaihe 2 Tulokset",
+          "filename": "results/results_phase2_randomness_analysis.json",
+          "description": "Vaihe 2 tulokset yhdistettynä (moduulit 5-7)",
+          "tags": ["phase2", "combined", "randomness", "comprehensive"],
           "created": "2025-07-25"
         },
         {
-          "name": "Lopullinen raportti",
+          "name": "Kokonaisvaltainen Lopullinen Raportti",
           "filename": "results/results_final_report.json",
-          "description": "Kattava tutkimusraportti kaikkine tuloksineen",
-          "tags": ["final", "comprehensive", "report"],
+          "description": "Kaikki vaiheet yhdistettynä lopulliseksi raportiksi",
+          "tags": ["final", "comprehensive", "all-phases", "complete"],
           "created": "2025-07-25"
         },
         {
-          "name": "Visualisoinnit", 
+          "name": "Yhdistetyt Visualisoinnit",
           "filename": "results/figures_summary_plots.png",
-          "description": "Keskeiset kuvaajat ja visualisoinnit",
-          "tags": ["figures", "plots", "visualization"],
+          "description": "Keskeisimmät kuvaajat yhdistettynä summary-kuvaksi",
+          "tags": ["visualization", "summary", "combined", "key-figures"],
           "created": "2025-07-25"
         }
       ]
