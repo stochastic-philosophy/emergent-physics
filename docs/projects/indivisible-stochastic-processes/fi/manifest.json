@@ -93,28 +93,28 @@
           "filename": "code/code_module01_setup.py",
           "description": "Perusasetukset ja referenssiprosessit",
           "tags": ["phase1", "setup", "reference-processes"],
-          "created": "2025-01-25"
+          "created": "2025-07-25"
         },
         {
           "name": "Moduuli 2: Division Events",
           "filename": "code/code_module02_division_detector.py", 
           "description": "Division events tunnistusalgoritmit",
           "tags": ["phase1", "division-events", "detection"],
-          "created": "2025-01-25"
+          "created": "2025-07-25"
         },
         {
           "name": "Moduuli 8: Hybridimallit",
           "filename": "code/code_module08_advanced_models.py",
           "description": "RMT + fraktaalit + perkolaatio hybridimallit", 
           "tags": ["phase3", "hybrid-models", "rmt", "fractals"],
-          "created": "2025-01-25"
+          "created": "2025-07-25"
         },
         {
           "name": "Apufunktiot",
           "filename": "code/utils_helper_functions.py",
           "description": "Yleiset apufunktiot ja työkalut",
           "tags": ["utilities", "helpers"],
-          "created": "2025-01-25"
+          "created": "2025-07-25"
         }
       ]
     },
