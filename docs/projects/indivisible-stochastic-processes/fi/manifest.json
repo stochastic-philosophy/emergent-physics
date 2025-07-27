@@ -334,6 +334,13 @@
           "created": "2025-07-25"
         },
         {
+          "name": "Kootut Vaihe 3 Tulokset",
+          "filename": "results/results_phase3_randomness_analysis.json",
+          "description": "Vaihe 3 tulokset yhdistettynä (moduulit 8-10)",
+          "tags": ["phase3", "combined", "analysis", "comprehensive"],
+          "created": "2025-07-25"
+        },
+        {
           "name": "Kokonaisvaltainen Lopullinen Raportti",
           "filename": "results/results_final_report.json",
           "description": "Kaikki vaiheet yhdistettynä lopulliseksi raportiksi",
