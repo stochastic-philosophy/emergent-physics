@@ -1,7 +1,7 @@
 /**
  * Main CSS - Base styles for Emergent Physics Research
  * Responsive design for tablet and desktop use
- * Updated for Phase 2: Markdown + File Management
+ * Updated for Phase 2: Markdown + File Management + Image size fixes
  */
 
 /* Reset and base styles */
@@ -776,13 +776,179 @@ h6:hover .heading-anchor {
     opacity: 1;
 }
 
-/* Code block styling */
-pre[class*="language-"] {
-    margin: 1rem 0;
-    padding: 1rem;
+/* Code block styling - Phase 2 fix */
+pre[class*="language-"],
+.text-content pre,
+.code-content pre,
+.json-content pre {
+    background: var(--code-background, #f8fafc);
+    border: 1px solid var(--border-color, #e2e8f0);
     border-radius: 6px;
+    padding: 1rem;
     overflow-x: auto;
     position: relative;
+    margin: 1rem 0;
+    font-family: 'Courier New', Consolas, Monaco, 'Lucida Console', monospace;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+/* Remove duplicate borders and spacing issues */
+pre[class*="language-"] code,
+.text-content pre code,
+.code-content pre code {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+/* Inline code styling */
+.markdown-content code:not(pre code),
+code:not(pre code) {
+    background: var(--code-background, #f8fafc);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 3px;
+    padding: 0.125rem 0.25rem;
+    font-family: 'Courier New', Consolas, Monaco, monospace;
+    font-size: 0.875em;
+    color: var(--code-text, #374151);
+}
+
+/* Markdown code blocks */
+.markdown-content pre {
+    background: var(--code-background, #f8fafc);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 6px;
+    padding: 1rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+    font-family: 'Courier New', Consolas, Monaco, monospace;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.markdown-content pre code {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    color: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+/* ===== IMAGE RESPONSIVENESS AND STYLING (NEW) ===== */
+
+/* Image responsiveness for markdown content */
+.markdown-content img,
+.file-content img,
+.content-area img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 1.5rem auto;
+    border-radius: 6px;
+    box-shadow: var(--shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
+    border: 1px solid var(--border-color, #e5e7eb);
+}
+
+/* Image containers for better layout */
+.image-content {
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+.image-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+    margin: 0 auto;
+    display: block;
+}
+
+/* Figures with captions */
+.markdown-content figure {
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+.markdown-content figure img {
+    margin-bottom: 0.5rem;
+}
+
+.markdown-content figcaption {
+    font-size: 0.875rem;
+    color: var(--text-secondary, #6b7280);
+    font-style: italic;
+    margin-top: 0.5rem;
+}
+
+/* Inline images should be smaller */
+.markdown-content p img {
+    display: inline-block;
+    max-width: 300px;
+    margin: 0 0.5rem;
+    vertical-align: middle;
+}
+
+/* Large images in their own paragraphs */
+.markdown-content > img,
+.markdown-content p:has(> img:only-child) img {
+    display: block;
+    margin: 1.5rem auto;
+    max-width: 100%;
+}
+
+/* Special styling for research images */
+.research-image {
+    max-width: 100%;
+    margin: 2rem auto;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: var(--shadow-lg);
+}
+
+/* Image zoom on hover (optional) */
+.markdown-content img:hover {
+    transform: scale(1.02);
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+/* CSV table styling */
+.csv-content .table-container {
+    margin: 1.5rem 0;
+}
+
+.csv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.csv-table th,
+.csv-table td {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    text-align: left;
+}
+
+.csv-table th {
+    background: var(--card-background);
+    font-weight: 600;
+}
+
+.csv-truncated {
+    text-align: center;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-top: 1rem;
 }
 
 /* Responsive design for file content */
@@ -817,6 +983,20 @@ pre[class*="language-"] {
         align-items: flex-start;
         gap: 0.5rem;
     }
+    
+    /* Mobile image adjustments */
+    .markdown-content img,
+    .file-content img,
+    .content-area img {
+        margin: 1rem auto;
+        border-radius: 4px;
+    }
+    
+    .markdown-content p img {
+        max-width: 100%;
+        display: block;
+        margin: 0.5rem auto;
+    }
 }
 
 @media (max-width: 480px) {
@@ -831,6 +1011,15 @@ pre[class*="language-"] {
     .download-file-btn {
         width: 100%;
         justify-content: center;
+    }
+    
+    /* Mobile image optimizations */
+    .markdown-content img,
+    .file-content img,
+    .content-area img {
+        border-radius: 4px;
+        margin: 0.75rem auto;
+        box-shadow: var(--shadow-sm);
     }
 }
 
@@ -939,5 +1128,13 @@ pre[class*="language-"] {
     body {
         font-size: 12pt;
         line-height: 1.4;
+    }
+    
+    /* Print-friendly images */
+    .markdown-content img,
+    .file-content img {
+        max-width: 100%;
+        page-break-inside: avoid;
+        border: 1px solid #ccc;
     }
 }
