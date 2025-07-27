@@ -1,6 +1,6 @@
 /**
- * Theme and Language Manager (FINAL FIX)
- * Prevents multiple event handlers and theme overrides
+ * Theme and Language Manager (FIXED - No CSS flashing)
+ * Preloads CSS before applying theme to prevent flashing
  */
 
 window.ThemeManager = {
@@ -21,6 +21,12 @@ window.ThemeManager = {
         initialized: false,
         inToggle: false,
         eventListenersAdded: false
+    },
+    
+    // CSS cache to prevent re-loading
+    cssCache: {
+        light: null,
+        dark: null
     },
     
     // Debug state
@@ -67,6 +73,30 @@ window.ThemeManager = {
     },
     
     /**
+     * Preload CSS for both themes to prevent flashing
+     */
+    preloadCSS: function() {
+        const themes = ['light', 'dark'];
+        
+        themes.forEach(theme => {
+            if (this.cssCache[theme]) return; // Already preloaded
+            
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = `assets/css/themes-${theme}.css`;
+            link.media = 'print'; // Load but don't apply
+            link.onload = () => {
+                link.media = 'all'; // Remove media restriction
+                this.cssCache[theme] = link;
+                this.log(`📦 CSS preloaded: themes-${theme}.css`);
+            };
+            
+            // Add to head but hidden
+            document.head.appendChild(link);
+        });
+    },
+    
+    /**
      * Create visual debug panel
      */
     createDebugPanel: function() {
@@ -100,6 +130,7 @@ window.ThemeManager = {
             <div>
                 <button onclick="ThemeManager.forceLight()" style="background: #fff; color: #000; border: none; padding: 5px 10px; margin: 2px; border-radius: 3px; cursor: pointer;">Force Light</button>
                 <button onclick="ThemeManager.forceDark()" style="background: #000; color: #fff; border: 1px solid #fff; padding: 5px 10px; margin: 2px; border-radius: 3px; cursor: pointer;">Force Dark</button>
+                <button onclick="ThemeManager.testHeaderToggle()" style="background: #ff8800; color: #fff; border: none; padding: 5px 10px; margin: 2px; border-radius: 3px; cursor: pointer;">Test Header</button>
                 <button onclick="ThemeManager.refreshDebug()" style="background: #0088ff; color: #fff; border: none; padding: 5px 10px; margin: 2px; border-radius: 3px; cursor: pointer;">Refresh</button>
             </div>
             <div id="debug-content" style="margin-top: 10px; border-top: 1px solid #00ff00; padding-top: 10px;">
@@ -109,6 +140,20 @@ window.ThemeManager = {
         
         document.body.appendChild(panel);
         this.debug.element = panel;
+    },
+    
+    /**
+     * Test header toggle directly
+     */
+    testHeaderToggle: function() {
+        this.log('🧪 TESTING HEADER TOGGLE DIRECTLY');
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+            this.log('🖱️ Simulating click on header toggle...');
+            themeToggle.click();
+        } else {
+            this.log('❌ Header toggle not found!');
+        }
     },
     
     /**
@@ -136,12 +181,7 @@ window.ThemeManager = {
      */
     forceLight: function() {
         this.log('🧪 FORCE LIGHT THEME');
-        this.flags.inToggle = true;
         this.setTheme('light', 'force-light');
-        setTimeout(() => {
-            this.flags.inToggle = false;
-            this.refreshDebug();
-        }, 300);
     },
     
     /**
@@ -149,12 +189,7 @@ window.ThemeManager = {
      */
     forceDark: function() {
         this.log('🧪 FORCE DARK THEME');
-        this.flags.inToggle = true;
         this.setTheme('dark', 'force-dark');
-        setTimeout(() => {
-            this.flags.inToggle = false;
-            this.refreshDebug();
-        }, 300);
     },
     
     /**
@@ -180,6 +215,7 @@ window.ThemeManager = {
             <div>Text Color: <span style="color: #ffff00;">${bodyStyle.color}</span></div>
             <div>In Toggle: <span style="color: #ffff00;">${this.flags.inToggle}</span></div>
             <div>Event Listeners: <span style="color: #ffff00;">${this.flags.eventListenersAdded}</span></div>
+            <div>Preloaded CSS: <span style="color: #ffff00;">light=${!!this.cssCache.light}, dark=${!!this.cssCache.dark}</span></div>
             <div><strong>Recent Logs:</strong></div>
             <div style="max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.5); padding: 5px; margin-top: 5px;">
                 ${this.debug.calls.slice(-8).map(call => 
@@ -229,6 +265,9 @@ window.ThemeManager = {
                 return;
             }
             
+            // Preload both CSS files to prevent flashing
+            this.preloadCSS();
+            
             // Load saved preferences
             this.current.theme = Storage.getTheme();
             this.current.language = Storage.getLanguage();
@@ -245,7 +284,7 @@ window.ThemeManager = {
             // Mark as initialized
             this.flags.initialized = true;
             
-            // Auto-show debug panel on tablets
+            // Auto-show debug panel on tablets (optional)
             setTimeout(() => {
                 this.showDebug();
             }, 1000);
@@ -258,7 +297,7 @@ window.ThemeManager = {
     },
     
     /**
-     * Set up event listeners (with duplicate prevention)
+     * Set up event listeners (SIMPLIFIED and BULLETPROOF)
      */
     setupEventListeners: function() {
         if (this.flags.eventListenersAdded) {
@@ -266,40 +305,32 @@ window.ThemeManager = {
             return;
         }
         
-        // Remove any existing listeners first
+        // SIMPLIFIED theme toggle - no cloning, just direct event
         const themeToggle = document.getElementById('theme-toggle');
         if (themeToggle) {
-            // Clone node to remove all event listeners
-            const newThemeToggle = themeToggle.cloneNode(true);
-            themeToggle.parentNode.replaceChild(newThemeToggle, themeToggle);
+            this.log('🎛️ Adding theme toggle listener (SIMPLIFIED)');
             
-            // Add single event listener
-            this.log('🎛️ Adding theme toggle listener');
-            newThemeToggle.addEventListener('click', (e) => {
+            // Remove any existing onclick
+            themeToggle.onclick = null;
+            
+            // Add single clean event listener
+            themeToggle.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 
-                if (this.flags.inToggle) {
-                    this.log('⏳ Already in toggle, ignoring click');
-                    return;
-                }
-                
-                this.log('🖱️ THEME TOGGLE CLICKED!');
-                this.toggleTheme();
-            });
+                this.log('🖱️ HEADER THEME TOGGLE CLICKED!');
+                this.instantToggle(); // Use instant toggle for header
+            }, { once: false });
+            
         } else {
             this.log('⚠️ Theme toggle button not found!');
         }
         
-        // Language buttons
+        // Language buttons (simplified)
         const langButtons = document.querySelectorAll('.lang-btn');
         this.log(`🌐 Found ${langButtons.length} language buttons`);
         langButtons.forEach((button, index) => {
-            // Remove existing listeners
-            const newButton = button.cloneNode(true);
-            button.parentNode.replaceChild(newButton, button);
-            
-            newButton.addEventListener('click', (e) => {
+            button.addEventListener('click', (e) => {
                 const lang = e.target.getAttribute('data-lang');
                 this.log(`🗣️ Language button clicked: ${lang}`);
                 if (lang) {
@@ -309,51 +340,119 @@ window.ThemeManager = {
         });
         
         this.flags.eventListenersAdded = true;
-        this.log('👂 Event listeners set up completed');
+        this.log('👂 Event listeners set up completed (SIMPLIFIED)');
     },
     
     /**
-     * Toggle between themes (with protection)
+     * INSTANT TOGGLE - No delays, preloaded CSS
      */
-    toggleTheme: function() {
+    instantToggle: function() {
         if (this.flags.inToggle) {
             this.log('🚫 Already in toggle, aborting');
             return;
         }
         
         this.flags.inToggle = true;
-        this.log('🔄 TOGGLE THEME STARTED (protected)');
+        this.log('⚡ INSTANT TOGGLE STARTED');
         
         const oldTheme = this.current.theme;
         const newTheme = oldTheme === 'light' ? 'dark' : 'light';
         
-        this.log(`🎯 Toggling: ${oldTheme} → ${newTheme}`);
-        this.setTheme(newTheme, 'toggle');
+        this.log(`🎯 Instant toggle: ${oldTheme} → ${newTheme}`);
         
-        // Check result after delay
+        // Use instant theme setting (no async loading)
+        this.setThemeInstant(newTheme, 'header-toggle');
+        
         setTimeout(() => {
-            const result = this.current.theme;
-            const bodyClass = document.body.className;
-            
-            this.log(`🔍 Toggle result: expected=${newTheme}, actual=${result}, body=${bodyClass}`);
-            
-            if (result !== newTheme) {
-                this.log('🚨 TOGGLE FAILED! Something overrode the theme');
-                // Try to force it one more time
-                this.log('🔧 Attempting to force correct theme...');
-                this.current.theme = newTheme;
-                this.applyTheme(newTheme);
-            } else {
-                this.log('✅ Toggle succeeded');
-            }
-            
             this.flags.inToggle = false;
+            this.log('⚡ Instant toggle completed');
             this.refreshDebug();
-        }, 300);
+        }, 100);
     },
     
     /**
-     * Set specific theme (with protection)
+     * INSTANT theme setting - uses preloaded CSS
+     */
+    setThemeInstant: function(theme, source = 'unknown') {
+        this.log(`⚡ SET THEME INSTANT: ${theme} (from: ${source})`);
+        
+        if (theme !== 'light' && theme !== 'dark') {
+            this.log(`⚠️ Invalid theme: ${theme}, using light`);
+            theme = 'light';
+        }
+        
+        const oldTheme = this.current.theme;
+        this.current.theme = theme;
+        
+        // Save to storage
+        if (typeof Storage !== 'undefined') {
+            Storage.setTheme(theme);
+        } else {
+            localStorage.setItem('theme', theme);
+        }
+        
+        // Apply instantly using preloaded CSS
+        this.applyThemeInstant(theme);
+        this.log(`⚡ Theme set instantly: ${oldTheme} → ${theme}`);
+    },
+    
+    /**
+     * Apply theme INSTANTLY - uses preloaded CSS, no loading delay
+     */
+    applyThemeInstant: function(theme) {
+        this.log(`⚡ APPLYING THEME INSTANTLY: ${theme}`);
+        
+        try {
+            // Use preloaded CSS or create new
+            let themeCSS = document.getElementById('theme-css');
+            if (!themeCSS) {
+                themeCSS = document.createElement('link');
+                themeCSS.id = 'theme-css';
+                themeCSS.rel = 'stylesheet';
+                document.head.appendChild(themeCSS);
+            }
+            
+            // Use preloaded CSS or fallback to direct loading
+            if (this.cssCache[theme]) {
+                this.log(`📦 Using preloaded CSS for ${theme}`);
+                themeCSS.href = this.cssCache[theme].href;
+            } else {
+                this.log(`📁 Loading CSS directly for ${theme}`);
+                themeCSS.href = `assets/css/themes-${theme}.css`;
+            }
+            
+            // Update body class IMMEDIATELY
+            document.body.className = document.body.className.replace(/theme-\w+/g, '');
+            document.body.classList.add(`theme-${theme}`);
+            
+            // Update HTML element
+            document.documentElement.className = document.documentElement.className.replace(/theme-\w+/g, '');
+            document.documentElement.classList.add(`theme-${theme}`);
+            
+            this.log(`⚡ Body class updated instantly: theme-${theme}`);
+            
+            // Update icon and status
+            this.updateThemeIcon(theme);
+            this.updateStatusDisplay();
+            
+            this.log(`⚡ Theme applied instantly: ${theme}`);
+            
+        } catch (error) {
+            this.log('❌ Instant apply theme error: ' + error.message);
+        }
+    },
+    
+    /**
+     * Regular toggle (for popup buttons)
+     */
+    toggleTheme: function() {
+        const newTheme = this.current.theme === 'light' ? 'dark' : 'light';
+        this.log(`🔄 Regular toggle to: ${newTheme}`);
+        this.setTheme(newTheme, 'toggle');
+    },
+    
+    /**
+     * Regular set theme (with loading)
      */
     setTheme: function(theme, source = 'unknown') {
         this.log(`🎨 SET THEME: ${theme} (from: ${source})`);
@@ -366,15 +465,11 @@ window.ThemeManager = {
         const oldTheme = this.current.theme;
         this.current.theme = theme;
         
-        // Save to storage (prevent loops)
-        if (source !== 'storage-callback') {
-            if (typeof Storage !== 'undefined') {
-                Storage.setTheme(theme);
-                this.log('💾 Saved via Storage module');
-            } else {
-                localStorage.setItem('theme', theme);
-                this.log('💾 Saved via localStorage');
-            }
+        // Save to storage
+        if (typeof Storage !== 'undefined') {
+            Storage.setTheme(theme);
+        } else {
+            localStorage.setItem('theme', theme);
         }
         
         this.applyTheme(theme);
@@ -382,38 +477,30 @@ window.ThemeManager = {
     },
     
     /**
-     * Apply theme to document
+     * Regular apply theme
      */
     applyTheme: function(theme) {
         this.log(`🖌️ APPLYING THEME: ${theme}`);
         
         try {
-            // Update CSS
             let themeCSS = document.getElementById('theme-css');
             if (!themeCSS) {
                 themeCSS = document.createElement('link');
                 themeCSS.id = 'theme-css';
                 themeCSS.rel = 'stylesheet';
                 document.head.appendChild(themeCSS);
-                this.log('🆕 Created CSS link');
             }
             
-            const newHref = `assets/css/themes-${theme}.css?v=${Date.now()}`;
-            themeCSS.href = newHref;
-            this.log(`🔗 CSS updated: themes-${theme}.css`);
+            themeCSS.href = `assets/css/themes-${theme}.css`;
             
             // Update body class
-            const oldClass = document.body.className;
             document.body.className = document.body.className.replace(/theme-\w+/g, '');
             document.body.classList.add(`theme-${theme}`);
-            
-            this.log(`👤 Body class: ${oldClass} → ${document.body.className}`);
             
             // Update HTML element
             document.documentElement.className = document.documentElement.className.replace(/theme-\w+/g, '');
             document.documentElement.classList.add(`theme-${theme}`);
             
-            // Update icon (safely)
             this.updateThemeIcon(theme);
             this.updateStatusDisplay();
             
@@ -425,7 +512,7 @@ window.ThemeManager = {
     },
     
     /**
-     * Update theme icon (safely)
+     * Update theme icon
      */
     updateThemeIcon: function(theme) {
         try {
@@ -435,7 +522,6 @@ window.ThemeManager = {
                 themeIcon.setAttribute('data-feather', iconName);
                 this.log(`🌙 Icon updated: ${iconName}`);
                 
-                // Safely update feather icons
                 if (typeof feather !== 'undefined' && feather.replace) {
                     try {
                         feather.replace();
