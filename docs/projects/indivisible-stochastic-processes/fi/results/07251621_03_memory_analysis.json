@@ -16,7 +16,7 @@
     "total_markov_violations": 79,
     "conditioning_sparsity": 0.0,
     "available_conditioning_times": 0,
-    "expected_memory_depth": Infinity,
+    "expected_memory_depth": "Infinity",
     "memory_depth_samples": 30
   },
   "indivisible": {
