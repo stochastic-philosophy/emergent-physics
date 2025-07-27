@@ -91,30 +91,72 @@
         {
           "name": "Moduuli 1: Alustus ja referenssit",
           "filename": "code/code_module01_setup.py",
-          "description": "Perusasetukset ja referenssiprosessit",
-          "tags": ["phase1", "setup", "reference-processes"],
-          "created": "2025-07-25"
+          "description": "Perusasetukset, Google Drive mount ja referenssiprosessit (Markov, deterministinen, indivisible, white noise)",
+          "tags": ["phase1", "setup", "reference-processes", "barandes-theory"],
+          "created": "2025-01-25"
         },
         {
-          "name": "Moduuli 2: Division Events",
-          "filename": "code/code_module02_division_detector.py", 
-          "description": "Division events tunnistusalgoritmit",
-          "tags": ["phase1", "division-events", "detection"],
-          "created": "2025-07-25"
+          "name": "Moduuli 2: Division Events Detector",
+          "filename": "code/code_module02_division_detector.py",
+          "description": "Division events tunnistusalgoritmit: korrelaatio-, riippuvuus- ja vuorovaikutuspohjaiset menetelmät",
+          "tags": ["phase1", "division-events", "detection", "correlation"],
+          "created": "2025-01-25"
         },
         {
-          "name": "Moduuli 8: Hybridimallit",
+          "name": "Moduuli 3: Non-Markov Memory Detector",
+          "filename": "code/code_module03_memory_detector.py",
+          "description": "Muistin syvyyden mittaus, Markov-ominaisuuden testaus ja conditioning sparsity analyysi",
+          "tags": ["phase1", "memory", "non-markov", "conditioning"],
+          "created": "2025-01-25"
+        },
+        {
+          "name": "Moduuli 4: Validointitestit",
+          "filename": "code/code_module04_validation.py",
+          "description": "Indivisible score laskenta, kokonaisvaltainen validointi ja kriittisyysanalyysi",
+          "tags": ["phase1", "validation", "indivisible-score", "metrics"],
+          "created": "2025-01-25"
+        },
+        {
+          "name": "Moduuli 5: Satunnaisuusgeneraattorit",
+          "filename": "code/code_module05_generators.py",
+          "description": "14 satunnaisuustyyppiä (simple→mathematical→complex) ja yksinkertaiset hybridimallit",
+          "tags": ["phase2", "randomness", "generators", "hybrid-simple"],
+          "created": "2025-01-25"
+        },
+        {
+          "name": "Moduuli 6: Systemaattinen testaus",
+          "filename": "code/code_module06_systematic_testing.py",
+          "description": "Monte Carlo -pohjainen systemaattinen testaussilmukka kaikille satunnaisuustyypeille",
+          "tags": ["phase2", "systematic", "monte-carlo", "testing"],
+          "created": "2025-01-25"
+        },
+        {
+          "name": "Moduuli 7: Tulosten analyysi",
+          "filename": "code/code_module07_analysis.py",
+          "description": "Satunnaisuustyyppien ranking, tilastollinen analyysi ja fysikaaliset johtopäätökset",
+          "tags": ["phase2", "analysis", "ranking", "statistics"],
+          "created": "2025-01-25"
+        },
+        {
+          "name": "Moduuli 8: Advanced hybridimallit",
           "filename": "code/code_module08_advanced_models.py",
-          "description": "RMT + fraktaalit + perkolaatio hybridimallit", 
-          "tags": ["phase3", "hybrid-models", "rmt", "fractals"],
-          "created": "2025-07-25"
+          "description": "RMT+fraktaalit, perkolaatio+RMT ja triple hybrid (ultimate) -mallit",
+          "tags": ["phase3", "hybrid-models", "rmt", "fractals", "percolation"],
+          "created": "2025-01-25"
         },
         {
-          "name": "Apufunktiot",
-          "filename": "code/utils_helper_functions.py",
-          "description": "Yleiset apufunktiot ja työkalut",
-          "tags": ["utilities", "helpers"],
-          "created": "2025-07-25"
+          "name": "Moduuli 9: Parametrioptimointsi",
+          "filename": "code/code_module09_optimization.py",
+          "description": "Grid search -parametrioptimointsi advanced hybridimalleille",
+          "tags": ["phase3", "optimization", "grid-search", "parameters"],
+          "created": "2025-01-25"
+        },
+        {
+          "name": "Moduuli 10: Lopullinen analyysi",
+          "filename": "code/code_module10_final_analysis.py",
+          "description": "Koko tutkimuksen yhteenveto, Barandes'in teorian validointi ja fysikaaliset implikaatiot",
+          "tags": ["phase3", "final-analysis", "barandes-validation", "conclusions"],
+          "created": "2025-01-25"
         }
       ]
     },
