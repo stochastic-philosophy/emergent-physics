@@ -37,49 +37,49 @@
           "filename": "documentation/overview_project.md", 
           "description": "Kokonaisvaltainen kuvaus tutkimusprojektista",
           "tags": ["overview", "introduction"],
-          "created": "2025-01-25"
+          "created": "2025-07-25"
         },
         {
           "name": "Tutkimusohjelma",
           "filename": "documentation/overview_research_program.md",
           "description": "Laaja tutkimusohjelma ja jatkosuunnitelmat", 
           "tags": ["roadmap", "future-research"],
-          "created": "2025-01-25"
+          "created": "2025-07-25"
         },
         {
           "name": "Vaihe 1: Validointi",
           "filename": "documentation/documentation_phase1_validation.md",
           "description": "Mittareiden validoinnin dokumentaatio",
           "tags": ["phase1", "validation", "metrics"],
-          "created": "2025-01-25"
+          "created": "2025-07-25"
         },
         {
           "name": "Vaihe 2: Satunnaisuusanalyysi", 
           "filename": "documentation/documentation_phase2_randomness.md",
           "description": "Satunnaisuustyyppien systemaattinen testaus",
           "tags": ["phase2", "randomness", "monte-carlo"],
-          "created": "2025-01-25"
+          "created": "2025-07-25"
         },
         {
           "name": "Vaihe 3: Hybridimallit",
           "filename": "documentation/documentation_phase3_hybrids.md", 
           "description": "Edistyneiden hybridimallien kehitys",
           "tags": ["phase3", "hybrid-models", "optimization"],
-          "created": "2025-01-25"
+          "created": "2025-07-25"
         },
         {
           "name": "Koodausohjeet",
           "filename": "documentation/guidelines_coding_standards.md",
           "description": "Dokumentointistandardit ja koodausohjeet",
           "tags": ["guidelines", "documentation", "standards"],
-          "created": "2025-01-25"
+          "created": "2025-07-25"
         },
         {
           "name": "Seuraavat vaiheet",
           "filename": "documentation/roadmap_next_steps.md",
           "description": "Jatkotutkimussuunnitelmat ja prioriteetit",
           "tags": ["roadmap", "future", "extensions"],
-          "created": "2025-01-25"
+          "created": "2025-07-25"
         }
       ]
     },
