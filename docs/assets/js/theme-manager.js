@@ -1,5 +1,5 @@
 /**
- * Theme and Language Manager
+ * Theme and Language Manager (Fixed CSS loading)
  * Handles theme switching (light/dark) and language switching (fi/en)
  * Uses localStorage to persist user preferences
  */
@@ -15,6 +15,12 @@ window.ThemeManager = {
     current: {
         theme: null,
         language: null
+    },
+    
+    // CSS preloading state
+    cssLoaded: {
+        light: false,
+        dark: false
     },
     
     // Language text mappings
@@ -73,16 +79,87 @@ window.ThemeManager = {
             
             DEBUG.info(`Loaded preferences: theme=${this.current.theme}, language=${this.current.language}`);
             
-            // Apply initial theme and language
-            this.applyTheme(this.current.theme);
-            this.applyLanguage(this.current.language);
+            // Preload CSS files to prevent flashing
+            this.preloadCSSFiles().then(() => {
+                // Apply initial theme and language
+                this.applyTheme(this.current.theme);
+                this.applyLanguage(this.current.language);
+                
+                // Set up event listeners
+                this.setupEventListeners();
+                
+                DEBUG.success('ThemeManager initialized successfully');
+            });
             
-            // Set up event listeners
-            this.setupEventListeners();
-            
-            DEBUG.success('ThemeManager initialized successfully');
         } catch (error) {
             DEBUG.reportError(error, 'ThemeManager initialization failed');
+        }
+    },
+    
+    /**
+     * Preload both CSS theme files to prevent flashing
+     */
+    preloadCSSFiles: async function() {
+        DEBUG.info('Preloading CSS theme files...');
+        
+        try {
+            // Create light theme link if it doesn't exist
+            let lightCSS = document.getElementById('theme-css-light');
+            if (!lightCSS) {
+                lightCSS = document.createElement('link');
+                lightCSS.id = 'theme-css-light';
+                lightCSS.rel = 'stylesheet';
+                lightCSS.href = 'assets/css/themes-light.css';
+                document.head.appendChild(lightCSS);
+            }
+            
+            // Create dark theme link
+            let darkCSS = document.getElementById('theme-css-dark');
+            if (!darkCSS) {
+                darkCSS = document.createElement('link');
+                darkCSS.id = 'theme-css-dark';
+                darkCSS.rel = 'stylesheet';
+                darkCSS.href = 'assets/css/themes-dark.css';
+                darkCSS.disabled = true; // Initially disabled
+                document.head.appendChild(darkCSS);
+            }
+            
+            // Wait for both CSS files to load
+            const promises = [];
+            
+            if (!this.cssLoaded.light) {
+                promises.push(new Promise((resolve) => {
+                    if (lightCSS.sheet || lightCSS.styleSheet) {
+                        this.cssLoaded.light = true;
+                        resolve();
+                    } else {
+                        lightCSS.onload = () => {
+                            this.cssLoaded.light = true;
+                            resolve();
+                        };
+                    }
+                }));
+            }
+            
+            if (!this.cssLoaded.dark) {
+                promises.push(new Promise((resolve) => {
+                    if (darkCSS.sheet || darkCSS.styleSheet) {
+                        this.cssLoaded.dark = true;
+                        resolve();
+                    } else {
+                        darkCSS.onload = () => {
+                            this.cssLoaded.dark = true;
+                            resolve();
+                        };
+                    }
+                }));
+            }
+            
+            await Promise.all(promises);
+            DEBUG.success('CSS theme files preloaded successfully');
+            
+        } catch (error) {
+            DEBUG.warn('CSS preloading failed, using fallback method:', error);
         }
     },
     
@@ -143,19 +220,33 @@ window.ThemeManager = {
     },
     
     /**
-     * Apply theme to the document
+     * Apply theme to the document (Fixed version - no CSS loading flicker)
      */
     applyTheme: function(theme) {
         try {
             DEBUG.info(`Applying theme: ${theme}`);
             
-            // Update theme CSS file
-            const themeCSS = document.getElementById('theme-css');
-            if (themeCSS) {
-                themeCSS.href = `assets/css/themes-${theme}.css`;
-                DEBUG.info(`Updated theme CSS file: themes-${theme}.css`);
+            // Get both CSS links
+            const lightCSS = document.getElementById('theme-css-light');
+            const darkCSS = document.getElementById('theme-css-dark');
+            
+            if (lightCSS && darkCSS) {
+                // Use the preloaded CSS files - just toggle disabled state
+                if (theme === 'light') {
+                    lightCSS.disabled = false;
+                    darkCSS.disabled = true;
+                } else {
+                    lightCSS.disabled = true;
+                    darkCSS.disabled = false;
+                }
+                DEBUG.info(`Switched to preloaded ${theme} theme CSS`);
             } else {
-                DEBUG.warn('Theme CSS element not found');
+                // Fallback to old method if preloading failed
+                DEBUG.warn('Preloaded CSS not found, using fallback method');
+                const themeCSS = document.getElementById('theme-css');
+                if (themeCSS) {
+                    themeCSS.href = `assets/css/themes-${theme}.css`;
+                }
             }
             
             // Update body class - CRITICAL for styling
