@@ -18,7 +18,7 @@ Kolmivaiheinen tutkimuksemme Jacob Barandes'in indivisible stochastic processes 
 
 Alkuperäinen tutkimuskysymyksemme kuului: *"Voivatko hybridijärjestelmät (RMT + fraktaalit + perkolaatio) tuottaa indivisible stochastic process -ominaisuuksia?"*
 
-![Score Evolution](../projects/projekti/fi/results/score_evolution.png)
+![Score Evolution](https://stochastic-philosophy.github.io/emergent-physics/projects/indivisible-stochastic-processes/fi/results/score_evolution.png)
 
 **Vastaus on yksiselitteinen kyllä.** Kuten lopullisesta yhteenvedosta (kuva 9) näkyy, score kehitys oli vaikuttava:
 
@@ -30,7 +30,7 @@ Triple hybrid -malli saavutti lähes täydellisen indivisible-käyttäytymisen, 
 
 ### 1.2 Digital Physics Dominanssi
 
-![Satunnaisuusanalyysi](../projects/projekti/fi/results/randomness_analysis.png)
+![Satunnaisuusanalyysi](https://stochastic-philosophy.github.io/emergent-physics/projects/projekti/fi/results/randomness_analysis.png)
 
 Vaihe 2:n systemaattinen satunnaisuusanalyysi paljasti yllättävän tuloksen: **binääriset satunnaisuustyypit dominoivat** kaikkia muita:
 
@@ -42,7 +42,7 @@ Tämä tulos on **fundamentaalinen**: se viittaa siihen, että todellisuuden poh
 
 ### 1.3 Barandes'in Teorian Validointi
 
-![Division Events Detection](../projects/projekti/fi/results/division_events.png)
+![Division Events Detection](https://stochastic-philosophy.github.io/emergent-physics/projects/projekti/fi/results/division_events.png)
 
 Division events -analyysi vahvisti Barandes'in teorian keskeisiä väitteitä:
 
@@ -54,7 +54,7 @@ Kuten kuvassa 2 näkyy, indivisible-prosessi tuotti **9 division eventsiä 300 p
 
 ### 1.4 Memory Depth ja Non-Markovian Käyttäytyminen
 
-![Memory Analysis](../projects/projekti/fi/results/memory_analysis.png)
+![Memory Analysis](https://stochastic-philosophy.github.io/emergent-physics/projects/projekti/fi/results/memory_analysis.png)
 
 Memory analysis (kuva 3) paljasti tärkeän löydöksen:
 
@@ -70,7 +70,7 @@ Tämä tukee Barandes'in väitettä että indivisible-prosessit ovat **"keskivä
 
 ### 2.1 Triple Hybrid Menestys
 
-![Advanced Hybrid Models](../projects/projekti/fi/results/hybrid_models.png)
+![Advanced Hybrid Models](https://stochastic-philosophy.github.io/emergent-physics/projects/projekti/fi/results/hybrid_models.png)
 
 Advanced hybrid -mallit (kuva 7) osoittivat selkeän hierarkian:
 
@@ -78,7 +78,7 @@ Advanced hybrid -mallit (kuva 7) osoittivat selkeän hierarkian:
 2. **RMT-Fractal**: 0.923 (kaksi komponenttia)
 3. **Percolation-RMT**: 0.897 (kaksi komponenttia)
 
-![Parameter Optimization](../projects/projekti/fi/results/parameter_optimization.png)
+![Parameter Optimization](https://stochastic-philosophy.github.io/emergent-physics/projects/projekti/fi/results/parameter_optimization.png)
 
 Parameter optimization (kuva 8) vahvisti että **kaikki kolme komponenttia ovat tarpeen** maksimaalisen indivisible-käyttäytymisen saavuttamiseen. Triple hybrid -mallit dominoivat top 8 optimoituja malleja.
 
@@ -119,7 +119,7 @@ $$\text{Information (Binary)} \rightarrow \text{Physics (Quantum-like)}$$
 
 ### 3.3 Kompleksilukujen Rooli
 
-![Kategoriatasoinen Vertailu](../projects/projekti/fi/results/category_comparison.png)
+![Kategoriatasoinen Vertailu](https://stochastic-philosophy.github.io/emergent-physics/projects/projekti/fi/results/category_comparison.png)
 
 Kategoriatasoinen analyysi (kuva 6) paljastaa että:
 
@@ -135,7 +135,7 @@ Kategoriatasoinen analyysi (kuva 6) paljastaa että:
 
 ### 4.1 Referenssiprosessien Käyttäytyminen
 
-![Referenssiprosessit](../projects/projekti/fi/results/reference_processes.png)
+![Referenssiprosessit](https://stochastic-philosophy.github.io/emergent-physics/projects/projekti/fi/results/reference_processes.png)
 
 Vaihe 1:n validointi (kuva 1) osoitti että mittarimme toimivat odotetulla tavalla:
 
@@ -144,7 +144,7 @@ Vaihe 1:n validointi (kuva 1) osoitti että mittarimme toimivat odotetulla taval
 - **White noise**: Ei division events:eja, puhdasta kohinaa
 - **Indivisible reference**: **160 odotettua division eventsiä**, selkeästi näkyvät punaisina pisteinä
 
-![Phase 1 Validation](../projects/projekti/fi/results/phase1_validation.png)
+![Phase 1 Validation](https://stochastic-philosophy.github.io/emergent-physics/projects/projekti/fi/results/phase1_validation.png)
 
 Lopullinen validation (kuva 4) vahvisti että indivisible reference (0.676) erottuu selkeästi muista referenssiprosesseista (kaikki <0.2), osoittaen että **mittarimme on validi ja luotettava**.
 
