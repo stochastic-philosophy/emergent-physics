@@ -69,7 +69,7 @@
             "time_series_std": 0.7344796514530413,
             "interaction_events": 0,
             "expected_division_events": 0,
-            "expected_memory_depth": Infinity
+            "expected_memory_depth": "Infinity"
           },
           "indivisible": {
             "process_type": "known_indivisible",
@@ -267,7 +267,7 @@
             "total_markov_violations": 79,
             "conditioning_sparsity": 0.0,
             "available_conditioning_times": 0,
-            "expected_memory_depth": Infinity,
+            "expected_memory_depth": "Infinity",
             "memory_depth_samples": 30
           },
           "indivisible": {
