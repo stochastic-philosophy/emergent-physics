@@ -1,0 +1,1538 @@
+{
+  "optimization_results": {
+    "binary_pm1_rmt_fractal": {
+      "randomness_type": "binary_pm1",
+      "model_name": "rmt_fractal",
+      "best_score": 0.9412368762752736,
+      "best_parameters": {
+        "rmt_weight": 0.4,
+        "fractal_dim": 2.1,
+        "interaction_strength": 0.1
+      },
+      "all_results": [
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_dim": 1.5,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8678840042045385
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_dim": 1.5,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9135252581462933
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_dim": 1.5,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8699788536449639
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_dim": 1.8,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8735133865083783
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_dim": 1.8,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8778188338589007
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_dim": 1.8,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8827136585667471
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_dim": 2.1,
+            "interaction_strength": 0.08
+          },
+          "score": 0.9305573486675324
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_dim": 2.1,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9412368762752736
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_dim": 2.1,
+            "interaction_strength": 0.12
+          },
+          "score": 0.9006474989179498
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.6,
+            "fractal_dim": 1.5,
+            "interaction_strength": 0.08
+          },
+          "score": 0.84122178940209
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.6,
+            "fractal_dim": 1.5,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8369301922958017
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.6,
+            "fractal_dim": 1.5,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8612344030173746
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.6,
+            "fractal_dim": 1.8,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8587054968156805
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.6,
+            "fractal_dim": 1.8,
+            "interaction_strength": 0.1
+          },
+          "score": 0.905379830581834
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.6,
+            "fractal_dim": 1.8,
+            "interaction_strength": 0.12
+          },
+          "score": 0.9261282384220616
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.6,
+            "fractal_dim": 2.1,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8923348791195203
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.6,
+            "fractal_dim": 2.1,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8733771099981452
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.6,
+            "fractal_dim": 2.1,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8970951585976629
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.8,
+            "fractal_dim": 1.5,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8895200643047055
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.8,
+            "fractal_dim": 1.5,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9145652630928093
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.8,
+            "fractal_dim": 1.5,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8843509552958636
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.8,
+            "fractal_dim": 1.8,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8569254931057936
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.8,
+            "fractal_dim": 1.8,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9222627836517653
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.8,
+            "fractal_dim": 1.8,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8705721882149263
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.8,
+            "fractal_dim": 2.1,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8818143819946825
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.8,
+            "fractal_dim": 2.1,
+            "interaction_strength": 0.1
+          },
+          "score": 0.896634885302665
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.8,
+            "fractal_dim": 2.1,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8756107092067026
+        }
+      ],
+      "n_evaluations": 27,
+      "parameter_grid": {
+        "rmt_weight": [
+          0.4,
+          0.6,
+          0.8
+        ],
+        "fractal_dim": [
+          1.5,
+          1.8,
+          2.1
+        ],
+        "interaction_strength": [
+          0.08,
+          0.1,
+          0.12
+        ]
+      }
+    },
+    "binary_pm1_percolation_rmt": {
+      "randomness_type": "binary_pm1",
+      "model_name": "percolation_rmt",
+      "best_score": 0.9290808137018489,
+      "best_parameters": {
+        "percolation_threshold": 0.55,
+        "network_size": 30,
+        "interaction_strength": 0.1
+      },
+      "all_results": [
+        {
+          "parameters": {
+            "percolation_threshold": 0.55,
+            "network_size": 30,
+            "interaction_strength": 0.08
+          },
+          "score": 0.805073146602362
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.55,
+            "network_size": 30,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9290808137018489
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.55,
+            "network_size": 30,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8492324244110554
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.55,
+            "network_size": 50,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8747045075125209
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.55,
+            "network_size": 50,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8382573424843877
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.55,
+            "network_size": 50,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8991642861559389
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.55,
+            "network_size": 70,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8921827737587337
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.55,
+            "network_size": 70,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8878961231682435
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.55,
+            "network_size": 70,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8908647746243741
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.593,
+            "network_size": 30,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8535217955852347
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.593,
+            "network_size": 30,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8489376120694986
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.593,
+            "network_size": 30,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8316067519940642
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.593,
+            "network_size": 50,
+            "interaction_strength": 0.08
+          },
+          "score": 0.88462301366475
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.593,
+            "network_size": 50,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9154501947690598
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.593,
+            "network_size": 50,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8421274964446918
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.593,
+            "network_size": 70,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8089195572868362
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.593,
+            "network_size": 70,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8464223087862487
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.593,
+            "network_size": 70,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8612418227910718
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.65,
+            "network_size": 30,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8332195634699809
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.65,
+            "network_size": 30,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8081854943424226
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.65,
+            "network_size": 30,
+            "interaction_strength": 0.12
+          },
+          "score": 0.9117581153774811
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.65,
+            "network_size": 50,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8185519075001547
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.65,
+            "network_size": 50,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9000408087553331
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.65,
+            "network_size": 50,
+            "interaction_strength": 0.12
+          },
+          "score": 0.9191677487169975
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.65,
+            "network_size": 70,
+            "interaction_strength": 0.08
+          },
+          "score": 0.7695175910468066
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.65,
+            "network_size": 70,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8514526680269586
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.65,
+            "network_size": 70,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8846489828726892
+        }
+      ],
+      "n_evaluations": 27,
+      "parameter_grid": {
+        "percolation_threshold": [
+          0.55,
+          0.593,
+          0.65
+        ],
+        "network_size": [
+          30,
+          50,
+          70
+        ],
+        "interaction_strength": [
+          0.08,
+          0.1,
+          0.12
+        ]
+      }
+    },
+    "binary_pm1_triple_hybrid": {
+      "randomness_type": "binary_pm1",
+      "model_name": "triple_hybrid",
+      "best_score": 0.9585553700612133,
+      "best_parameters": {
+        "rmt_weight": 0.5,
+        "fractal_weight": 0.4,
+        "interaction_strength": 0.08
+      },
+      "all_results": [
+        {
+          "parameters": {
+            "rmt_weight": 0.3,
+            "fractal_weight": 0.2,
+            "interaction_strength": 0.08
+          },
+          "score": 0.9404778334260806
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.3,
+            "fractal_weight": 0.2,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8892284671984173
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.3,
+            "fractal_weight": 0.2,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8831675013912076
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.3,
+            "fractal_weight": 0.3,
+            "interaction_strength": 0.08
+          },
+          "score": 0.925666975823904
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.3,
+            "fractal_weight": 0.3,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9058289742162865
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.3,
+            "fractal_weight": 0.3,
+            "interaction_strength": 0.12
+          },
+          "score": 0.942421814134669
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.3,
+            "fractal_weight": 0.4,
+            "interaction_strength": 0.08
+          },
+          "score": 0.9305563593643728
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.3,
+            "fractal_weight": 0.4,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9382650095838745
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.3,
+            "fractal_weight": 0.4,
+            "interaction_strength": 0.12
+          },
+          "score": 0.9501277437704818
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_weight": 0.2,
+            "interaction_strength": 0.08
+          },
+          "score": 0.936920051938416
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_weight": 0.2,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9298218017683796
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_weight": 0.2,
+            "interaction_strength": 0.12
+          },
+          "score": 0.9067181104309654
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_weight": 0.3,
+            "interaction_strength": 0.08
+          },
+          "score": 0.924922277870525
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_weight": 0.3,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8873035305756508
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_weight": 0.3,
+            "interaction_strength": 0.12
+          },
+          "score": 0.9332363816236939
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_weight": 0.4,
+            "interaction_strength": 0.08
+          },
+          "score": 0.9364800593581896
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_weight": 0.4,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9065603165770111
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_weight": 0.4,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8914566252395971
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.5,
+            "fractal_weight": 0.2,
+            "interaction_strength": 0.08
+          },
+          "score": 0.9286272182031782
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.5,
+            "fractal_weight": 0.2,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9335282260557721
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.5,
+            "fractal_weight": 0.2,
+            "interaction_strength": 0.12
+          },
+          "score": 0.9196149137451309
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.5,
+            "fractal_weight": 0.3,
+            "interaction_strength": 0.08
+          },
+          "score": 0.9464032647004267
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.5,
+            "fractal_weight": 0.3,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9321971186545479
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.5,
+            "fractal_weight": 0.3,
+            "interaction_strength": 0.12
+          },
+          "score": 0.914270945402832
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.5,
+            "fractal_weight": 0.4,
+            "interaction_strength": 0.08
+          },
+          "score": 0.9585553700612133
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.5,
+            "fractal_weight": 0.4,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9273035305756508
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.5,
+            "fractal_weight": 0.4,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8911652754590986
+        }
+      ],
+      "n_evaluations": 27,
+      "parameter_grid": {
+        "rmt_weight": [
+          0.3,
+          0.4,
+          0.5
+        ],
+        "fractal_weight": [
+          0.2,
+          0.3,
+          0.4
+        ],
+        "interaction_strength": [
+          0.08,
+          0.1,
+          0.12
+        ]
+      }
+    },
+    "binary_01_rmt_fractal": {
+      "randomness_type": "binary_01",
+      "model_name": "rmt_fractal",
+      "best_score": 0.9487889692697706,
+      "best_parameters": {
+        "rmt_weight": 0.6,
+        "fractal_dim": 2.1,
+        "interaction_strength": 0.1
+      },
+      "all_results": [
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_dim": 1.5,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8726311754158166
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_dim": 1.5,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9200430346874421
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_dim": 1.5,
+            "interaction_strength": 0.12
+          },
+          "score": 0.919751190255364
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_dim": 1.8,
+            "interaction_strength": 0.08
+          },
+          "score": 0.9006274655289682
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_dim": 1.8,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8632998206888024
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_dim": 1.8,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8821237865578434
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_dim": 2.1,
+            "interaction_strength": 0.08
+          },
+          "score": 0.9376610400049467
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_dim": 2.1,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9462657515612443
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_dim": 2.1,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8496867618870958
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.6,
+            "fractal_dim": 1.5,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8778124033883635
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.6,
+            "fractal_dim": 1.5,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8467104433314785
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.6,
+            "fractal_dim": 1.5,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8941314536573302
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.6,
+            "fractal_dim": 1.8,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8832919062635258
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.6,
+            "fractal_dim": 1.8,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9259751437581154
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.6,
+            "fractal_dim": 1.8,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8825719408891363
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.6,
+            "fractal_dim": 2.1,
+            "interaction_strength": 0.08
+          },
+          "score": 0.9041832684103136
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.6,
+            "fractal_dim": 2.1,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9487889692697706
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.6,
+            "fractal_dim": 2.1,
+            "interaction_strength": 0.12
+          },
+          "score": 0.867013417424102
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.8,
+            "fractal_dim": 1.5,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8129257404315835
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.8,
+            "fractal_dim": 1.5,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9273040252272308
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.8,
+            "fractal_dim": 1.5,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8680546589995674
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.8,
+            "fractal_dim": 1.8,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8606314227416064
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.8,
+            "fractal_dim": 1.8,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9016684597786435
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.8,
+            "fractal_dim": 1.8,
+            "interaction_strength": 0.12
+          },
+          "score": 0.9310210845235888
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.8,
+            "fractal_dim": 2.1,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8798894453719163
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.8,
+            "fractal_dim": 2.1,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8596005688493169
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.8,
+            "fractal_dim": 2.1,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8785709515859766
+        }
+      ],
+      "n_evaluations": 27,
+      "parameter_grid": {
+        "rmt_weight": [
+          0.4,
+          0.6,
+          0.8
+        ],
+        "fractal_dim": [
+          1.5,
+          1.8,
+          2.1
+        ],
+        "interaction_strength": [
+          0.08,
+          0.1,
+          0.12
+        ]
+      }
+    },
+    "binary_01_percolation_rmt": {
+      "randomness_type": "binary_01",
+      "model_name": "percolation_rmt",
+      "best_score": 0.9130889754529155,
+      "best_parameters": {
+        "percolation_threshold": 0.65,
+        "network_size": 50,
+        "interaction_strength": 0.12
+      },
+      "all_results": [
+        {
+          "parameters": {
+            "percolation_threshold": 0.55,
+            "network_size": 30,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8764825326160887
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.55,
+            "network_size": 30,
+            "interaction_strength": 0.1
+          },
+          "score": 0.816938848698448
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.55,
+            "network_size": 30,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8507151425214866
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.55,
+            "network_size": 50,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8089254931057938
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.55,
+            "network_size": 50,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8221232919062635
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.55,
+            "network_size": 50,
+            "interaction_strength": 0.12
+          },
+          "score": 0.7999035429419404
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.55,
+            "network_size": 70,
+            "interaction_strength": 0.08
+          },
+          "score": 0.861815618623632
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.55,
+            "network_size": 70,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8068573548506771
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.55,
+            "network_size": 70,
+            "interaction_strength": 0.12
+          },
+          "score": 0.7993089717430286
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.593,
+            "network_size": 30,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8835919124466706
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.593,
+            "network_size": 30,
+            "interaction_strength": 0.1
+          },
+          "score": 0.7844941569282137
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.593,
+            "network_size": 30,
+            "interaction_strength": 0.12
+          },
+          "score": 0.7997541581648427
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.593,
+            "network_size": 50,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8767728930934274
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.593,
+            "network_size": 50,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8702662462128239
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.593,
+            "network_size": 50,
+            "interaction_strength": 0.12
+          },
+          "score": 0.766867247882273
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.593,
+            "network_size": 70,
+            "interaction_strength": 0.08
+          },
+          "score": 0.905513881159958
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.593,
+            "network_size": 70,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8446329066963458
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.593,
+            "network_size": 70,
+            "interaction_strength": 0.12
+          },
+          "score": 0.862124528535213
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.65,
+            "network_size": 30,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8705566066901627
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.65,
+            "network_size": 30,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8224163729672913
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.65,
+            "network_size": 30,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8846452729858406
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.65,
+            "network_size": 50,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8019637667717804
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.65,
+            "network_size": 50,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8510104495146232
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.65,
+            "network_size": 50,
+            "interaction_strength": 0.12
+          },
+          "score": 0.9130889754529155
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.65,
+            "network_size": 70,
+            "interaction_strength": 0.08
+          },
+          "score": 0.8241840103876833
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.65,
+            "network_size": 70,
+            "interaction_strength": 0.1
+          },
+          "score": 0.8151489519569655
+        },
+        {
+          "parameters": {
+            "percolation_threshold": 0.65,
+            "network_size": 70,
+            "interaction_strength": 0.12
+          },
+          "score": 0.8492408334879121
+        }
+      ],
+      "n_evaluations": 27,
+      "parameter_grid": {
+        "percolation_threshold": [
+          0.55,
+          0.593,
+          0.65
+        ],
+        "network_size": [
+          30,
+          50,
+          70
+        ],
+        "interaction_strength": [
+          0.08,
+          0.1,
+          0.12
+        ]
+      }
+    },
+    "binary_01_triple_hybrid": {
+      "randomness_type": "binary_01",
+      "model_name": "triple_hybrid",
+      "best_score": 0.9581086996846597,
+      "best_parameters": {
+        "rmt_weight": 0.3,
+        "fractal_weight": 0.3,
+        "interaction_strength": 0.08
+      },
+      "all_results": [
+        {
+          "parameters": {
+            "rmt_weight": 0.3,
+            "fractal_weight": 0.2,
+            "interaction_strength": 0.08
+          },
+          "score": 0.940922525196315
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.3,
+            "fractal_weight": 0.2,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9505667470475485
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.3,
+            "fractal_weight": 0.2,
+            "interaction_strength": 0.12
+          },
+          "score": 0.89705385519075
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.3,
+            "fractal_weight": 0.3,
+            "interaction_strength": 0.08
+          },
+          "score": 0.9581086996846597
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.3,
+            "fractal_weight": 0.3,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9406351326284549
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.3,
+            "fractal_weight": 0.3,
+            "interaction_strength": 0.12
+          },
+          "score": 0.9323544178569222
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.3,
+            "fractal_weight": 0.4,
+            "interaction_strength": 0.08
+          },
+          "score": 0.918551165522785
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.3,
+            "fractal_weight": 0.4,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9502679774933532
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.3,
+            "fractal_weight": 0.4,
+            "interaction_strength": 0.12
+          },
+          "score": 0.9247909478760898
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_weight": 0.2,
+            "interaction_strength": 0.08
+          },
+          "score": 0.9493734001112966
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_weight": 0.2,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9478961231682436
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_weight": 0.2,
+            "interaction_strength": 0.12
+          },
+          "score": 0.9013921968713289
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_weight": 0.3,
+            "interaction_strength": 0.08
+          },
+          "score": 0.9275852346503433
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_weight": 0.3,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9387131639151672
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_weight": 0.3,
+            "interaction_strength": 0.12
+          },
+          "score": 0.9302721820317815
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_weight": 0.4,
+            "interaction_strength": 0.08
+          },
+          "score": 0.9552985840598529
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_weight": 0.4,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9465613058801706
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.4,
+            "fractal_weight": 0.4,
+            "interaction_strength": 0.12
+          },
+          "score": 0.9239079948061585
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.5,
+            "fractal_weight": 0.2,
+            "interaction_strength": 0.08
+          },
+          "score": 0.9563294379521426
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.5,
+            "fractal_weight": 0.2,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9556065046682743
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.5,
+            "fractal_weight": 0.2,
+            "interaction_strength": 0.12
+          },
+          "score": 0.9323504606442837
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.5,
+            "fractal_weight": 0.3,
+            "interaction_strength": 0.08
+          },
+          "score": 0.9148462251901318
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.5,
+            "fractal_weight": 0.3,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9341138935262475
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.5,
+            "fractal_weight": 0.3,
+            "interaction_strength": 0.12
+          },
+          "score": 0.799908984109318
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.5,
+            "fractal_weight": 0.4,
+            "interaction_strength": 0.08
+          },
+          "score": 0.9255168490694369
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.5,
+            "fractal_weight": 0.4,
+            "interaction_strength": 0.1
+          },
+          "score": 0.9111615655722503
+        },
+        {
+          "parameters": {
+            "rmt_weight": 0.5,
+            "fractal_weight": 0.4,
+            "interaction_strength": 0.12
+          },
+          "score": 0.9440502071353492
+        }
+      ],
+      "n_evaluations": 27,
+      "parameter_grid": {
+        "rmt_weight": [
+          0.3,
+          0.4,
+          0.5
+        ],
+        "fractal_weight": [
+          0.2,
+          0.3,
+          0.4
+        ],
+        "interaction_strength": [
+          0.08,
+          0.1,
+          0.12
+        ]
+      }
+    }
+  },
+  "top_5_models": [
+    {
+      "key": "binary_pm1_triple_hybrid",
+      "score": 0.9585553700612133
+    },
+    {
+      "key": "binary_01_triple_hybrid",
+      "score": 0.9581086996846597
+    },
+    {
+      "key": "binary_01_rmt_fractal",
+      "score": 0.9487889692697706
+    },
+    {
+      "key": "binary_pm1_rmt_fractal",
+      "score": 0.9412368762752736
+    },
+    {
+      "key": "binary_pm1_percolation_rmt",
+      "score": 0.9290808137018489
+    }
+  ],
+  "model_analysis": {
+    "rmt_fractal": {
+      "max_score": 0.9487889692697706,
+      "avg_score": 0.9450129227725221,
+      "std_score": 0.0037760464972484975
+    },
+    "percolation_rmt": {
+      "max_score": 0.9290808137018489,
+      "avg_score": 0.9210848945773822,
+      "std_score": 0.007995919124466733
+    },
+    "triple_hybrid": {
+      "max_score": 0.9585553700612133,
+      "avg_score": 0.9583320348729365,
+      "std_score": 0.00022333518827677423
+    }
+  },
+  "randomness_analysis": {
+    "binary_pm1": {
+      "max_score": 0.9585553700612133,
+      "avg_score": 0.9429576866794452,
+      "std_score": 0.0120943033278941
+    },
+    "binary_01": {
+      "max_score": 0.9581086996846597,
+      "avg_score": 0.9399955481357819,
+      "std_score": 0.0194025270502811
+    }
+  },
+  "optimization_stats": {
+    "total_evaluations": 162,
+    "models_optimized": 3,
+    "randomness_types_tested": 2,
+    "best_overall_score": 0.9585553700612133
+  },
+  "timestamp": "07251621"
+}

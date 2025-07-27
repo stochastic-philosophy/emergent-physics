@@ -1,0 +1,38 @@
+{
+  "markov": {
+    "process_type": "pure_markov",
+    "time_series_length": 1000,
+    "time_series_mean": 24.334,
+    "time_series_std": 14.424647101402515,
+    "interaction_events": 0,
+    "expected_division_events": 0,
+    "expected_memory_depth": 1.0
+  },
+  "deterministic": {
+    "process_type": "deterministic_sine",
+    "time_series_length": 1000,
+    "time_series_mean": -6.252776074688881e-16,
+    "time_series_std": 0.7344796514530413,
+    "interaction_events": 0,
+    "expected_division_events": 0,
+    "expected_memory_depth": Infinity
+  },
+  "indivisible": {
+    "process_type": "known_indivisible",
+    "time_series_length": 1000,
+    "time_series_mean": -0.015005168366951573,
+    "time_series_std": 0.7307497411544271,
+    "interaction_events": 160,
+    "expected_division_events": 160,
+    "expected_memory_depth": 1.16
+  },
+  "white_noise": {
+    "process_type": "white_noise",
+    "time_series_length": 1000,
+    "time_series_mean": -0.05512490870649019,
+    "time_series_std": 0.9895381533947226,
+    "interaction_events": 0,
+    "expected_division_events": 0,
+    "expected_memory_depth": 0.0
+  }
+}

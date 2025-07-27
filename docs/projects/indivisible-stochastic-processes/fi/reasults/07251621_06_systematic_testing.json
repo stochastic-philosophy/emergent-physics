@@ -1,0 +1,856 @@
+{
+  "systematic_results": {
+    "binary_01_int0.1": {
+      "randomness_type": "binary_01",
+      "interaction_strength": 0.1,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.15558333333333335,
+      "avg_memory_depth": 2.9600000000000004,
+      "avg_interaction_rate": 0.09899874843554443,
+      "avg_indivisible_score": 0.9557774440272566,
+      "std_division_rate": 0.012803536837747435,
+      "std_memory_depth": 0.8093618885681897,
+      "std_interaction_rate": 0.009473111123988116,
+      "std_indivisible_score": 0.01923101918781567,
+      "avg_score_components": {
+        "division": 0.9846666666666669,
+        "memory": 0.9387777777777776,
+        "interaction": 0.9319983312473926
+      }
+    },
+    "binary_pm1_int0.1": {
+      "randomness_type": "binary_pm1",
+      "interaction_strength": 0.1,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.16037500000000002,
+      "avg_memory_depth": 2.7600000000000002,
+      "avg_interaction_rate": 0.10191906549853984,
+      "avg_indivisible_score": 0.9596006396884997,
+      "std_division_rate": 0.013509834380924143,
+      "std_memory_depth": 0.7666376806114694,
+      "std_interaction_rate": 0.009092500680946932,
+      "std_indivisible_score": 0.01524089077738416,
+      "avg_score_components": {
+        "division": 0.9821666666666666,
+        "memory": 0.9488888888888888,
+        "interaction": 0.9358920873313864
+      }
+    },
+    "uniform_01_int0.1": {
+      "randomness_type": "uniform_01",
+      "interaction_strength": 0.1,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.15941666666666665,
+      "avg_memory_depth": 2.9366666666666665,
+      "avg_interaction_rate": 0.10050062578222778,
+      "avg_indivisible_score": 0.9518668335419274,
+      "std_division_rate": 0.013434770394597579,
+      "std_memory_depth": 0.9857259028530982,
+      "std_interaction_rate": 0.009377829179593603,
+      "std_indivisible_score": 0.01809459858048663,
+      "avg_score_components": {
+        "division": 0.9819999999999999,
+        "memory": 0.9306666666666668,
+        "interaction": 0.9340008343763037
+      }
+    },
+    "uniform_pm1_int0.1": {
+      "randomness_type": "uniform_pm1",
+      "interaction_strength": 0.1,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.1603333333333333,
+      "avg_memory_depth": 2.8100000000000005,
+      "avg_interaction_rate": 0.10204422194409676,
+      "avg_indivisible_score": 0.9509451258517594,
+      "std_division_rate": 0.015804579153594133,
+      "std_memory_depth": 0.951262319236918,
+      "std_interaction_rate": 0.01084239822194094,
+      "std_indivisible_score": 0.01809773048706747,
+      "avg_score_components": {
+        "division": 0.9800000000000001,
+        "memory": 0.9293333333333335,
+        "interaction": 0.9360589625921292
+      }
+    },
+    "gaussian_std_int0.1": {
+      "randomness_type": "gaussian_std",
+      "interaction_strength": 0.1,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.15945833333333334,
+      "avg_memory_depth": 2.823333333333333,
+      "avg_interaction_rate": 0.10025031289111387,
+      "avg_indivisible_score": 0.9517334167709637,
+      "std_division_rate": 0.016660467597146116,
+      "std_memory_depth": 0.8069214473678477,
+      "std_interaction_rate": 0.01198869839947444,
+      "std_indivisible_score": 0.013594102418630552,
+      "avg_score_components": {
+        "division": 0.9797222222222223,
+        "memory": 0.9327777777777778,
+        "interaction": 0.9336670838548187
+      }
+    },
+    "exponential_int0.1": {
+      "randomness_type": "exponential",
+      "interaction_strength": 0.1,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.159375,
+      "avg_memory_depth": 2.913333333333333,
+      "avg_interaction_rate": 0.09958281184814351,
+      "avg_indivisible_score": 0.9535554164928384,
+      "std_division_rate": 0.016942765171797276,
+      "std_memory_depth": 0.9258269576738168,
+      "std_interaction_rate": 0.011663449667425852,
+      "std_indivisible_score": 0.015651982745217934,
+      "avg_score_components": {
+        "division": 0.9802777777777777,
+        "memory": 0.9372222222222223,
+        "interaction": 0.9327770824641914
+      }
+    },
+    "cauchy_int0.1": {
+      "randomness_type": "cauchy",
+      "interaction_strength": 0.1,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.15899999999999995,
+      "avg_memory_depth": 3.8333333333333335,
+      "avg_interaction_rate": 0.09879015435961618,
+      "avg_indivisible_score": 0.9406551522736758,
+      "std_division_rate": 0.01572020992226249,
+      "std_memory_depth": 0.8795200711499173,
+      "std_interaction_rate": 0.012228381817767616,
+      "std_indivisible_score": 0.026365142313933804,
+      "avg_score_components": {
+        "division": 0.9808888888888888,
+        "memory": 0.904888888888889,
+        "interaction": 0.9317202058128216
+      }
+    },
+    "log_normal_int0.1": {
+      "randomness_type": "log_normal",
+      "interaction_strength": 0.1,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.1569583333333333,
+      "avg_memory_depth": 3.1,
+      "avg_interaction_rate": 0.09970796829370045,
+      "avg_indivisible_score": 0.9538554582116536,
+      "std_division_rate": 0.015754243255566278,
+      "std_memory_depth": 1.0557777543908884,
+      "std_interaction_rate": 0.011265625135466095,
+      "std_indivisible_score": 0.02536564665878405,
+      "avg_score_components": {
+        "division": 0.9816111111111112,
+        "memory": 0.9365555555555554,
+        "interaction": 0.9329439577249339
+      }
+    },
+    "student_t_int0.1": {
+      "randomness_type": "student_t",
+      "interaction_strength": 0.1,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.15854166666666666,
+      "avg_memory_depth": 2.8299999999999996,
+      "avg_interaction_rate": 0.09949937421777219,
+      "avg_indivisible_score": 0.9531776109025171,
+      "std_division_rate": 0.017008219009904853,
+      "std_memory_depth": 0.9209234495874237,
+      "std_interaction_rate": 0.013157310066851318,
+      "std_indivisible_score": 0.018099781777297753,
+      "avg_score_components": {
+        "division": 0.9807222222222223,
+        "memory": 0.9358888888888889,
+        "interaction": 0.9326658322903628
+      }
+    },
+    "chi2_int0.1": {
+      "randomness_type": "chi2",
+      "interaction_strength": 0.1,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.15725,
+      "avg_memory_depth": 2.8266666666666667,
+      "avg_interaction_rate": 0.09970796829370046,
+      "avg_indivisible_score": 0.9499221248783204,
+      "std_division_rate": 0.0129075236457915,
+      "std_memory_depth": 1.0686232056040874,
+      "std_interaction_rate": 0.009204649392087852,
+      "std_indivisible_score": 0.02085335158740449,
+      "avg_score_components": {
+        "division": 0.9832222222222223,
+        "memory": 0.9251111111111111,
+        "interaction": 0.9329439577249341
+      }
+    },
+    "complex_gaussian_int0.1": {
+      "randomness_type": "complex_gaussian",
+      "interaction_strength": 0.1,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.158,
+      "avg_memory_depth": 3.0733333333333337,
+      "avg_interaction_rate": 0.09962453066332916,
+      "avg_indivisible_score": 0.9507887637324435,
+      "std_division_rate": 0.014778221588991461,
+      "std_memory_depth": 0.8932835807041096,
+      "std_interaction_rate": 0.009836797680816757,
+      "std_indivisible_score": 0.017946326516923388,
+      "avg_score_components": {
+        "division": 0.9825555555555555,
+        "memory": 0.928,
+        "interaction": 0.9328327075511056
+      }
+    },
+    "complex_uniform_int0.1": {
+      "randomness_type": "complex_uniform",
+      "interaction_strength": 0.1,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.16054166666666667,
+      "avg_memory_depth": 2.806666666666666,
+      "avg_interaction_rate": 0.10137672090112641,
+      "avg_indivisible_score": 0.9541671255736336,
+      "std_division_rate": 0.012465299056001645,
+      "std_memory_depth": 1.019455192192815,
+      "std_interaction_rate": 0.00807881382187613,
+      "std_indivisible_score": 0.01751311120113012,
+      "avg_score_components": {
+        "division": 0.9808333333333334,
+        "memory": 0.9369999999999998,
+        "interaction": 0.9351689612015018
+      }
+    },
+    "fractional_brownian_int0.1": {
+      "randomness_type": "fractional_brownian",
+      "interaction_strength": 0.1,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.1585,
+      "avg_memory_depth": 4.513333333333334,
+      "avg_interaction_rate": 0.10045890696704213,
+      "avg_indivisible_score": 0.9216779307467671,
+      "std_division_rate": 0.014766939425622358,
+      "std_memory_depth": 0.9908694274334142,
+      "std_interaction_rate": 0.009737210787898569,
+      "std_indivisible_score": 0.040743249392349364,
+      "avg_score_components": {
+        "division": 0.9817777777777779,
+        "memory": 0.8554444444444447,
+        "interaction": 0.9339452092893895
+      }
+    },
+    "pink_noise_int0.1": {
+      "randomness_type": "pink_noise",
+      "interaction_strength": 0.1,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.1560833333333333,
+      "avg_memory_depth": 5.603333333333334,
+      "avg_interaction_rate": 0.0992073425114727,
+      "avg_indivisible_score": 0.8684997357808372,
+      "std_division_rate": 0.015061448211318265,
+      "std_memory_depth": 0.9449808933988502,
+      "std_interaction_rate": 0.009672649226494901,
+      "std_indivisible_score": 0.05678455734624534,
+      "avg_score_components": {
+        "division": 0.9827777777777781,
+        "memory": 0.7223333333333335,
+        "interaction": 0.9322764566819636
+      }
+    },
+    "binary_01_int0.15": {
+      "randomness_type": "binary_01",
+      "interaction_strength": 0.15,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.21866666666666668,
+      "avg_memory_depth": 2.9133333333333336,
+      "avg_interaction_rate": 0.14985398414685022,
+      "avg_indivisible_score": 0.942250980392157,
+      "std_division_rate": 0.01697710877099579,
+      "std_memory_depth": 0.7504369097769349,
+      "std_interaction_rate": 0.013448479230381671,
+      "std_indivisible_score": 0.025008939349094053,
+      "avg_score_components": {
+        "division": 0.9156666666666666,
+        "memory": 0.9468888888888889,
+        "interaction": 0.9861437908496733
+      }
+    },
+    "binary_pm1_int0.15": {
+      "randomness_type": "binary_pm1",
+      "interaction_strength": 0.15,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.22270833333333334,
+      "avg_memory_depth": 2.5799999999999996,
+      "avg_interaction_rate": 0.1525657071339174,
+      "avg_indivisible_score": 0.9282670838548185,
+      "std_division_rate": 0.01741073463572274,
+      "std_memory_depth": 1.0643934109779771,
+      "std_interaction_rate": 0.014499974239675521,
+      "std_indivisible_score": 0.03707321781350394,
+      "avg_score_components": {
+        "division": 0.9106111111111111,
+        "memory": 0.9181111111111111,
+        "interaction": 0.9838909748296483
+      }
+    },
+    "uniform_01_int0.15": {
+      "randomness_type": "uniform_01",
+      "interaction_strength": 0.15,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.21904166666666666,
+      "avg_memory_depth": 2.9899999999999998,
+      "avg_interaction_rate": 0.1491447642886942,
+      "avg_indivisible_score": 0.925252315394243,
+      "std_division_rate": 0.015352399830500622,
+      "std_memory_depth": 1.301371071857165,
+      "std_interaction_rate": 0.011803181093199725,
+      "std_indivisible_score": 0.03303830089473585,
+      "avg_score_components": {
+        "division": 0.9118333333333334,
+        "memory": 0.9077777777777778,
+        "interaction": 0.9870393547489918
+      }
+    },
+    "uniform_pm1_int0.15": {
+      "randomness_type": "uniform_pm1",
+      "interaction_strength": 0.15,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.2205416666666667,
+      "avg_memory_depth": 2.8466666666666667,
+      "avg_interaction_rate": 0.15173133083020446,
+      "avg_indivisible_score": 0.9352543178973718,
+      "std_division_rate": 0.01833622136343497,
+      "std_memory_depth": 0.7826166934642328,
+      "std_interaction_rate": 0.016250054213550736,
+      "std_indivisible_score": 0.02043983138137712,
+      "avg_score_components": {
+        "division": 0.913388888888889,
+        "memory": 0.9338888888888889,
+        "interaction": 0.981716033931303
+      }
+    },
+    "gaussian_std_int0.15": {
+      "randomness_type": "gaussian_std",
+      "interaction_strength": 0.15,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.22104166666666666,
+      "avg_memory_depth": 2.7399999999999998,
+      "avg_interaction_rate": 0.15014601585314977,
+      "avg_indivisible_score": 0.937090168265888,
+      "std_division_rate": 0.014829177788700519,
+      "std_memory_depth": 0.9243376006633075,
+      "std_interaction_rate": 0.011381593172287055,
+      "std_indivisible_score": 0.022105596956555944,
+      "avg_score_components": {
+        "division": 0.9096111111111113,
+        "memory": 0.9394444444444443,
+        "interaction": 0.9873397302183285
+      }
+    },
+    "exponential_int0.15": {
+      "randomness_type": "exponential",
+      "interaction_strength": 0.15,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.21862499999999999,
+      "avg_memory_depth": 3.0833333333333335,
+      "avg_interaction_rate": 0.1478931998331247,
+      "avg_indivisible_score": 0.927659324155194,
+      "std_division_rate": 0.01293151028818109,
+      "std_memory_depth": 1.1532803456035985,
+      "std_interaction_rate": 0.010776463373458065,
+      "std_indivisible_score": 0.02045756410132964,
+      "avg_score_components": {
+        "division": 0.9085000000000001,
+        "memory": 0.9164444444444445,
+        "interaction": 0.9884077318870811
+      }
+    },
+    "cauchy_int0.15": {
+      "randomness_type": "cauchy",
+      "interaction_strength": 0.15,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.2205416666666666,
+      "avg_memory_depth": 3.6266666666666665,
+      "avg_interaction_rate": 0.1487692949520234,
+      "avg_indivisible_score": 0.9202921151439298,
+      "std_division_rate": 0.01686553232351578,
+      "std_memory_depth": 1.041451977876187,
+      "std_interaction_rate": 0.01338933510332296,
+      "std_indivisible_score": 0.029787330240571175,
+      "avg_score_components": {
+        "division": 0.9125,
+        "memory": 0.8951111111111111,
+        "interaction": 0.9862383534974273
+      }
+    },
+    "log_normal_int0.15": {
+      "randomness_type": "log_normal",
+      "interaction_strength": 0.15,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.22104166666666666,
+      "avg_memory_depth": 3.1000000000000005,
+      "avg_interaction_rate": 0.15056320400500628,
+      "avg_indivisible_score": 0.9262272006675011,
+      "std_division_rate": 0.01360178960856091,
+      "std_memory_depth": 1.144261042478216,
+      "std_interaction_rate": 0.010882854922817707,
+      "std_indivisible_score": 0.02938762604936268,
+      "avg_score_components": {
+        "division": 0.9052777777777777,
+        "memory": 0.9158888888888889,
+        "interaction": 0.9888026700041718
+      }
+    },
+    "student_t_int0.15": {
+      "randomness_type": "student_t",
+      "interaction_strength": 0.15,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.22495833333333334,
+      "avg_memory_depth": 2.8,
+      "avg_interaction_rate": 0.15348352106800167,
+      "avg_indivisible_score": 0.934743401474065,
+      "std_division_rate": 0.01682471933066211,
+      "std_memory_depth": 0.8752142594816426,
+      "std_interaction_rate": 0.012633914832671352,
+      "std_indivisible_score": 0.01587282571941238,
+      "avg_score_components": {
+        "division": 0.9016111111111111,
+        "memory": 0.9417777777777778,
+        "interaction": 0.9869392295925462
+      }
+    },
+    "chi2_int0.15": {
+      "randomness_type": "chi2",
+      "interaction_strength": 0.15,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.224625,
+      "avg_memory_depth": 3.0666666666666673,
+      "avg_interaction_rate": 0.15381727158948688,
+      "avg_indivisible_score": 0.9317090529828955,
+      "std_division_rate": 0.015010933515274789,
+      "std_memory_depth": 0.8564785785736592,
+      "std_interaction_rate": 0.011191300594368438,
+      "std_indivisible_score": 0.02090598019929074,
+      "avg_score_components": {
+        "division": 0.9005,
+        "memory": 0.935111111111111,
+        "interaction": 0.9873230426922543
+      }
+    },
+    "complex_gaussian_int0.15": {
+      "randomness_type": "complex_gaussian",
+      "interaction_strength": 0.15,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.22333333333333333,
+      "avg_memory_depth": 2.703333333333333,
+      "avg_interaction_rate": 0.15148101793909058,
+      "avg_indivisible_score": 0.9335350298984842,
+      "std_division_rate": 0.011380416903123053,
+      "std_memory_depth": 0.7489919151024856,
+      "std_interaction_rate": 0.010123928184265715,
+      "std_indivisible_score": 0.015287767219520835,
+      "avg_score_components": {
+        "division": 0.9022222222222225,
+        "memory": 0.9371111111111112,
+        "interaction": 0.9890084828257544
+      }
+    },
+    "complex_uniform_int0.15": {
+      "randomness_type": "complex_uniform",
+      "interaction_strength": 0.15,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.22008333333333333,
+      "avg_memory_depth": 3.0366666666666666,
+      "avg_interaction_rate": 0.14993742177722155,
+      "avg_indivisible_score": 0.9354782923098317,
+      "std_division_rate": 0.01648842186370653,
+      "std_memory_depth": 0.8396361645908832,
+      "std_interaction_rate": 0.014256851930811658,
+      "std_indivisible_score": 0.020083608740837065,
+      "avg_score_components": {
+        "division": 0.910888888888889,
+        "memory": 0.9356666666666668,
+        "interaction": 0.9842803504380477
+      }
+    },
+    "fractional_brownian_int0.15": {
+      "randomness_type": "fractional_brownian",
+      "interaction_strength": 0.15,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.22370833333333334,
+      "avg_memory_depth": 4.303333333333333,
+      "avg_interaction_rate": 0.15356695869837295,
+      "avg_indivisible_score": 0.9020231122236129,
+      "std_division_rate": 0.015008620208252176,
+      "std_memory_depth": 1.2410971848417927,
+      "std_interaction_rate": 0.012432556910457299,
+      "std_indivisible_score": 0.04385254939965502,
+      "avg_score_components": {
+        "division": 0.9057222222222222,
+        "memory": 0.8564444444444443,
+        "interaction": 0.9857822277847311
+      }
+    },
+    "pink_noise_int0.15": {
+      "randomness_type": "pink_noise",
+      "interaction_strength": 0.15,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.2225,
+      "avg_memory_depth": 5.59,
+      "avg_interaction_rate": 0.15285773884021692,
+      "avg_indivisible_score": 0.8473716033931303,
+      "std_division_rate": 0.013616778865306824,
+      "std_memory_depth": 1.2546845553099526,
+      "std_interaction_rate": 0.010608726395120404,
+      "std_indivisible_score": 0.07647792851139713,
+      "avg_score_components": {
+        "division": 0.9074444444444445,
+        "memory": 0.7166666666666666,
+        "interaction": 0.9886357947434293
+      }
+    },
+    "binary_01_int0.2": {
+      "randomness_type": "binary_01",
+      "interaction_strength": 0.2,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.2804583333333333,
+      "avg_memory_depth": 2.623333333333333,
+      "avg_interaction_rate": 0.20400500625782228,
+      "avg_indivisible_score": 0.906198664997914,
+      "std_division_rate": 0.014154958397050213,
+      "std_memory_depth": 1.0531487179986605,
+      "std_interaction_rate": 0.013209787035753456,
+      "std_indivisible_score": 0.03437436481304925,
+      "avg_score_components": {
+        "division": 0.8781666666666667,
+        "memory": 0.9233333333333335,
+        "interaction": 0.9279933249895704
+      }
+    },
+    "binary_pm1_int0.2": {
+      "randomness_type": "binary_pm1",
+      "interaction_strength": 0.2,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.27175,
+      "avg_memory_depth": 2.8800000000000003,
+      "avg_interaction_rate": 0.19674593241551938,
+      "avg_indivisible_score": 0.9242899735780837,
+      "std_division_rate": 0.014735868937165988,
+      "std_memory_depth": 1.0094222770145966,
+      "std_interaction_rate": 0.012744671284779822,
+      "std_indivisible_score": 0.03027289179082972,
+      "avg_score_components": {
+        "division": 0.9032222222222221,
+        "memory": 0.9386666666666666,
+        "interaction": 0.9376720901126405
+      }
+    },
+    "uniform_01_int0.2": {
+      "randomness_type": "uniform_01",
+      "interaction_strength": 0.2,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.2762916666666666,
+      "avg_memory_depth": 3.12,
+      "avg_interaction_rate": 0.19974968710888608,
+      "avg_indivisible_score": 0.9183111945487415,
+      "std_division_rate": 0.013445427248283664,
+      "std_memory_depth": 0.8711677986090473,
+      "std_interaction_rate": 0.013485957887502615,
+      "std_indivisible_score": 0.02646193634491277,
+      "avg_score_components": {
+        "division": 0.8902777777777778,
+        "memory": 0.9386666666666665,
+        "interaction": 0.9336670838548184
+      }
+    },
+    "uniform_pm1_int0.2": {
+      "randomness_type": "uniform_pm1",
+      "interaction_strength": 0.2,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.27329166666666665,
+      "avg_memory_depth": 2.67,
+      "avg_interaction_rate": 0.19816437213183144,
+      "avg_indivisible_score": 0.9114006118759563,
+      "std_division_rate": 0.01643637776059217,
+      "std_memory_depth": 1.2053077062172408,
+      "std_interaction_rate": 0.01335653783361045,
+      "std_indivisible_score": 0.03344384414153976,
+      "avg_score_components": {
+        "division": 0.9018333333333335,
+        "memory": 0.9087777777777778,
+        "interaction": 0.9357808371575582
+      }
+    },
+    "gaussian_std_int0.2": {
+      "randomness_type": "gaussian_std",
+      "interaction_strength": 0.2,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.27475,
+      "avg_memory_depth": 2.8133333333333335,
+      "avg_interaction_rate": 0.19699624530663334,
+      "avg_indivisible_score": 0.9116010012515646,
+      "std_division_rate": 0.01626729848499744,
+      "std_memory_depth": 1.1505747356092182,
+      "std_interaction_rate": 0.014242928147043898,
+      "std_indivisible_score": 0.023754113532478808,
+      "avg_score_components": {
+        "division": 0.8854444444444444,
+        "memory": 0.924888888888889,
+        "interaction": 0.9373383395911556
+      }
+    },
+    "exponential_int0.2": {
+      "randomness_type": "exponential",
+      "interaction_strength": 0.2,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.2785416666666667,
+      "avg_memory_depth": 2.96,
+      "avg_interaction_rate": 0.20171047142261161,
+      "avg_indivisible_score": 0.9121883187317482,
+      "std_division_rate": 0.015834703888049882,
+      "std_memory_depth": 1.0480458005259123,
+      "std_interaction_rate": 0.012619855397465232,
+      "std_indivisible_score": 0.0339048143561005,
+      "avg_score_components": {
+        "division": 0.8858333333333335,
+        "memory": 0.929111111111111,
+        "interaction": 0.9310527047698512
+      }
+    },
+    "cauchy_int0.2": {
+      "randomness_type": "cauchy",
+      "interaction_strength": 0.2,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.2794166666666667,
+      "avg_memory_depth": 3.6133333333333337,
+      "avg_interaction_rate": 0.2011264080100125,
+      "avg_indivisible_score": 0.9027662911973302,
+      "std_division_rate": 0.016840963617191135,
+      "std_memory_depth": 0.945421716601762,
+      "std_interaction_rate": 0.013619068718930039,
+      "std_indivisible_score": 0.035344412005303076,
+      "avg_score_components": {
+        "division": 0.876888888888889,
+        "memory": 0.9141111111111113,
+        "interaction": 0.9318314559866501
+      }
+    },
+    "log_normal_int0.2": {
+      "randomness_type": "log_normal",
+      "interaction_strength": 0.2,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.27724999999999994,
+      "avg_memory_depth": 2.7700000000000005,
+      "avg_interaction_rate": 0.1992073425114727,
+      "avg_indivisible_score": 0.9125224864413851,
+      "std_division_rate": 0.012576432986608987,
+      "std_memory_depth": 1.0234419052068042,
+      "std_interaction_rate": 0.010561124450198387,
+      "std_indivisible_score": 0.02757163657634919,
+      "avg_score_components": {
+        "division": 0.891,
+        "memory": 0.9231111111111112,
+        "interaction": 0.9343902099847031
+      }
+    },
+    "student_t_int0.2": {
+      "randomness_type": "student_t",
+      "interaction_strength": 0.2,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.28279166666666666,
+      "avg_memory_depth": 2.7533333333333343,
+      "avg_interaction_rate": 0.2043804755944931,
+      "avg_indivisible_score": 0.9089874287303575,
+      "std_division_rate": 0.016710411342101134,
+      "std_memory_depth": 0.9006417465094296,
+      "std_interaction_rate": 0.014112372045805198,
+      "std_indivisible_score": 0.03574779073508829,
+      "avg_score_components": {
+        "division": 0.8688333333333332,
+        "memory": 0.939888888888889,
+        "interaction": 0.9274926992073426
+      }
+    },
+    "chi2_int0.2": {
+      "randomness_type": "chi2",
+      "interaction_strength": 0.2,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.27812499999999996,
+      "avg_memory_depth": 2.89,
+      "avg_interaction_rate": 0.19999999999999998,
+      "avg_indivisible_score": 0.8993555555555556,
+      "std_division_rate": 0.018032811529727327,
+      "std_memory_depth": 1.3432175301615643,
+      "std_interaction_rate": 0.014929508049291641,
+      "std_indivisible_score": 0.040593645821366243,
+      "avg_score_components": {
+        "division": 0.8768333333333337,
+        "memory": 0.9048888888888889,
+        "interaction": 0.9333333333333335
+      }
+    },
+    "complex_gaussian_int0.2": {
+      "randomness_type": "complex_gaussian",
+      "interaction_strength": 0.2,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.27925,
+      "avg_memory_depth": 2.76,
+      "avg_interaction_rate": 0.20150187734668334,
+      "avg_indivisible_score": 0.9112439438186624,
+      "std_division_rate": 0.013012814197295428,
+      "std_memory_depth": 1.0291096475432862,
+      "std_interaction_rate": 0.010531005741157763,
+      "std_indivisible_score": 0.03553363343390989,
+      "avg_score_components": {
+        "division": 0.8830000000000001,
+        "memory": 0.9294444444444443,
+        "interaction": 0.9313308302044223
+      }
+    },
+    "complex_uniform_int0.2": {
+      "randomness_type": "complex_uniform",
+      "interaction_strength": 0.2,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.2795833333333333,
+      "avg_memory_depth": 2.7066666666666666,
+      "avg_interaction_rate": 0.2011681268251982,
+      "avg_indivisible_score": 0.9075107217355028,
+      "std_division_rate": 0.014741994060807681,
+      "std_memory_depth": 1.0670624265816044,
+      "std_interaction_rate": 0.014026210629365132,
+      "std_indivisible_score": 0.02785312698994619,
+      "avg_score_components": {
+        "division": 0.8816666666666665,
+        "memory": 0.9212222222222224,
+        "interaction": 0.9317758308997358
+      }
+    },
+    "fractional_brownian_int0.2": {
+      "randomness_type": "fractional_brownian",
+      "interaction_strength": 0.2,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.27879166666666666,
+      "avg_memory_depth": 4.263333333333334,
+      "avg_interaction_rate": 0.20387984981226534,
+      "avg_indivisible_score": 0.8818764844945073,
+      "std_division_rate": 0.019068088889264413,
+      "std_memory_depth": 1.049915340502377,
+      "std_interaction_rate": 0.016472382427038423,
+      "std_indivisible_score": 0.048103014731781274,
+      "avg_score_components": {
+        "division": 0.8730555555555556,
+        "memory": 0.8675555555555555,
+        "interaction": 0.9281602002503129
+      }
+    },
+    "pink_noise_int0.2": {
+      "randomness_type": "pink_noise",
+      "interaction_strength": 0.2,
+      "n_successful_trials": 30,
+      "n_total_trials": 30,
+      "success_rate": 1.0,
+      "avg_division_rate": 0.27120833333333333,
+      "avg_memory_depth": 5.153333333333332,
+      "avg_interaction_rate": 0.19712140175219026,
+      "avg_indivisible_score": 0.8709231817549715,
+      "std_division_rate": 0.013557298669802265,
+      "std_memory_depth": 0.7800569779758969,
+      "std_interaction_rate": 0.013373792456850012,
+      "std_indivisible_score": 0.05307115565427624,
+      "avg_score_components": {
+        "division": 0.9061666666666665,
+        "memory": 0.8025555555555556,
+        "interaction": 0.9371714643304131
+      }
+    }
+  },
+  "test_parameters": {
+    "n_monte_carlo": 30,
+    "time_series_length": 800,
+    "interaction_strengths": [
+      0.1,
+      0.15,
+      0.2
+    ],
+    "n_randomness_types": 14,
+    "total_tests_run": 1260
+  },
+  "timestamp": "07251621"
+}

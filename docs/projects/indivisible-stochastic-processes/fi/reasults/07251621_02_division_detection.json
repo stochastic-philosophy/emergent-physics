@@ -1,0 +1,159 @@
+{
+  "markov": {
+    "total_division_events": 0,
+    "strong_division_events": 0,
+    "division_rate": 0.0,
+    "expected_events": 0,
+    "division_events_list": [],
+    "correlations_mean": 0.0,
+    "correlations_max": 0.0
+  },
+  "deterministic": {
+    "total_division_events": 0,
+    "strong_division_events": 0,
+    "division_rate": 0.0,
+    "expected_events": 0,
+    "division_events_list": [],
+    "correlations_mean": 0.0,
+    "correlations_max": 0.0
+  },
+  "indivisible": {
+    "total_division_events": 237,
+    "strong_division_events": 160,
+    "division_rate": 0.16,
+    "expected_events": 160,
+    "division_events_list": [
+      {
+        "time": 18,
+        "score": 0.8,
+        "methods": [
+          "correlation",
+          "interaction"
+        ],
+        "details": {
+          "correlation": 0.4420592914967031,
+          "interaction": 1.0
+        }
+      },
+      {
+        "time": 41,
+        "score": 0.8,
+        "methods": [
+          "correlation",
+          "interaction"
+        ],
+        "details": {
+          "correlation": 0.592043376301403,
+          "interaction": 1.0
+        }
+      },
+      {
+        "time": 129,
+        "score": 0.8,
+        "methods": [
+          "correlation",
+          "interaction"
+        ],
+        "details": {
+          "correlation": 0.5806740012551965,
+          "interaction": 1.0
+        }
+      },
+      {
+        "time": 136,
+        "score": 0.8,
+        "methods": [
+          "correlation",
+          "interaction"
+        ],
+        "details": {
+          "correlation": 0.6056036061610504,
+          "interaction": 1.0
+        }
+      },
+      {
+        "time": 144,
+        "score": 0.8,
+        "methods": [
+          "correlation",
+          "interaction"
+        ],
+        "details": {
+          "correlation": 0.29914769401235036,
+          "interaction": 1.0
+        }
+      },
+      {
+        "time": 177,
+        "score": 0.8,
+        "methods": [
+          "correlation",
+          "interaction"
+        ],
+        "details": {
+          "correlation": 0.5826189835332253,
+          "interaction": 1.0
+        }
+      },
+      {
+        "time": 221,
+        "score": 0.8,
+        "methods": [
+          "correlation",
+          "interaction"
+        ],
+        "details": {
+          "correlation": 0.3704760429492001,
+          "interaction": 1.0
+        }
+      },
+      {
+        "time": 260,
+        "score": 0.8,
+        "methods": [
+          "correlation",
+          "interaction"
+        ],
+        "details": {
+          "correlation": 0.5478882764903991,
+          "interaction": 1.0
+        }
+      },
+      {
+        "time": 284,
+        "score": 0.8,
+        "methods": [
+          "correlation",
+          "interaction"
+        ],
+        "details": {
+          "correlation": 0.6201242781517025,
+          "interaction": 1.0
+        }
+      },
+      {
+        "time": 301,
+        "score": 0.8,
+        "methods": [
+          "correlation",
+          "interaction"
+        ],
+        "details": {
+          "correlation": 0.7255933130993549,
+          "interaction": 1.0
+        }
+      }
+    ],
+    "correlations_mean": 0.2554346698658304,
+    "correlations_max": 0.9969386978256488
+  },
+  "white_noise": {
+    "total_division_events": 0,
+    "strong_division_events": 0,
+    "division_rate": 0.0,
+    "expected_events": 0,
+    "division_events_list": [],
+    "correlations_mean": 0.0,
+    "correlations_max": 0.0
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "markov": {
+    "avg_memory_depth": 1.3,
+    "memory_depth_std": 1.6360521589077368,
+    "markov_violation_rate": 2.85,
+    "total_markov_violations": 57,
+    "conditioning_sparsity": 0.0,
+    "available_conditioning_times": 0,
+    "expected_memory_depth": 1.0,
+    "memory_depth_samples": 30
+  },
+  "deterministic": {
+    "avg_memory_depth": 11.533333333333333,
+    "memory_depth_std": 3.774770044504551,
+    "markov_violation_rate": 3.95,
+    "total_markov_violations": 79,
+    "conditioning_sparsity": 0.0,
+    "available_conditioning_times": 0,
+    "expected_memory_depth": Infinity,
+    "memory_depth_samples": 30
+  },
+  "indivisible": {
+    "avg_memory_depth": 3.2666666666666666,
+    "memory_depth_std": 3.1297852251481335,
+    "markov_violation_rate": 3.0,
+    "total_markov_violations": 60,
+    "conditioning_sparsity": 0.01,
+    "available_conditioning_times": 10,
+    "expected_memory_depth": 1.16,
+    "memory_depth_samples": 30
+  },
+  "white_noise": {
+    "avg_memory_depth": 0.6666666666666666,
+    "memory_depth_std": 1.5129074290546956,
+    "markov_violation_rate": 2.6,
+    "total_markov_violations": 52,
+    "conditioning_sparsity": 0.0,
+    "available_conditioning_times": 0,
+    "expected_memory_depth": 0.0,
+    "memory_depth_samples": 30
+  }
+}

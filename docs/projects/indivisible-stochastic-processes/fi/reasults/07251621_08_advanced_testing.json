@@ -1,0 +1,149 @@
+{
+  "hybrid_test_results": {
+    "binary_pm1_rmt_fractal": {
+      "randomness_type": "binary_pm1",
+      "model_type": "rmt_fractal",
+      "time_series_length": 800,
+      "time_series_mean": 0.026453135373627496,
+      "time_series_std": 0.4585147937648037,
+      "interaction_events": 86,
+      "interaction_rate": 0.10763454317897372,
+      "parameters": {
+        "randomness_type": "binary_pm1",
+        "rmt_weight": 0.6,
+        "fractal_dim": 1.8,
+        "interaction_strength": 0.1,
+        "matrix_size": 14
+      },
+      "ts_min": -2.515272215176439,
+      "ts_max": 6.74859587184401,
+      "has_nan": false,
+      "has_inf": false,
+      "status": "OK"
+    },
+    "binary_pm1_percolation_rmt": {
+      "randomness_type": "binary_pm1",
+      "model_type": "percolation_rmt",
+      "time_series_length": 800,
+      "time_series_mean": -1.2434497875801754e-16,
+      "time_series_std": 1.0,
+      "interaction_events": 70,
+      "interaction_rate": 0.08760951188986232,
+      "parameters": {
+        "randomness_type": "binary_pm1",
+        "percolation_threshold": 0.593,
+        "network_size": 50,
+        "interaction_strength": 0.1,
+        "percolation_connectivity": 0.5306122448979592
+      },
+      "ts_min": -0.7318906894480912,
+      "ts_max": 10.633620502123557,
+      "has_nan": false,
+      "has_inf": false,
+      "status": "OK"
+    },
+    "binary_pm1_triple_hybrid": {
+      "randomness_type": "binary_pm1",
+      "model_type": "triple_hybrid",
+      "time_series_length": 800,
+      "time_series_mean": -0.1251711425214307,
+      "time_series_std": 0.33311370767085213,
+      "interaction_events": 79,
+      "interaction_rate": 0.09887359198998748,
+      "parameters": {
+        "randomness_type": "binary_pm1",
+        "rmt_weight": 0.4,
+        "fractal_weight": 0.3,
+        "percolation_weight": 0.3,
+        "interaction_strength": 0.1,
+        "matrix_size": 10,
+        "network_size": 20
+      },
+      "ts_min": -0.7115039666903973,
+      "ts_max": 0.9731518064125209,
+      "has_nan": false,
+      "has_inf": false,
+      "status": "OK"
+    },
+    "binary_01_rmt_fractal": {
+      "randomness_type": "binary_01",
+      "model_type": "rmt_fractal",
+      "time_series_length": 800,
+      "time_series_mean": 0.07656950637166761,
+      "time_series_std": 0.4437945032678384,
+      "interaction_events": 84,
+      "interaction_rate": 0.10513141426783479,
+      "parameters": {
+        "randomness_type": "binary_01",
+        "rmt_weight": 0.6,
+        "fractal_dim": 1.8,
+        "interaction_strength": 0.1,
+        "matrix_size": 14
+      },
+      "ts_min": -2.098851719873876,
+      "ts_max": 6.8883889010431245,
+      "has_nan": false,
+      "has_inf": false,
+      "status": "OK"
+    },
+    "binary_01_percolation_rmt": {
+      "randomness_type": "binary_01",
+      "model_type": "percolation_rmt",
+      "time_series_length": 800,
+      "time_series_mean": 6.661338147750939e-17,
+      "time_series_std": 1.0,
+      "interaction_events": 75,
+      "interaction_rate": 0.09386733416770963,
+      "parameters": {
+        "randomness_type": "binary_01",
+        "percolation_threshold": 0.593,
+        "network_size": 50,
+        "interaction_strength": 0.1,
+        "percolation_connectivity": 0.5510204081632653
+      },
+      "ts_min": -1.7398330279215872,
+      "ts_max": 4.0362532288136075,
+      "has_nan": false,
+      "has_inf": false,
+      "status": "OK"
+    },
+    "binary_01_triple_hybrid": {
+      "randomness_type": "binary_01",
+      "model_type": "triple_hybrid",
+      "time_series_length": 800,
+      "time_series_mean": 0.011563714865683715,
+      "time_series_std": 0.39038270966285643,
+      "interaction_events": 87,
+      "interaction_rate": 0.10888610763454318,
+      "parameters": {
+        "randomness_type": "binary_01",
+        "rmt_weight": 0.4,
+        "fractal_weight": 0.3,
+        "percolation_weight": 0.3,
+        "interaction_strength": 0.1,
+        "matrix_size": 10,
+        "network_size": 20
+      },
+      "ts_min": -0.5824872127173918,
+      "ts_max": 1.215391520098142,
+      "has_nan": false,
+      "has_inf": false,
+      "status": "OK"
+    }
+  },
+  "optimal_parameters": {
+    "optimal_randomness": "binary_pm1",
+    "optimal_interaction": 0.1,
+    "top_randomness_types": [
+      "binary_pm1",
+      "binary_01",
+      "complex_uniform"
+    ]
+  },
+  "available_models": [
+    "rmt_fractal",
+    "percolation_rmt",
+    "triple_hybrid"
+  ],
+  "timestamp": "07251621"
+}

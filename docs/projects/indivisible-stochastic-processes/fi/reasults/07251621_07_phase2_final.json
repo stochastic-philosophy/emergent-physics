@@ -1,0 +1,74 @@
+{
+  "phase2_summary": {
+    "best_randomness_type": "binary_pm1",
+    "best_indivisible_score": 0.9596006396884997,
+    "optimal_interaction_strength": 0.1,
+    "total_tests_analyzed": 42,
+    "categories_tested": [
+      "SIMPLE",
+      "MATHEMATICAL",
+      "COMPLEX"
+    ]
+  },
+  "rankings": {
+    "top10_by_type": {
+      "binary_pm1": 0.9596006396884997,
+      "binary_01": 0.9557774440272566,
+      "complex_uniform": 0.9541671255736336,
+      "log_normal": 0.9538554582116536,
+      "exponential": 0.9535554164928384,
+      "student_t": 0.9531776109025171,
+      "uniform_01": 0.9518668335419274,
+      "gaussian_std": 0.9517334167709637,
+      "uniform_pm1": 0.9509451258517594,
+      "complex_gaussian": 0.9507887637324435
+    },
+    "category_averages": {
+      "COMPLEX": 0.9070913271218654,
+      "MATHEMATICAL": 0.9285077958559312,
+      "SIMPLE": 0.933989318129143
+    },
+    "interaction_strength_analysis": {
+      "mean": {
+        "0.1": 0.944,
+        "0.15": 0.923,
+        "0.2": 0.906
+      },
+      "std": {
+        "0.1": 0.024,
+        "0.15": 0.024,
+        "0.2": 0.014
+      },
+      "max": {
+        "0.1": 0.96,
+        "0.15": 0.942,
+        "0.2": 0.924
+      }
+    }
+  },
+  "physical_conclusions": {
+    "complex_numbers_beneficial": true,
+    "optimal_division_event_rate": 0.1,
+    "dominant_score_component": "interaction_component"
+  },
+  "phase3_recommendations": {
+    "top_randomness_types": [
+      "binary_pm1",
+      "binary_01",
+      "complex_uniform"
+    ],
+    "optimal_interaction_strength": 0.1,
+    "best_overall_result": {
+      "randomness_type": "binary_pm1",
+      "score": 0.9596006396884997,
+      "interaction_strength": 0.1
+    },
+    "complex_numbers_beneficial": true,
+    "statistical_significance": true
+  },
+  "statistical_tests": {
+    "complex_vs_simple_pvalue": 0.01395259529801846,
+    "statistically_significant": true
+  },
+  "timestamp": "07251621"
+}
