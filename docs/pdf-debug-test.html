@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Debug Test</title>
+    <title>PDF Debug Test - FIXED</title>
     
     <style>
         body {
@@ -56,6 +56,14 @@
             background: #b91c1c;
         }
         
+        .success-btn {
+            background: #059669;
+        }
+        
+        .success-btn:hover {
+            background: #047857;
+        }
+        
         h1 { color: #333; }
         h2 { color: #666; }
         
@@ -89,27 +97,57 @@
         th {
             background: #f0f0f0;
         }
+        
+        /* Temp container for PDF - VISIBLE VERSION */
+        .pdf-temp-visible {
+            position: absolute !important;
+            top: 50px !important;
+            left: 50px !important;
+            width: 794px !important;
+            min-height: 600px !important;
+            background: white !important;
+            font-family: Arial, sans-serif !important;
+            line-height: 1.6 !important;
+            color: #000 !important;
+            padding: 20px !important;
+            border: 3px solid red !important;
+            z-index: 1000 !important;
+            opacity: 1 !important;
+        }
+        
+        .status-indicator {
+            background: #e0f7fa;
+            border: 1px solid #00acc1;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
     <div class="test-container">
-        <h1>🐛 PDF Debug Test</h1>
-        <p>Testaa PDF-generaattoria ja katso debug-lokeja</p>
+        <h1>🐛 PDF Debug Test - VISIBILITY FIXED</h1>
+        <p>Testaa PDF-generaattoria näkyvällä elementillä</p>
+        
+        <div class="status-indicator">
+            <strong>🔧 MUUTOS:</strong> Temp-elementti on nyt täysin näkyvä PDF-generoinnin aikana (punainen reunus)
+        </div>
         
         <div>
-            <button class="test-btn" onclick="testBasicPDF()">📄 Test Basic PDF</button>
+            <button class="test-btn" onclick="testVisiblePDF()">📄 Test Visible PDF</button>
             <button class="test-btn" onclick="testContentFind()">🔍 Test Content Finding</button>
+            <button class="success-btn" onclick="testHtml2Canvas()">🖼️ Test html2canvas</button>
             <button class="test-btn" onclick="clearDebug()">🗑️ Clear Debug</button>
         </div>
         
         <div id="debug-output" class="debug-info">
-            [DEBUG] PDF Debug Test initialized...<br>
+            [DEBUG] PDF Debug Test (VISIBILITY FIXED) initialized...<br>
         </div>
         
         <!-- Test content that will be converted to PDF -->
         <div class="test-content" id="main-markdown-content">
-            <h1>Test Document for PDF</h1>
-            <p>This is a test document to debug PDF generation issues.</p>
+            <h1>Test Document for PDF (Visible Version)</h1>
+            <p>This is a test document with FULL VISIBILITY during PDF generation.</p>
             
             <h2>Mathematical Formula Test</h2>
             <div class="math-test">
@@ -141,10 +179,16 @@ def hello_world():
             <blockquote>
                 This is a blockquote that should appear in the PDF with proper styling.
             </blockquote>
+            
+            <p style="color: red; font-weight: bold; font-size: 18px;">
+                🚨 RED TEXT TEST - This should be visible in PDF! 🚨
+            </p>
         </div>
     </div>
 
     <script>
+        let tempContainer = null;
+        
         // Simple debug logger
         function debugLog(message) {
             const debugOutput = document.getElementById('debug-output');
@@ -181,11 +225,48 @@ def hello_world():
             debugLog('Content finding test completed');
         }
         
-        async function testBasicPDF() {
-            debugLog('=== STARTING PDF GENERATION TEST ===');
+        async function testHtml2Canvas() {
+            debugLog('=== TESTING HTML2CANVAS SEPARATELY ===');
             
             try {
-                // Test 1: Check if html2pdf is available
+                await loadHtml2Canvas();
+                debugLog('✅ html2canvas loaded');
+                
+                const contentElement = document.getElementById('main-markdown-content');
+                debugLog(`✅ Content element: ${contentElement.innerHTML.length} chars`);
+                
+                debugLog('📸 Taking screenshot with html2canvas...');
+                const canvas = await window.html2canvas(contentElement, {
+                    backgroundColor: '#ffffff',
+                    logging: true
+                });
+                
+                debugLog(`✅ Canvas created: ${canvas.width}x${canvas.height}`);
+                
+                if (canvas.width > 0 && canvas.height > 0) {
+                    debugLog('🎉 html2canvas SUCCESS - canvas has content!');
+                    
+                    // Show the canvas as image for verification
+                    const imgData = canvas.toDataURL();
+                    const img = document.createElement('img');
+                    img.src = imgData;
+                    img.style.cssText = 'max-width: 400px; border: 2px solid green; margin: 10px 0;';
+                    document.querySelector('.test-container').appendChild(img);
+                    debugLog('✅ Canvas image added to page for verification');
+                } else {
+                    debugLog('❌ html2canvas FAILED - empty canvas');
+                }
+                
+            } catch (error) {
+                debugLog(`❌ html2canvas ERROR: ${error.message}`);
+            }
+        }
+        
+        async function testVisiblePDF() {
+            debugLog('=== STARTING VISIBLE PDF GENERATION TEST ===');
+            
+            try {
+                // Test 1: Load libraries
                 debugLog('Loading html2pdf.js...');
                 await loadHtml2PDF();
                 debugLog('✅ html2pdf.js loaded successfully');
@@ -201,40 +282,35 @@ def hello_world():
                 const clonedContent = contentElement.cloneNode(true);
                 debugLog(`✅ Content cloned: ${clonedContent.innerHTML.length} characters`);
                 
-                // Test 4: Create temp container
-                const tempContainer = document.createElement('div');
+                // Test 4: Create VISIBLE temp container
+                tempContainer = document.createElement('div');
                 tempContainer.id = 'pdf-temp-container';
-                tempContainer.style.cssText = `
-                    position: fixed !important;
-                    top: 0 !important;
-                    left: 0 !important;
-                    width: 794px !important;
-                    min-height: 1000px !important;
-                    background: white !important;
-                    font-family: Arial, sans-serif !important;
-                    line-height: 1.6 !important;
-                    color: #000 !important;
-                    padding: 20px !important;
-                    z-index: -9999 !important;
-                    opacity: 0.01 !important;
-                `;
+                tempContainer.className = 'pdf-temp-visible';
                 
+                // Add title
+                const title = document.createElement('h1');
+                title.textContent = '📄 PDF Test Document';
+                title.style.cssText = 'color: #000 !important; margin-bottom: 20px !important;';
+                tempContainer.appendChild(title);
                 tempContainer.appendChild(clonedContent);
+                
                 document.body.appendChild(tempContainer);
-                debugLog(`✅ Temp container created and added to DOM`);
+                debugLog(`✅ VISIBLE temp container created (red border should be visible on page)`);
                 
                 // Wait for rendering
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                debugLog('✅ Waited 1000ms for rendering');
+                debugLog('⏱️ Waiting 2 seconds for visible rendering...');
+                await new Promise(resolve => setTimeout(resolve, 2000));
                 
-                // Test 5: Generate PDF
-                debugLog('Starting PDF generation...');
+                debugLog(`✅ Container dimensions: ${tempContainer.scrollWidth}x${tempContainer.scrollHeight}`);
+                
+                // Test 5: Generate PDF from VISIBLE element
+                debugLog('📄 Starting PDF generation from VISIBLE element...');
                 const options = {
-                    margin: [10, 10, 10, 10],
-                    filename: 'debug-test.pdf',
+                    margin: [5, 5, 5, 5],
+                    filename: 'visible-debug-test.pdf',
                     image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { 
-                        scale: 2,
+                        scale: 1,
                         useCORS: true,
                         allowTaint: true,
                         backgroundColor: '#ffffff',
@@ -254,15 +330,27 @@ def hello_world():
                     .from(tempContainer)
                     .save();
                 
-                debugLog('🎉 PDF generation completed successfully!');
+                debugLog('🎉 VISIBLE PDF generation completed!');
+                debugLog('📥 Check your downloads for "visible-debug-test.pdf"');
+                
+                // Keep container visible for a moment
+                debugLog('⏱️ Keeping temp container visible for 3 more seconds...');
+                await new Promise(resolve => setTimeout(resolve, 3000));
                 
                 // Cleanup
                 document.body.removeChild(tempContainer);
+                tempContainer = null;
                 debugLog('✅ Cleanup completed');
                 
             } catch (error) {
                 debugLog(`❌ ERROR: ${error.message}`);
                 debugLog(`   Stack: ${error.stack}`);
+                
+                // Cleanup on error
+                if (tempContainer && tempContainer.parentNode) {
+                    document.body.removeChild(tempContainer);
+                    tempContainer = null;
+                }
             }
         }
         
@@ -287,10 +375,32 @@ def hello_world():
             });
         }
         
+        function loadHtml2Canvas() {
+            return new Promise((resolve, reject) => {
+                if (typeof window.html2canvas !== 'undefined') {
+                    resolve();
+                    return;
+                }
+                
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                script.onload = () => {
+                    debugLog('html2canvas script loaded from CDN');
+                    resolve();
+                };
+                script.onerror = () => {
+                    debugLog('Failed to load html2canvas from CDN');
+                    reject(new Error('Failed to load html2canvas'));
+                };
+                document.head.appendChild(script);
+            });
+        }
+        
         // Initialize
-        debugLog('PDF Debug Test page loaded');
-        debugLog('Click "Test Content Finding" to see what elements are available');
-        debugLog('Click "Test Basic PDF" to try generating a simple PDF');
+        debugLog('PDF Debug Test (VISIBILITY FIXED) page loaded');
+        debugLog('🔧 NEW: Temp container will be FULLY VISIBLE with red border');
+        debugLog('📱 Click "Test Visible PDF" to generate PDF from visible element');
+        debugLog('🖼️ Click "Test html2canvas" to test screenshot separately');
     </script>
 </body>
 </html>
