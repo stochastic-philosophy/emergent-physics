@@ -43,7 +43,6 @@ Voivatko hybridijärjestelmät (Random Matrix Theory + fraktaalit + perkolaatio)
 ### Hypoteesi
 $H_1$: Riittävän kompleksit hybridijärjestelmät saavuttavat korkeamman indivisible score -arvon kuin yksinkertaiset referenssiprosessit.
 
-$$\text{Score}{\text{hybrid}} > \text{Score}{\text{reference}}$$
 $$\text{Score}_{\text{hybrid}} > \text{Score}_{\text{reference}}$$
 
 ---
