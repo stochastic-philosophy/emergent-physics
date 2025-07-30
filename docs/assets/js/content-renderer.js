@@ -1,7 +1,6 @@
 /**
- * Content Renderer - Core File Rendering Module
- * Handles file viewing, content rendering, and content enhancements
- * Refactored from original content-renderer.js - PDF functionality moved to separate modules
+ * Content Renderer - Compatible with Fixed PDF Generator
+ * Core file rendering with reliable PDF integration
  */
 
 window.ContentRenderer = {
@@ -33,21 +32,21 @@ window.ContentRenderer = {
      * Initialize ContentRenderer
      */
     init: function() {
-        DEBUG.info('Initializing ContentRenderer (Refactored)...');
+        console.log('Initializing ContentRenderer (Compatible)...');
     },
     
     /**
      * View file content (Main entry point)
      */
     viewFile: async function(filePath) {
-        DEBUG.info(`=== VIEWING FILE: ${filePath} ===`);
+        console.log(`=== VIEWING FILE: ${filePath} ===`);
         
         try {
             UI.showLoading('Loading file content...');
             
             // Detect file type
             const fileType = FileManager.detectFileType(filePath);
-            DEBUG.info(`File type detected: ${fileType}`);
+            console.log(`File type detected: ${fileType}`);
             
             // Check if file is viewable
             if (!FileManager.isViewable(filePath)) {
@@ -58,6 +57,7 @@ window.ContentRenderer = {
             
             // Load file content
             const content = await FileManager.loadFile(filePath);
+            console.log(`File content loaded: ${content.length} characters`);
             
             // Update state
             this.state.currentFile = filePath;
@@ -85,10 +85,10 @@ window.ContentRenderer = {
             UI.updatePageTitle(`${displayName} - ${projectId}`);
             
             UI.hideLoading();
-            DEBUG.success(`File viewing completed: ${filePath}`);
+            console.log(`✅ File viewing completed: ${filePath}`);
             
         } catch (error) {
-            DEBUG.reportError(error, `Failed to view file: ${filePath}`);
+            console.error(`❌ Failed to view file: ${filePath}`, error);
             UI.hideLoading();
             UI.showError(`Failed to load file: ${error.message}`, true);
         }
@@ -117,10 +117,10 @@ window.ContentRenderer = {
                     <span class="file-type-badge">${fileType}</span>
                 </div>
                 <div class="file-actions">
-                    <button onclick="PDFGenerator.generateAdvancedPDF()" class="pdf-btn" title="Generate PDF with LaTeX and code highlighting">
+                    <button onclick="ContentRenderer.generatePDF()" class="pdf-btn" title="Generate PDF">
                         ${currentLang === 'fi' ? '📄 PDF' : '📄 PDF'}
                     </button>
-                    <button onclick="PDFGenerator.generatePDFWithOptions()" class="pdf-options-btn" title="PDF with options">
+                    <button onclick="ContentRenderer.generatePDFWithOptions()" class="pdf-options-btn" title="PDF with options">
                         ${currentLang === 'fi' ? '⚙️ PDF Asetukset' : '⚙️ PDF Options'}
                     </button>
                     <button onclick="ContentRenderer.downloadFile('${filePath}')" class="download-file-btn">
@@ -146,13 +146,13 @@ window.ContentRenderer = {
                 break;
                 
             case 'data':
-                html += '<div id="main-data-content">';
+                html += '<div class="data-content" id="main-data-content">';
                 html += await this.renderDataContent(content, fileName);
                 html += '</div>';
                 break;
                 
             case 'images':
-                html += '<div id="main-image-content">';
+                html += '<div class="image-content" id="main-image-content">';
                 html += this.renderImageContent(filePath, fileName);
                 html += '</div>';
                 break;
@@ -170,6 +170,48 @@ window.ContentRenderer = {
         
         // Scroll to top
         window.scrollTo(0, 0);
+        
+        console.log(`✅ Content rendered successfully: ${fileType}`);
+    },
+    
+    /**
+     * Generate PDF - WRAPPER FOR PDF GENERATOR
+     */
+    generatePDF: async function() {
+        console.log('PDF generation requested from ContentRenderer');
+        
+        try {
+            if (typeof PDFGenerator !== 'undefined') {
+                await PDFGenerator.generateAdvancedPDF();
+            } else {
+                console.error('PDFGenerator not available');
+                if (UI && UI.showNotification) {
+                    UI.showNotification('PDF Generator not available', 'error');
+                }
+            }
+        } catch (error) {
+            console.error('PDF generation failed:', error);
+        }
+    },
+    
+    /**
+     * Generate PDF with options - WRAPPER
+     */
+    generatePDFWithOptions: async function() {
+        console.log('PDF generation with options requested from ContentRenderer');
+        
+        try {
+            if (typeof PDFGenerator !== 'undefined') {
+                await PDFGenerator.generatePDFWithOptions();
+            } else {
+                console.error('PDFGenerator not available');
+                if (UI && UI.showNotification) {
+                    UI.showNotification('PDF Generator not available', 'error');
+                }
+            }
+        } catch (error) {
+            console.error('PDF generation with options failed:', error);
+        }
     },
     
     /**
@@ -177,14 +219,16 @@ window.ContentRenderer = {
      */
     renderMarkdownContent: async function(content) {
         if (typeof MarkdownProcessor === 'undefined') {
-            DEBUG.warn('MarkdownProcessor not available, returning escaped content');
+            console.warn('MarkdownProcessor not available, returning escaped content');
             return Utils.escapeHtml(content);
         }
         
         try {
-            return await MarkdownProcessor.processCombined(content, this.state.renderingOptions);
+            const rendered = await MarkdownProcessor.processCombined(content, this.state.renderingOptions);
+            console.log(`Markdown processed: ${rendered.length} chars output`);
+            return rendered;
         } catch (error) {
-            DEBUG.reportError(error, 'Markdown rendering failed');
+            console.error('Markdown rendering failed:', error);
             return Utils.escapeHtml(content);
         }
     },
@@ -200,6 +244,7 @@ window.ContentRenderer = {
                     <pre class="language-json"><code class="language-json">${Utils.escapeHtml(JSON.stringify(jsonData, null, 2))}</code></pre>
                 </div>`;
             } catch (e) {
+                console.warn('JSON parsing failed, showing as text');
                 return `<div class="text-content"><pre>${Utils.escapeHtml(content)}</pre></div>`;
             }
         } else if (fileName.endsWith('.csv')) {
@@ -250,7 +295,7 @@ window.ContentRenderer = {
             return html;
             
         } catch (error) {
-            DEBUG.error('CSV parsing failed:', error);
+            console.error('CSV parsing failed:', error);
             return `<div class="text-content"><pre>${Utils.escapeHtml(content)}</pre></div>`;
         }
     },
@@ -273,19 +318,21 @@ window.ContentRenderer = {
             if (fileType === 'code' || (fileType === 'data' && this.state.currentFile.endsWith('.json'))) {
                 if (typeof MarkdownProcessor !== 'undefined') {
                     MarkdownProcessor.highlightCode(contentArea);
+                    console.log('Code highlighting applied');
                 }
             }
             
             // Apply math rendering for markdown
             if (fileType === 'markdown' && typeof MarkdownProcessor !== 'undefined') {
                 await MarkdownProcessor.renderMath(contentArea);
+                console.log('Math rendering applied');
             }
             
             // Add additional enhancements
             this.addContentEnhancements(contentArea);
             
         } catch (error) {
-            DEBUG.reportError(error, 'Post-rendering enhancement failed');
+            console.error('Post-rendering enhancement failed:', error);
         }
     },
     
@@ -308,7 +355,7 @@ window.ContentRenderer = {
                         button.innerHTML = '✅';
                         setTimeout(() => button.innerHTML = '📋', 2000);
                     } catch (error) {
-                        DEBUG.error('Failed to copy code:', error);
+                        console.error('Failed to copy code:', error);
                         button.innerHTML = '❌';
                         setTimeout(() => button.innerHTML = '📋', 2000);
                     }
@@ -343,6 +390,8 @@ window.ContentRenderer = {
                 heading.appendChild(anchor);
             }
         });
+        
+        console.log('Content enhancements applied');
     },
     
     /**
@@ -357,7 +406,7 @@ window.ContentRenderer = {
      * Download file (trigger browser download)
      */
     downloadFile: async function(filePath) {
-        DEBUG.info(`=== DOWNLOADING FILE: ${filePath} ===`);
+        console.log(`=== DOWNLOADING FILE: ${filePath} ===`);
         
         try {
             // Check if file is downloadable
@@ -368,10 +417,10 @@ window.ContentRenderer = {
             }
             
             await FileManager.downloadFile(filePath);
-            DEBUG.success(`File download completed: ${filePath}`);
+            console.log(`✅ File download completed: ${filePath}`);
             
         } catch (error) {
-            DEBUG.reportError(error, `Failed to download file: ${filePath}`);
+            console.error(`❌ Failed to download file: ${filePath}`, error);
             UI.showNotification('Failed to download file', 'error');
         }
     },
@@ -440,7 +489,7 @@ window.ContentRenderer = {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    DEBUG.info('ContentRenderer (Refactored) module loaded successfully');
+    console.log('ContentRenderer (Compatible) module loaded successfully');
 });
 
 /**
