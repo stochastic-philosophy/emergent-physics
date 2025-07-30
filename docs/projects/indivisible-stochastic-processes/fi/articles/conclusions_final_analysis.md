@@ -1,6 +1,6 @@
 # Indivisible Stochastic Processes Tutkimus: Lopulliset Johtopäätökset ja Fysikaaliset Implikaatiot
 
-**Julkaistu:** 25. tammikuuta 2025  
+**Julkaistu:** 25. heinäkuuta 2025  
 **Kategoriat:** Johtopäätökset, Digital Physics, Kompleksiluvut  
 **Session:** 07251621
 
