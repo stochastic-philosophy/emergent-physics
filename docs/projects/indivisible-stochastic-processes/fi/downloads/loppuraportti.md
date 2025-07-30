@@ -160,6 +160,7 @@ for t in range(1, T):
 ```
 
 **Matemaattinen muoto**:
+
 $$X_t = \begin{cases}
 \alpha \cdot X_{t_{\text{last div}}} + \epsilon_t & \text{jos } D_t = 1 \\\\
 \beta \cdot X_{t-1} + \sigma \epsilon_t & \text{jos } D_t = 0
