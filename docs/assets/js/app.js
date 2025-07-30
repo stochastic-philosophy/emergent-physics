@@ -1,6 +1,7 @@
 /**
- * Main Application Logic (Refactored)
+ * Main Application Logic (Updated for Refactored Modules)
  * Coordinates between specialized modules and provides global state management
+ * Updated to handle refactored PDF modules
  */
 
 // Ensure DEBUG is available (fallback)
@@ -23,6 +24,7 @@ window.App = {
         currentFile: null,
         initialized: false,
         modules: {
+            // Core modules
             projectManager: false,
             contentRenderer: false,
             navigationManager: false,
@@ -31,14 +33,17 @@ window.App = {
             themeManager: false,
             ui: false,
             storage: false,
-            utils: false
+            utils: false,
+            // PDF modules (refactored)
+            pdfGenerator: false,
+            pdfLibraryManager: false
         }
     },
     
     // Application configuration
     config: {
-        version: '2.0.0',
-        phase: 'Phase 2 - Refactored',
+        version: '2.1.0',
+        phase: 'Phase 3 - PDF Generation (Refactored)',
         debug: localStorage.getItem('debug_mode') === 'true',
         initTimeout: 10000, // 10 seconds
         retryAttempts: 3
@@ -48,7 +53,7 @@ window.App = {
      * Initialize the application
      */
     init: async function() {
-        DEBUG.info('=== INITIALIZING APP (Refactored v2.0) ===');
+        DEBUG.info('=== INITIALIZING APP (Refactored PDF Modules v2.1) ===');
         
         try {
             // Check for required dependencies
@@ -65,9 +70,12 @@ window.App = {
             await this.initializeModules(); 
             await this.initializeNavigation();
             
+            // Initialize PDF modules
+            await this.initializePDFModules();
+            
             // Mark as initialized
             this.state.initialized = true;
-            DEBUG.success('=== APP INITIALIZED SUCCESSFULLY (Refactored v2.0) ===');
+            DEBUG.success('=== APP INITIALIZED SUCCESSFULLY (Refactored PDF v2.1) ===');
             
         } catch (error) {
             DEBUG.reportError(error, 'App initialization failed');
@@ -82,7 +90,8 @@ window.App = {
         const requiredModules = [
             'ThemeManager', 'Utils', 'Storage', 'UI', 
             'FileManager', 'MarkdownProcessor',
-            'ProjectManager', 'ContentRenderer', 'NavigationManager'
+            'ProjectManager', 'ContentRenderer', 'NavigationManager',
+            'PDFGenerator', 'PDFLibraryManager'  // New PDF modules
         ];
         
         const missing = requiredModules.filter(dep => typeof window[dep] === 'undefined');
@@ -102,6 +111,7 @@ window.App = {
      */
     updateModuleStates: function() {
         this.state.modules = {
+            // Core modules
             projectManager: typeof ProjectManager !== 'undefined',
             contentRenderer: typeof ContentRenderer !== 'undefined', 
             navigationManager: typeof NavigationManager !== 'undefined',
@@ -110,7 +120,10 @@ window.App = {
             themeManager: typeof ThemeManager !== 'undefined',
             ui: typeof UI !== 'undefined',
             storage: typeof Storage !== 'undefined',
-            utils: typeof Utils !== 'undefined'
+            utils: typeof Utils !== 'undefined',
+            // PDF modules (refactored)
+            pdfGenerator: typeof PDFGenerator !== 'undefined',
+            pdfLibraryManager: typeof PDFLibraryManager !== 'undefined'
         };
     },
     
@@ -171,10 +184,43 @@ window.App = {
                 ContentRenderer.init();
             }
             
-            DEBUG.success('Application modules initialized');
+            DEBUG.success('Core application modules initialized');
         } catch (error) {
             DEBUG.reportError(error, 'Module initialization failed');
             throw error;
+        }
+    },
+    
+    /**
+     * Initialize PDF modules (new)
+     */
+    initializePDFModules: async function() {
+        DEBUG.info('Initializing PDF modules...');
+        
+        try {
+            // PDF modules don't need explicit initialization, 
+            // but we can test their availability
+            if (PDFGenerator && PDFLibraryManager) {
+                DEBUG.success('PDF modules loaded successfully');
+                
+                // Optionally preload PDF libraries for better performance
+                if (this.config.debug) {
+                    setTimeout(() => {
+                        PDFLibraryManager.preloadLibraries().then(success => {
+                            if (success) {
+                                DEBUG.success('PDF libraries preloaded');
+                            } else {
+                                DEBUG.warn('PDF library preloading failed');
+                            }
+                        });
+                    }, 2000);
+                }
+            } else {
+                DEBUG.error('PDF modules not available');
+            }
+        } catch (error) {
+            DEBUG.reportError(error, 'PDF module initialization failed');
+            // Don't throw - PDF is not critical for basic app functionality
         }
     },
     
@@ -248,11 +294,19 @@ window.App = {
     },
     
     /**
-     * Get module status
+     * Get module status (updated for PDF modules)
      */
     getModuleStatus: function() {
         this.updateModuleStates();
-        return this.state.modules;
+        
+        const status = { ...this.state.modules };
+        
+        // Add PDF library status if available
+        if (status.pdfLibraryManager && PDFLibraryManager.getLibraryStatus) {
+            status.pdfLibraries = PDFLibraryManager.getLibraryStatus();
+        }
+        
+        return status;
     },
     
     /**
@@ -266,13 +320,30 @@ window.App = {
      * Get app information
      */
     getInfo: function() {
-        return {
+        const info = {
             version: this.config.version,
             phase: this.config.phase,
             initialized: this.state.initialized,
             modules: this.getModuleStatus(),
             state: this.getState()
         };
+        
+        // Add PDF-specific information
+        if (this.state.modules.pdfGenerator && this.state.modules.pdfLibraryManager) {
+            info.pdfCapabilities = {
+                available: true,
+                generatorReady: typeof PDFGenerator !== 'undefined',
+                libraryManagerReady: typeof PDFLibraryManager !== 'undefined',
+                librariesLoaded: PDFLibraryManager.getLibraryStatus ? PDFLibraryManager.getLibraryStatus() : null
+            };
+        } else {
+            info.pdfCapabilities = {
+                available: false,
+                reason: 'PDF modules not loaded'
+            };
+        }
+        
+        return info;
     },
     
     /**
@@ -293,6 +364,11 @@ window.App = {
             }
             if (ContentRenderer) {
                 ContentRenderer.clearCurrentFile();
+            }
+            
+            // Reset PDF modules
+            if (PDFLibraryManager && PDFLibraryManager.reset) {
+                PDFLibraryManager.reset();
             }
             
             // Show loading
@@ -327,10 +403,10 @@ window.App = {
     },
     
     /**
-     * Get debug information
+     * Get debug information (updated for PDF modules)
      */
     getDebugInfo: function() {
-        return {
+        const debugInfo = {
             config: this.config,
             state: this.getState(),
             modules: this.getModuleStatus(),
@@ -345,6 +421,17 @@ window.App = {
             storage: Storage ? Storage.getUsageInfo() : null,
             cache: FileManager ? FileManager.getCacheStats() : null
         };
+        
+        // Add PDF-specific debug info
+        if (this.state.modules.pdfGenerator && this.state.modules.pdfLibraryManager) {
+            debugInfo.pdf = {
+                generatorStatus: PDFGenerator.getStatus ? PDFGenerator.getStatus() : null,
+                librariesStatus: PDFLibraryManager.getLibraryStatus(),
+                librariesTested: PDFLibraryManager.testLibraries()
+            };
+        }
+        
+        return debugInfo;
     },
     
     /**
