@@ -225,7 +225,7 @@ missä $\theta_I = 0.3$.
 
 Kombinoi kaikki kolme menetelmää painotetusti:
 
-$$\text{Score}_{\text{division}}(t) = w_1 \mathbf{1}_{\rho}(t) + w_2 \mathbf{1}_{\Delta}(t) + w_3 \mathbf{1}_{I}(t)$$
+$$\text{Score}\_{\text{division}}(t) = w_1 \mathbf{1}\_{\rho}(t) + w_2 \mathbf{1}\_{\Delta}(t) + w_3 \mathbf{1}\_{I}(t)$$
 
 missä $w_1 = 0.3$, $w_2 = 0.2$, $w_3 = 0.5$ ja $\mathbf{1}$ = indikaattorifunktiot.
 
