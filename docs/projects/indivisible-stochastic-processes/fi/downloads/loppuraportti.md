@@ -722,7 +722,7 @@ Kaikki kategoriat osoittavat **laskevaa trendiä** interaction strength:n kasvae
 ### 2.7.1 Digital Physics Vahvistus
 
 **Binary dominance**:
-$$\text{Score}_{\text{binary\_pm1}} = 0.95 > \text{Score}_{\text{complex\_gaussian}} = 0.84$$
+$$\text{Score}\_{\text{binary\_pm1}} = 0.95 > \text{Score}\_{\text{complex\_gaussian}} = 0.84$$
 
 **Ero**: $\Delta = 0.11$ (13% parannus)
 
