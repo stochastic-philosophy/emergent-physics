@@ -502,7 +502,7 @@ missä:
 - $\gamma = 0.3$ (division event muisti)
 - $\delta = 0.7$ (division event injection)
 - $R_t$ = satunnaisluku valitusta jakaumasta
-- $P(D_t = 1) = \text{interaction\_strength}$
+- $P(D_t = 1) = \\text{interaction\\_strength}$
 
 ### 2.3.2 Division Events Mekanismi
 
