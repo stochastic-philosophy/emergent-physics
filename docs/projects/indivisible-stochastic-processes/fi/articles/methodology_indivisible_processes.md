@@ -1,6 +1,6 @@
 # Indivisible Stochastic Processes Hybridijärjestelmissä: Tutkimusmenetelmien Kuvaus ja Perustelu
 
-**Julkaistu:** 25. tammikuuta 2025  
+**Julkaistu:** 25. heinäkuuta 2025  
 **Kategoriat:** Metodologia, Barandes-teoria, Hybridisysteemit  
 **Tutkimustyyppi:** Kokeellinen simulaatiotutkimus
 
