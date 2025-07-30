@@ -1,7 +1,6 @@
 /**
- * PDF Generator - REGRESSION FIXES VERSION
- * Fixes: Math overlap, missing text, image page breaks, empty long PDFs
- * Back to working basics with incremental improvements
+ * PDF Generator - MATH OVERLAP & IMAGE FIXES
+ * Fixes: Duplicate LaTeX rendering, math positioning, image page breaks
  */
 
 window.PDFGenerator = {
@@ -13,28 +12,27 @@ window.PDFGenerator = {
         mathJaxReady: false
     },
     
-    // Configuration - CONSERVATIVE SETTINGS
+    // Configuration
     config: {
         defaultOptions: {
-            margin: [15, 15, 15, 15], // Larger margins for safety
-            image: { type: 'jpeg', quality: 0.95 }, // Slightly lower quality for stability
+            margin: [15, 15, 15, 15],
+            image: { type: 'jpeg', quality: 0.95 },
             html2canvas: { 
-                scale: 1.5, // Reduced scale to prevent memory issues
+                scale: 1.5,
                 useCORS: true,
                 allowTaint: true,
                 backgroundColor: '#ffffff',
                 logging: false,
-                width: 800, // Fixed width
-                height: null // Let height be calculated
+                width: 800,
+                height: null
             },
             jsPDF: { 
                 unit: 'mm', 
                 format: 'a4', 
                 orientation: 'portrait',
-                compress: false // Disable compression for debugging
+                compress: false
             }
         },
-        // Simplified content selectors - most reliable first
         contentSelectors: [
             '#main-markdown-content',
             '.markdown-content',
@@ -43,19 +41,18 @@ window.PDFGenerator = {
             '#main-data-content',
             '.data-content'
         ],
-        // Wait times for proper rendering
         waitTimes: {
-            domRender: 1000,      // Wait for DOM
-            mathJax: 2000,        // Wait for MathJax
-            finalRender: 500      // Final wait
+            domRender: 1000,
+            mathJax: 3000,  // Increased for complex math
+            finalRender: 1000
         }
     },
     
     /**
-     * Generate PDF - MAIN ENTRY POINT (Simplified)
+     * Generate PDF - MAIN ENTRY POINT
      */
     generateAdvancedPDF: async function(options = {}) {
-        console.log('=== STARTING PDF GENERATION (REGRESSION FIX) ===');
+        console.log('=== PDF GENERATION (MATH & IMAGE FIXES) ===');
         
         if (this.state.generatingPDF) {
             console.warn('PDF generation already in progress');
@@ -65,7 +62,6 @@ window.PDFGenerator = {
         this.state.generatingPDF = true;
         
         try {
-            // Show progress
             PDFLibraryManager.showPDFProgress('Starting PDF generation...', 0);
             
             const currentFile = ContentRenderer.getCurrentFile();
@@ -76,40 +72,29 @@ window.PDFGenerator = {
             const fileName = currentFile.split('/').pop();
             console.log(`PDF generation for file: ${fileName}`);
             
-            // Update progress
             PDFLibraryManager.updatePDFProgress(10, 'Finding content...');
             
-            // Find content - more reliable method
             const contentElement = this.findContentForPDF();
             if (!contentElement) {
                 throw new Error('No content found for PDF generation');
             }
             
             console.log(`Content found: ${contentElement.tagName}.${contentElement.className}`);
-            console.log(`Content size: ${contentElement.innerHTML.length} chars`);
             
             PDFLibraryManager.updatePDFProgress(20, 'Loading PDF libraries...');
-            
-            // Load html2pdf.js library
             await PDFLibraryManager.loadHtml2PDF();
             
-            PDFLibraryManager.updatePDFProgress(30, 'Preparing content for PDF...');
+            PDFLibraryManager.updatePDFProgress(30, 'Preparing content...');
+            const tempContainer = await this.createMathFixedTempContainer(contentElement);
             
-            // Create temp container with WORKING method
-            const tempContainer = await this.createWorkingTempContainer(contentElement);
-            
-            PDFLibraryManager.updatePDFProgress(60, 'Generating PDF...');
-            
-            // Configure PDF options
+            PDFLibraryManager.updatePDFProgress(70, 'Generating PDF...');
             const pdfOptions = this.buildPDFOptions(fileName, options);
             
-            // Generate PDF with working method
-            await this.generatePDFWithWorkingMethod(tempContainer, pdfOptions);
+            await this.generatePDFWithFixedMethod(tempContainer, pdfOptions);
             
             PDFLibraryManager.updatePDFProgress(100, 'PDF completed!');
             console.log('✅ PDF generation completed successfully');
             
-            // Hide progress after delay
             setTimeout(() => {
                 PDFLibraryManager.hidePDFProgress();
             }, 1500);
@@ -126,11 +111,6 @@ window.PDFGenerator = {
                 UI.showNotification(`PDF generation failed: ${error.message}`, 'error');
             }
             
-            // Show error to user on Android
-            if (typeof AndroidDebug !== 'undefined') {
-                AndroidDebug.error(`PDF Error: ${error.message}`);
-            }
-            
             throw error;
         } finally {
             this.state.generatingPDF = false;
@@ -139,7 +119,7 @@ window.PDFGenerator = {
     },
     
     /**
-     * Build PDF options - CONSERVATIVE
+     * Build PDF options
      */
     buildPDFOptions: function(fileName, userOptions = {}) {
         const defaults = this.config.defaultOptions;
@@ -160,7 +140,7 @@ window.PDFGenerator = {
     },
     
     /**
-     * Find content - SIMPLIFIED AND RELIABLE
+     * Find content for PDF
      */
     findContentForPDF: function() {
         console.log('Looking for content to convert to PDF...');
@@ -170,8 +150,6 @@ window.PDFGenerator = {
             if (element && element.innerHTML.trim().length > 0) {
                 console.log(`✅ Found content: ${selector}`);
                 return element;
-            } else {
-                console.log(`❌ Not found or empty: ${selector}`);
             }
         }
         
@@ -180,22 +158,24 @@ window.PDFGenerator = {
     },
     
     /**
-     * Create temp container - BACK TO WORKING METHOD
+     * Create temp container with MATH FIXES
      */
-    createWorkingTempContainer: async function(contentElement) {
-        console.log('Creating temp container for PDF...');
+    createMathFixedTempContainer: async function(contentElement) {
+        console.log('Creating math-fixed temp container...');
         
-        // Clean up any existing containers first
         this.cleanupPDFGeneration();
         
-        // Clone the content completely
+        // Clone content
         const clonedContent = contentElement.cloneNode(true);
         console.log(`Content cloned: ${clonedContent.innerHTML.length} chars`);
         
-        // Remove interactive elements that shouldn't be in PDF
+        // Remove interactive elements
         this.removeInteractiveElements(clonedContent);
         
-        // Create container with SIMPLE, WORKING approach
+        // CRITICAL: Clean existing MathJax output to prevent duplicates
+        this.cleanMathJaxDuplicates(clonedContent);
+        
+        // Create container
         const tempContainer = document.createElement('div');
         tempContainer.id = 'pdf-temp-container';
         tempContainer.style.cssText = `
@@ -212,7 +192,7 @@ window.PDFGenerator = {
             z-index: 1000;
         `;
         
-        // Add document title
+        // Add title
         const currentFile = ContentRenderer.getCurrentFile();
         if (currentFile) {
             const fileName = currentFile.split('/').pop();
@@ -227,24 +207,45 @@ window.PDFGenerator = {
             tempContainer.appendChild(title);
         }
         
-        // Add the cloned content
         tempContainer.appendChild(clonedContent);
         
-        // Apply PDF-specific styles
-        this.addPDFStyles(tempContainer);
+        // Apply FIXED PDF styles
+        this.addFixedPDFStyles(tempContainer);
         
-        // Add to DOM (off-screen)
         document.body.appendChild(tempContainer);
         this.state.currentTempContainer = tempContainer;
         
-        console.log('Temp container added to DOM, waiting for rendering...');
+        console.log('Temp container added, waiting for rendering...');
         
-        // Wait for DOM to settle
-        await this.waitForRendering(tempContainer);
+        await this.waitForMathRendering(tempContainer);
         
-        console.log(`✅ Temp container ready: ${tempContainer.offsetWidth}x${tempContainer.offsetHeight}`);
+        console.log(`✅ Math-fixed container ready: ${tempContainer.offsetWidth}x${tempContainer.offsetHeight}`);
         
         return tempContainer;
+    },
+    
+    /**
+     * Clean MathJax duplicates - CRITICAL FIX
+     */
+    cleanMathJaxDuplicates: function(container) {
+        console.log('Cleaning MathJax duplicates...');
+        
+        // Remove all existing MathJax output elements
+        const mathJaxElements = container.querySelectorAll(
+            'mjx-container, .MathJax, .MathJax_Display, .MathJax_Preview, mjx-assistive-mml'
+        );
+        
+        console.log(`Found ${mathJaxElements.length} existing MathJax elements to remove`);
+        
+        mathJaxElements.forEach(el => {
+            el.remove();
+        });
+        
+        // Also remove any MathJax scripts
+        const scripts = container.querySelectorAll('script[type*="math"]');
+        scripts.forEach(script => script.remove());
+        
+        console.log('MathJax cleanup completed');
     },
     
     /**
@@ -269,48 +270,61 @@ window.PDFGenerator = {
             elements.forEach(el => el.remove());
         });
         
-        console.log('Interactive elements removed from PDF content');
+        console.log('Interactive elements removed');
     },
     
     /**
-     * Wait for proper rendering
+     * Wait for math rendering with fixes
      */
-    waitForRendering: async function(container) {
-        // Wait for DOM rendering
+    waitForMathRendering: async function(container) {
+        // Wait for DOM
         await Utils.sleep(this.config.waitTimes.domRender);
         
-        // Wait for MathJax if available
+        // Re-render MathJax in clean container
         if (window.MathJax && window.MathJax.typesetPromise) {
-            console.log('Waiting for MathJax to render...');
+            console.log('Re-rendering MathJax in clean container...');
             try {
+                // Clear MathJax state for this container
+                if (window.MathJax.startup && window.MathJax.startup.document) {
+                    window.MathJax.startup.document.clear();
+                }
+                
                 await window.MathJax.typesetPromise([container]);
-                await Utils.sleep(this.config.waitTimes.mathJax); // Extra wait for complex math
-                console.log('✅ MathJax rendering completed');
+                
+                // Extra wait for complex math to settle
+                await Utils.sleep(this.config.waitTimes.mathJax);
+                
+                console.log('✅ MathJax re-rendering completed');
                 this.state.mathJaxReady = true;
+                
+                // Verify no duplicates created
+                const mathElements = container.querySelectorAll('mjx-container');
+                console.log(`Final math elements count: ${mathElements.length}`);
+                
             } catch (mathError) {
-                console.warn('MathJax rendering failed:', mathError);
+                console.warn('MathJax re-rendering failed:', mathError);
                 this.state.mathJaxReady = false;
             }
         }
         
-        // Final wait for everything to settle
+        // Final wait
         await Utils.sleep(this.config.waitTimes.finalRender);
     },
     
     /**
-     * Add PDF-specific styles - FIXED FOR REGRESSION ISSUES
+     * Add FIXED PDF styles
      */
-    addPDFStyles: function(container) {
+    addFixedPDFStyles: function(container) {
         const style = document.createElement('style');
         style.textContent = `
-            /* BASIC PDF STYLES - CONSERVATIVE APPROACH */
+            /* MATH OVERLAP FIXES */
             * {
                 box-sizing: border-box;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
             
-            /* TYPOGRAPHY FIXES */
+            /* TYPOGRAPHY */
             body, div, p, span, li {
                 color: black !important;
                 font-family: 'Segoe UI', Arial, sans-serif !important;
@@ -323,6 +337,7 @@ window.PDFGenerator = {
                 margin-top: 20px !important;
                 margin-bottom: 10px !important;
                 page-break-after: avoid !important;
+                clear: both !important;
             }
             
             h1 { font-size: 24px !important; }
@@ -333,35 +348,59 @@ window.PDFGenerator = {
             p {
                 margin-bottom: 12px !important;
                 color: black !important;
-            }
-            
-            /* MATH FIXES - PREVENT OVERLAP */
-            .MathJax, .MathJax_Display, mjx-container {
-                display: inline-block !important;
-                margin: 2px 4px !important;
-                vertical-align: baseline !important;
-                line-height: 1.2 !important;
-            }
-            
-            /* Display math should be on its own line */
-            mjx-container[display="true"], .MathJax_Display {
-                display: block !important;
-                text-align: center !important;
-                margin: 16px 0 !important;
                 clear: both !important;
             }
             
-            /* Remove shadows and effects from math */
+            /* CRITICAL MATH FIXES - PREVENT OVERLAPS */
+            mjx-container {
+                display: inline-block !important;
+                margin: 0 2px !important;
+                vertical-align: baseline !important;
+                position: static !important;
+                transform: none !important;
+            }
+            
+            /* Inline math (single $) */
+            mjx-container[display="false"] {
+                display: inline !important;
+                margin: 0 1px !important;
+                vertical-align: baseline !important;
+                line-height: inherit !important;
+            }
+            
+            /* Display math (double $$) */
+            mjx-container[display="true"] {
+                display: block !important;
+                text-align: center !important;
+                margin: 16px auto !important;
+                clear: both !important;
+                width: 100% !important;
+                position: static !important;
+            }
+            
+            /* Math content fixes */
             mjx-container mjx-math {
+                display: inline-block !important;
+                position: static !important;
+                transform: none !important;
                 filter: none !important;
                 text-shadow: none !important;
                 box-shadow: none !important;
                 background: transparent !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
             
             mjx-container mjx-math * {
                 color: black !important;
                 fill: black !important;
+                position: static !important;
+                transform: none !important;
+            }
+            
+            /* Remove any absolute positioning from math */
+            mjx-container *[style*="position"] {
+                position: static !important;
             }
             
             /* CODE BLOCKS */
@@ -374,11 +413,45 @@ window.PDFGenerator = {
                 page-break-inside: avoid !important;
                 overflow: visible !important;
                 white-space: pre-wrap !important;
+                clear: both !important;
             }
             
             pre {
                 margin: 16px 0 !important;
                 max-width: 100% !important;
+            }
+            
+            /* ENHANCED IMAGE FIXES */
+            img {
+                max-width: 100% !important;
+                height: auto !important;
+                display: block !important;
+                margin: 20px auto !important;
+                page-break-inside: avoid !important;
+                page-break-before: auto !important;
+                page-break-after: auto !important;
+                clear: both !important;
+            }
+            
+            /* Specific image constraints for PDF */
+            img {
+                max-width: 700px !important;
+                max-height: 400px !important;
+            }
+            
+            /* Force page breaks around large images */
+            img[width], img[height] {
+                page-break-before: auto !important;
+                page-break-after: auto !important;
+                margin-top: 20px !important;
+                margin-bottom: 20px !important;
+            }
+            
+            /* Image containers */
+            .image-content, figure {
+                page-break-inside: avoid !important;
+                margin: 20px 0 !important;
+                clear: both !important;
             }
             
             /* TABLES */
@@ -387,6 +460,7 @@ window.PDFGenerator = {
                 width: 100% !important;
                 margin: 16px 0 !important;
                 page-break-inside: avoid !important;
+                clear: both !important;
             }
             
             th, td {
@@ -402,27 +476,11 @@ window.PDFGenerator = {
                 font-weight: bold !important;
             }
             
-            /* IMAGE FIXES - PREVENT PAGE BREAK ISSUES */
-            img {
-                max-width: 100% !important;
-                height: auto !important;
-                display: block !important;
-                margin: 16px auto !important;
-                page-break-inside: avoid !important;
-                page-break-before: auto !important;
-                page-break-after: auto !important;
-            }
-            
-            /* Specific image size limits for PDF */
-            img {
-                max-width: 700px !important;
-                max-height: 500px !important;
-            }
-            
             /* LISTS */
             ul, ol {
                 margin: 16px 0 !important;
                 padding-left: 20px !important;
+                clear: both !important;
             }
             
             li {
@@ -437,37 +495,33 @@ window.PDFGenerator = {
                 padding-left: 16px !important;
                 font-style: italic !important;
                 page-break-inside: avoid !important;
+                clear: both !important;
             }
             
-            /* GENERAL PAGE BREAK RULES */
-            .page-break-before { page-break-before: always !important; }
-            .page-break-after { page-break-after: always !important; }
-            .page-break-avoid { page-break-inside: avoid !important; }
+            /* GENERAL CLEAR FIXES */
+            .markdown-content > * {
+                clear: both !important;
+            }
             
-            /* Prevent breaks in critical elements */
-            h1, h2, h3, h4, h5, h6,
-            .math-display, 
-            pre, 
-            table,
-            blockquote {
-                page-break-inside: avoid !important;
+            /* Prevent elements from floating over each other */
+            * {
+                float: none !important;
+                position: static !important;
             }
         `;
         
         container.appendChild(style);
-        console.log('PDF styles applied to temp container');
+        console.log('Fixed PDF styles applied');
     },
     
     /**
-     * Generate PDF with working method - SIMPLIFIED
+     * Generate PDF with fixed method
      */
-    generatePDFWithWorkingMethod: async function(container, options) {
-        console.log('Starting PDF generation with html2pdf...');
+    generatePDFWithFixedMethod: async function(container, options) {
+        console.log('Starting PDF generation...');
         console.log('Container size:', container.offsetWidth, 'x', container.offsetHeight);
-        console.log('Container content length:', container.innerHTML.length);
         
         try {
-            // Use html2pdf with CONSERVATIVE settings
             await window.html2pdf()
                 .set({
                     margin: options.margin,
@@ -487,16 +541,16 @@ window.PDFGenerator = {
                 .from(container)
                 .save();
             
-            console.log('✅ PDF generated and downloaded successfully');
+            console.log('✅ PDF generated successfully');
             
         } catch (error) {
-            console.error('❌ html2pdf failed:', error);
+            console.error('❌ PDF generation failed:', error);
             throw error;
         }
     },
     
     /**
-     * Generate PDF with options dialog
+     * Generate PDF with options
      */
     generatePDFWithOptions: async function() {
         const currentLang = UI.getCurrentLanguage();
@@ -514,12 +568,11 @@ window.PDFGenerator = {
     },
     
     /**
-     * Clean up - COMPREHENSIVE
+     * Cleanup
      */
     cleanupPDFGeneration: function() {
         console.log('Cleaning up PDF generation...');
         
-        // Remove tracked container
         if (this.state.currentTempContainer) {
             try {
                 if (this.state.currentTempContainer.parentNode) {
@@ -532,7 +585,6 @@ window.PDFGenerator = {
             this.state.currentTempContainer = null;
         }
         
-        // Remove any orphaned containers
         const tempContainers = document.querySelectorAll('#pdf-temp-container');
         tempContainers.forEach((container, index) => {
             try {
@@ -545,9 +597,7 @@ window.PDFGenerator = {
             }
         });
         
-        // Reset state
         this.state.mathJaxReady = false;
-        
         console.log('PDF cleanup completed');
     },
     
@@ -564,14 +614,10 @@ window.PDFGenerator = {
     }
 };
 
-// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('PDFGenerator (Regression Fix) loaded successfully');
+    console.log('PDFGenerator (Math & Image Fixes) loaded');
 });
 
-/**
- * Export for Node.js compatibility
- */
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = PDFGenerator;
 }
