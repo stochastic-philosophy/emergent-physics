@@ -1,6 +1,7 @@
 /**
  * Content Renderer - Sisällön renderöinti ja esittäminen
  * Handles file viewing, content rendering, file downloads, and PDF generation
+ * FIXED VERSION - Debug for empty PDF issue
  */
 
 window.ContentRenderer = {
@@ -140,28 +141,32 @@ window.ContentRenderer = {
         // Render content based on file type
         switch (fileType) {
             case 'markdown':
-                html += '<div class="markdown-content">';
+                html += '<div class="markdown-content" id="main-markdown-content">';
                 html += await this.renderMarkdownContent(content);
                 html += '</div>';
                 break;
                 
             case 'code':
                 const language = this.detectCodeLanguage(fileName);
-                html += `<div class="code-content">`;
+                html += `<div class="code-content" id="main-code-content">`;
                 html += `<pre class="language-${language}"><code class="language-${language}">${Utils.escapeHtml(content)}</code></pre>`;
                 html += `</div>`;
                 break;
                 
             case 'data':
+                html += '<div id="main-data-content">';
                 html += await this.renderDataContent(content, fileName);
+                html += '</div>';
                 break;
                 
             case 'images':
+                html += '<div id="main-image-content">';
                 html += this.renderImageContent(filePath, fileName);
+                html += '</div>';
                 break;
                 
             default:
-                html += `<div class="text-content"><pre>${Utils.escapeHtml(content)}</pre></div>`;
+                html += `<div class="text-content" id="main-text-content"><pre>${Utils.escapeHtml(content)}</pre></div>`;
         }
         
         html += `</div>`;
@@ -366,13 +371,13 @@ window.ContentRenderer = {
         }
     },
     
-    // ================== PDF GENERATION METHODS ==================
+    // ================== PDF GENERATION METHODS (FIXED) ==================
     
     /**
-     * Generate PDF with full visual fidelity (LaTeX + Code highlighting)
+     * Generate PDF with full visual fidelity (LaTeX + Code highlighting) - FIXED VERSION
      */
     generateAdvancedPDF: async function(options = {}) {
-        DEBUG.info('=== GENERATING ADVANCED PDF ===');
+        DEBUG.info('=== GENERATING ADVANCED PDF (FIXED VERSION) ===');
         
         if (this.pdfState.generatingPDF) {
             DEBUG.warn('PDF generation already in progress');
@@ -382,7 +387,7 @@ window.ContentRenderer = {
         this.pdfState.generatingPDF = true;
         
         try {
-            // Show progress instead of generic loading
+            // Show progress
             this.showPDFProgress('Initializing PDF generation...', 0);
             
             const currentFile = this.state.currentFile;
@@ -391,9 +396,19 @@ window.ContentRenderer = {
             }
             
             const fileName = currentFile.split('/').pop();
+            DEBUG.info(`PDF generation for file: ${fileName}`);
             
             // Update progress
             this.updatePDFProgress(10, 'Preparing content...');
+            
+            // DEBUG: Check what content is available
+            const contentElement = this.findContentForPDF();
+            if (!contentElement) {
+                throw new Error('No content found for PDF generation');
+            }
+            
+            DEBUG.info(`Content element found: ${contentElement.tagName}, class: ${contentElement.className}`);
+            DEBUG.info(`Content length: ${contentElement.innerHTML.length} characters`);
             
             // Configure PDF options
             const pdfOptions = {
@@ -405,7 +420,9 @@ window.ContentRenderer = {
                     useCORS: true,
                     allowTaint: true,
                     backgroundColor: '#ffffff',
-                    removeContainer: true
+                    logging: true,  // Enable logging for debug
+                    width: contentElement.scrollWidth,
+                    height: contentElement.scrollHeight
                 },
                 jsPDF: { 
                     unit: 'mm', 
@@ -425,14 +442,14 @@ window.ContentRenderer = {
             
             // Try html2pdf.js first (best quality)
             try {
-                this.updatePDFProgress(30, 'Generating PDF...');
-                await this.generatePDFWithHtml2PDF(pdfOptions);
+                this.updatePDFProgress(30, 'Generating PDF with html2pdf.js...');
+                await this.generatePDFWithHtml2PDF_Fixed(contentElement, pdfOptions);
                 this.updatePDFProgress(100, 'PDF completed!');
                 DEBUG.success('PDF generated with html2pdf.js');
             } catch (html2pdfError) {
-                DEBUG.warn('html2pdf.js failed, trying fallback method');
+                DEBUG.warn('html2pdf.js failed, trying fallback method:', html2pdfError);
                 this.updatePDFProgress(40, 'Trying alternative method...');
-                await this.generatePDFWithFallback(pdfOptions);
+                await this.generatePDFWithFallback_Fixed(contentElement, pdfOptions);
                 this.updatePDFProgress(100, 'PDF completed!');
                 DEBUG.success('PDF generated with fallback method');
             }
@@ -460,16 +477,58 @@ window.ContentRenderer = {
     },
     
     /**
-     * Generate PDF using html2pdf.js (preserves LaTeX and code highlighting)
+     * Find content element for PDF - FIXED VERSION
      */
-    generatePDFWithHtml2PDF: async function(options) {
-        DEBUG.info('Generating PDF with html2pdf.js...');
+    findContentForPDF: function() {
+        // Try different selectors in priority order
+        const selectors = [
+            '#main-markdown-content',
+            '#main-code-content', 
+            '#main-data-content',
+            '#main-image-content',
+            '#main-text-content',
+            '.markdown-content',
+            '.file-content',
+            '.code-content',
+            '.data-content',
+            '.text-content',
+            '#main-content .file-content',
+            '#main-content'
+        ];
+        
+        for (const selector of selectors) {
+            const element = document.querySelector(selector);
+            if (element && element.innerHTML.trim().length > 0) {
+                DEBUG.info(`Found content using selector: ${selector}`);
+                DEBUG.info(`Content preview: ${element.innerHTML.substring(0, 200)}...`);
+                return element;
+            }
+        }
+        
+        DEBUG.error('No content element found for PDF generation');
+        DEBUG.info('Available elements:');
+        selectors.forEach(selector => {
+            const el = document.querySelector(selector);
+            DEBUG.info(`${selector}: ${el ? 'exists' : 'not found'} ${el ? `(${el.innerHTML.length} chars)` : ''}`);
+        });
+        
+        return null;
+    },
+    
+    /**
+     * Generate PDF using html2pdf.js - FIXED VERSION
+     */
+    generatePDFWithHtml2PDF_Fixed: async function(contentElement, options) {
+        DEBUG.info('Generating PDF with html2pdf.js (FIXED)...');
         
         // Load html2pdf.js if needed
         await this.loadHtml2PDF();
         
-        // Get the content element optimized for PDF
-        const contentElement = await this.prepareContentForPDF();
+        // Prepare content element for PDF
+        const preparedElement = await this.prepareContentForPDF_Fixed(contentElement);
+        
+        DEBUG.info(`Prepared element HTML length: ${preparedElement.innerHTML.length}`);
+        DEBUG.info(`Prepared element dimensions: ${preparedElement.scrollWidth}x${preparedElement.scrollHeight}`);
         
         // Configure html2pdf options
         const html2pdfOptions = {
@@ -481,20 +540,22 @@ window.ContentRenderer = {
             pagebreak: options.pagebreak
         };
         
+        DEBUG.info('Starting html2pdf generation...');
+        
         // Generate and download PDF
         await window.html2pdf()
             .set(html2pdfOptions)
-            .from(contentElement)
+            .from(preparedElement)
             .save();
         
-        DEBUG.success('html2pdf.js generation completed');
+        DEBUG.success('html2pdf.js generation completed successfully');
     },
     
     /**
-     * Fallback: Generate PDF using html2canvas + jsPDF
+     * Fallback: Generate PDF using html2canvas + jsPDF - FIXED VERSION
      */
-    generatePDFWithFallback: async function(options) {
-        DEBUG.info('Generating PDF with fallback method (html2canvas + jsPDF)...');
+    generatePDFWithFallback_Fixed: async function(contentElement, options) {
+        DEBUG.info('Generating PDF with fallback method (html2canvas + jsPDF) - FIXED...');
         
         // Load required libraries
         await Promise.all([
@@ -502,10 +563,24 @@ window.ContentRenderer = {
             this.loadJsPDF()
         ]);
         
-        const contentElement = await this.prepareContentForPDF();
+        const preparedElement = await this.prepareContentForPDF_Fixed(contentElement);
+        
+        DEBUG.info('Starting html2canvas rendering...');
         
         // Generate canvas from HTML
-        const canvas = await window.html2canvas(contentElement, options.html2canvas);
+        const canvas = await window.html2canvas(preparedElement, {
+            ...options.html2canvas,
+            logging: true,
+            onrendered: function(canvas) {
+                DEBUG.info(`Canvas rendered: ${canvas.width}x${canvas.height}`);
+            }
+        });
+        
+        DEBUG.info(`Canvas created: ${canvas.width}x${canvas.height}`);
+        
+        if (canvas.width === 0 || canvas.height === 0) {
+            throw new Error('Generated canvas is empty (0x0 dimensions)');
+        }
         
         // Convert canvas to PDF
         const { jsPDF } = window.jsPDF;
@@ -518,6 +593,8 @@ window.ContentRenderer = {
         
         let heightLeft = imgHeight;
         let position = 0;
+        
+        DEBUG.info(`Adding image to PDF: ${imgWidth}x${imgHeight}mm`);
         
         // Add image to PDF with page breaks
         pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
@@ -533,83 +610,106 @@ window.ContentRenderer = {
         // Download PDF
         pdf.save(options.filename);
         
-        DEBUG.success('Fallback PDF generation completed');
+        DEBUG.success('Fallback PDF generation completed successfully');
     },
     
     /**
-     * Prepare content for PDF generation (optimize layout, ensure math is rendered)
+     * Prepare content for PDF generation - FIXED VERSION
      */
-    prepareContentForPDF: async function() {
-        DEBUG.info('Preparing content for PDF...');
-        
-        // Get main content element
-        let contentElement = document.querySelector('.file-content') || 
-                            document.querySelector('.markdown-content') ||
-                            document.querySelector('#main-content');
+    prepareContentForPDF_Fixed: async function(contentElement) {
+        DEBUG.info('Preparing content for PDF (FIXED)...');
         
         if (!contentElement) {
-            throw new Error('No content element found');
+            throw new Error('Content element is null or undefined');
         }
         
         // Clone content to avoid modifying original
         const clonedContent = contentElement.cloneNode(true);
+        DEBUG.info(`Cloned content length: ${clonedContent.innerHTML.length}`);
         
         // Remove elements that shouldn't be in PDF
         const elementsToRemove = [
             '.file-navigation', '.project-navigation', '.back-to-home-btn',
-            '.copy-code-btn', '.file-actions', 'script', 'button[onclick]'
+            '.copy-code-btn', '.file-actions', 'script', 'button[onclick]',
+            '.pdf-btn', '.pdf-options-btn', '.download-file-btn'
         ];
         
         elementsToRemove.forEach(selector => {
             const elements = clonedContent.querySelectorAll(selector);
+            DEBUG.info(`Removing ${elements.length} elements with selector: ${selector}`);
             elements.forEach(el => el.remove());
         });
         
         // Ensure MathJax has finished rendering
         if (window.MathJax && window.MathJax.typesetPromise) {
             DEBUG.info('Waiting for MathJax to finish rendering...');
-            await window.MathJax.typesetPromise([clonedContent]);
-            DEBUG.success('MathJax rendering completed');
+            try {
+                await window.MathJax.typesetPromise([clonedContent]);
+                DEBUG.success('MathJax rendering completed');
+            } catch (mathError) {
+                DEBUG.warn('MathJax rendering failed:', mathError);
+            }
         }
         
         // Add PDF-specific styles
-        this.addPDFStyles(clonedContent);
+        this.addPDFStyles_Fixed(clonedContent);
         
         // Create temporary container for PDF generation
         const tempContainer = document.createElement('div');
         tempContainer.id = 'pdf-temp-container';
         tempContainer.style.cssText = `
-            position: absolute;
-            top: -9999px;
-            left: -9999px;
-            width: 210mm;
-            background: white;
-            font-family: 'Segoe UI', sans-serif;
-            line-height: 1.6;
-            color: #000;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 794px !important;
+            min-height: 1000px !important;
+            background: white !important;
+            font-family: 'Segoe UI', sans-serif !important;
+            line-height: 1.6 !important;
+            color: #000 !important;
+            padding: 20px !important;
+            overflow: visible !important;
+            z-index: -9999 !important;
+            opacity: 0.01 !important;
         `;
         
+        // Add title to PDF
+        const fileName = this.state.currentFile ? this.state.currentFile.split('/').pop() : 'document';
+        const title = document.createElement('h1');
+        title.textContent = Utils.filenameToDisplayName(fileName);
+        title.style.cssText = 'margin-bottom: 20px !important; color: #000 !important; font-size: 24px !important;';
+        
+        tempContainer.appendChild(title);
         tempContainer.appendChild(clonedContent);
         document.body.appendChild(tempContainer);
         
-        // Wait a bit for rendering to complete
-        await Utils.sleep(500);
+        // Wait for rendering to complete
+        await Utils.sleep(1000);
         
-        DEBUG.success('Content prepared for PDF');
+        DEBUG.info(`Prepared container dimensions: ${tempContainer.scrollWidth}x${tempContainer.scrollHeight}`);
+        DEBUG.success('Content prepared for PDF (FIXED)');
+        
         return tempContainer;
     },
     
     /**
-     * Add PDF-specific styles to content
+     * Add PDF-specific styles to content - FIXED VERSION
      */
-    addPDFStyles: function(contentElement) {
+    addPDFStyles_Fixed: function(contentElement) {
         const pdfStyles = document.createElement('style');
         pdfStyles.textContent = `
-            /* PDF-specific styles */
+            /* PDF-specific styles - FIXED */
             * {
                 -webkit-print-color-adjust: exact !important;
                 color-adjust: exact !important;
                 print-color-adjust: exact !important;
+                box-sizing: border-box !important;
+            }
+            
+            /* Ensure all content is visible */
+            body, div, p, h1, h2, h3, h4, h5, h6, pre, code, table, tr, td, th {
+                color: #000 !important;
+                background: transparent !important;
             }
             
             /* Ensure code blocks are readable */
@@ -621,6 +721,7 @@ window.ContentRenderer = {
                 font-family: 'Courier New', monospace !important;
                 white-space: pre-wrap !important;
                 word-wrap: break-word !important;
+                color: #000 !important;
             }
             
             /* Preserve syntax highlighting colors */
@@ -636,6 +737,7 @@ window.ContentRenderer = {
                 margin: 16px 0 !important;
                 text-align: center !important;
                 page-break-inside: avoid !important;
+                color: #000 !important;
             }
             
             /* Table styling */
@@ -650,6 +752,7 @@ window.ContentRenderer = {
                 border: 1px solid #ddd !important;
                 padding: 8px !important;
                 text-align: left !important;
+                color: #000 !important;
             }
             
             th {
@@ -673,6 +776,7 @@ window.ContentRenderer = {
             p {
                 margin-bottom: 12px !important;
                 line-height: 1.6 !important;
+                color: #000 !important;
             }
             
             /* Lists */
@@ -683,6 +787,7 @@ window.ContentRenderer = {
             
             li {
                 margin-bottom: 6px !important;
+                color: #000 !important;
             }
             
             /* Blockquotes */
@@ -696,23 +801,24 @@ window.ContentRenderer = {
             
             /* Images */
             img {
-                max-width: 100% !important;
+                max-width: 700px !important;
                 height: auto !important;
                 page-break-inside: avoid !important;
                 margin: 16px 0 !important;
+                display: block !important;
             }
             
-            /* Page breaks */
-            .page-break-before {
-                page-break-before: always !important;
-            }
-            
-            .page-break-after {
-                page-break-after: always !important;
+            /* Ensure visibility */
+            .markdown-content, .code-content, .text-content, .json-content {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                color: #000 !important;
             }
         `;
         
-        contentElement.insertBefore(pdfStyles, contentElement.firstChild);
+        document.head.appendChild(pdfStyles);
+        contentElement.insertBefore(pdfStyles.cloneNode(true), contentElement.firstChild);
     },
     
     /**
@@ -855,6 +961,7 @@ window.ContentRenderer = {
         const tempContainer = document.getElementById('pdf-temp-container');
         if (tempContainer) {
             document.body.removeChild(tempContainer);
+            DEBUG.info('PDF temp container cleaned up');
         }
     },
     
