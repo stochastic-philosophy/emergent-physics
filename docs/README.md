@@ -4,7 +4,7 @@
 
 Tämä on **Vaihe 2** implementation: täysi markdown-tuki, LaTeX-matematiikka ja tiedostonhallinta.
 
-## 🚀 v2.0 Markdown + File Management (2025-01-25)
+## 🚀 v2.0 Markdown + File Management (2025-07-25)
 
 ### ✅ Uudet ominaisuudet:
 - **📁 file-manager.js** - Tiedostojen lataus ja cache-hallinta
