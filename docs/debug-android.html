@@ -294,19 +294,41 @@
         function testBasicFunctions() {
             AndroidDebug.info('=== TESTING BASIC FUNCTIONS ===');
             
-            // Test window objects
+            // Test window objects with more detailed info
             const modules = [
                 'Utils', 'Storage', 'UI', 'ThemeManager',
                 'FileManager', 'MarkdownProcessor', 'ProjectManager',
                 'ContentRenderer', 'PDFGenerator', 'PDFLibraryManager'
             ];
             
+            AndroidDebug.info(`Testing ${modules.length} modules...`);
+            
             modules.forEach(mod => {
                 const exists = typeof window[mod] !== 'undefined';
                 if (exists) {
                     AndroidDebug.success(`✅ ${mod}: Available`);
+                    // Test if module has key methods
+                    if (mod === 'PDFGenerator' && window[mod].generateAdvancedPDF) {
+                        AndroidDebug.info(`  - generateAdvancedPDF: Available`);
+                    }
+                    if (mod === 'PDFLibraryManager' && window[mod].getLibraryStatus) {
+                        AndroidDebug.info(`  - getLibraryStatus: Available`);
+                    }
                 } else {
                     AndroidDebug.error(`❌ ${mod}: Missing`);
+                    
+                    // Try to figure out why it's missing
+                    if (mod === 'PDFGenerator') {
+                        AndroidDebug.info('  Checking if script loaded...');
+                        const scripts = Array.from(document.scripts);
+                        const pdfScript = scripts.find(s => s.src.includes('pdf-generator.js'));
+                        if (pdfScript) {
+                            AndroidDebug.info(`  - Script found: ${pdfScript.src}`);
+                            AndroidDebug.warn(`  - But PDFGenerator object not created - script error?`);
+                        } else {
+                            AndroidDebug.error(`  - Script not found in DOM`);
+                        }
+                    }
                 }
             });
             
@@ -316,12 +338,33 @@
                     const appInfo = App.getInfo();
                     AndroidDebug.success(`App Version: ${appInfo.version}`);
                     AndroidDebug.info(`Initialized: ${appInfo.initialized}`);
+                    
+                    if (appInfo.modules) {
+                        AndroidDebug.info('App Module Status:');
+                        Object.entries(appInfo.modules).forEach(([key, value]) => {
+                            AndroidDebug.info(`  ${key}: ${value ? '✅' : '❌'}`);
+                        });
+                    }
                 } catch (error) {
                     AndroidDebug.error(`App Error: ${error.message}`);
                 }
             } else {
                 AndroidDebug.error('❌ App: Not available');
             }
+            
+            // Check all loaded scripts
+            AndroidDebug.info('=== LOADED SCRIPTS ===');
+            const scripts = Array.from(document.scripts);
+            const relevantScripts = scripts.filter(s => 
+                s.src.includes('.js') && 
+                (s.src.includes('assets/js/') || s.src.includes('debug') || s.src.includes('pdf'))
+            );
+            
+            AndroidDebug.info(`Found ${relevantScripts.length} relevant scripts:`);
+            relevantScripts.forEach(script => {
+                const name = script.src.split('/').pop();
+                AndroidDebug.info(`  - ${name}: ${script.src}`);
+            });
         }
 
         function testPDFModules() {
