@@ -418,7 +418,7 @@ Kvanttimekaniikan ytimessä on fundamentaalinen kysymys satunnaisuuden luonteest
 Wheeler's "It from Bit" -hypoteesin mukaan kaikki fysikaaliset ilmiöt juontuvat informaatiosta - binäärisestä datasta. Jos tämä hypoteesi pitää paikkaansa, **binääriset satunnaisuustyypit** (kuten $\pm 1$ -prosessit) pitäisi tuottaa korkeampia indivisible score -arvoja kuin kompleksilukupohjaiset prosessit.
 
 **Testattava hypoteesi**:
-$$\text{Score}_{\text{binary}} > \text{Score}_{\text{complex}}$$
+$$\text{Score}\_{\text{binary}} > \text{Score}\_{\text{complex}}$$
 
 ### 2.1.3 Kompleksilukujen fundamentaalisuus
 
