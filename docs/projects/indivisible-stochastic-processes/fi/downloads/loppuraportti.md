@@ -782,7 +782,7 @@ $$\text{Informaatio} (\text{bits}) \rightarrow \text{Fysikaaliset ilmiöt} (\tex
 ### 2.8.3 Hypoteesin Vahvistus
 
 **Vaihe 2 hypoteesi**:
-$$H_2: \text{Score}_{\text{binary}} > \text{Score}_{\text{complex}}$$
+$$H_2: \text{Score}\_{\text{binary}} > \text{Score}\_{\text{complex}}$$
 
 **Tulos**: $0.95 > 0.84$ ✅ **VAHVISTETTU**
 
@@ -865,7 +865,7 @@ Hybridimallit yhdistävät kolme keskeistä fysikaalista lähestymistapaa:
 3. **Perkolaatioteoria**: Kriittiset ilmiöt, threshold-käyttäytyminen, verkostoefektit
 
 **Hypoteesi**: 
-$$\text{Score}_{\text{hybrid}} = f(\text{RMT}, \text{Fractals}, \text{Percolation}) > \text{Score}_{\text{simple}}$$
+$$\text{Score}\_{\text{hybrid}} = f(\text{RMT}, \text{Fractals}, \text{Percolation}) > \text{Score}\_{\text{simple}}$$
 
 ### 3.1.3 Non-linear Coupling
 
@@ -995,7 +995,7 @@ missä:
 - $\delta = 0.3$ (fresh randomness)
 
 **Observable**:
-$$X_t = \sum_{i=1}^{\text{network\_size}} |S_t^{(i)}|^2$$
+$$X_t = \sum_{i=1}^{\text{network\\_size}} |S_t^{(i)}|^2$$
 
 ### 3.3.3 RMT-Percolation Coupling
 
@@ -1292,7 +1292,7 @@ for randomness_type in TOP_RANDOMNESS_TYPES[:2]:  # binary_pm1, binary_01
 ### 3.8.1 Barandes'in Teorian Empiirinen Validointi
 
 **Hypoteesin vahvistus**:
-$$\text{Score}_{\text{hybrid}}(0.959) > \text{Score}_{\text{reference}}(0.676)$$
+$$\text{Score}\_{\text{hybrid}}(0.959) > \text{Score}\_{\text{reference}}(0.676)$$
 
 **Parannus**: +41.8%
 
@@ -1307,7 +1307,7 @@ $$\text{Score}_{\text{hybrid}}(0.959) > \text{Score}_{\text{reference}}(0.676)$$
 ### 3.8.2 Digital Physics ja "It from Bit"
 
 **Wheeler's hypoteesin tuki**:
-$$\text{Score}_{\text{binary\_pm1}} = 0.97 > \text{Score}_{\text{complex\_gaussian}} = 0.84$$
+$$\text{Score}\_{\text{binary\\_pm1}} = 0.97 > \text{Score}\_{\text{complex\\_gaussian}} = 0.84$$
 
 **Ero**: $\Delta = 0.13$ (15.5% parannus)
 
