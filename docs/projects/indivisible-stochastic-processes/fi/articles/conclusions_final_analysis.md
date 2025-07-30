@@ -134,7 +134,7 @@ Tämä tulos on **vallankumouksellinen** kvanttimekaniikan ymmärtämiselle:
 
 Triple hybrid demonstroi **"kokonaisuus > osiensa summa"** -periaatteen:
 
-$$\text{Indivisible Score}_{\text{triple}} > \max(\text{Score}_{\text{RMT}}, \text{Score}_{\text{fractal}}, \text{Score}_{\text{percolation}})$$
+$$\text{Indivisible Score}\_{\text{triple}} > \max(\text{Score}\_{\text{RMT}}, \text{Score}\_{\text{fractal}}, \text{Score}\_{\text{percolation}})$$
 
 Tämä viittaa siihen, että **kvanttimaisuus syntyy eri fysikaalisten mekanismien vuorovaikutuksesta**, ei mistään yksittäisestä ilmiöstä.
 
