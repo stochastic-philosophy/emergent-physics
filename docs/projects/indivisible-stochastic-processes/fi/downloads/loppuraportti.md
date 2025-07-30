@@ -165,6 +165,11 @@ $$X_t = \begin{cases}
 \beta \cdot X_{t-1} + \sigma \epsilon_t & \text{jos } D_t = 0
 \end{cases}$$
 
+$$X_t = \begin{cases}
+\alpha \cdot X_{t_{\text{last div}}} + \epsilon_t & \text{jos } D_t = 1 \\\\
+\beta \cdot X_{t-1} + \sigma \epsilon_t & \text{jos } D_t = 0
+\end{cases}$$
+
 missä $\alpha = 0.3$, $\beta = 0.9$, $\sigma = 0.1$ ja $\epsilon_t \sim \mathcal{N}(0,1)$.
 
 **Odotukset**:
