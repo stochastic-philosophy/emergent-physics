@@ -1,7 +1,6 @@
 /**
- * Content Renderer - Sisällön renderöinti ja esittäminen
- * Handles file viewing, content rendering, file downloads, and PDF generation
- * FIXED VERSION - Debug for empty PDF issue
+ * Content Renderer - VISIBILITY FIXED VERSION
+ * PDF generation now uses VISIBLE temp element during generation
  */
 
 window.ContentRenderer = {
@@ -371,13 +370,13 @@ window.ContentRenderer = {
         }
     },
     
-    // ================== PDF GENERATION METHODS (FIXED) ==================
+    // ================== PDF GENERATION METHODS (VISIBILITY FIXED) ==================
     
     /**
-     * Generate PDF with full visual fidelity (LaTeX + Code highlighting) - FIXED VERSION
+     * Generate PDF with full visual fidelity - VISIBILITY FIXED VERSION
      */
     generateAdvancedPDF: async function(options = {}) {
-        DEBUG.info('=== GENERATING ADVANCED PDF (FIXED VERSION) ===');
+        DEBUG.info('=== GENERATING ADVANCED PDF (VISIBILITY FIXED) ===');
         
         if (this.pdfState.generatingPDF) {
             DEBUG.warn('PDF generation already in progress');
@@ -401,7 +400,7 @@ window.ContentRenderer = {
             // Update progress
             this.updatePDFProgress(10, 'Preparing content...');
             
-            // DEBUG: Check what content is available
+            // Find and prepare content
             const contentElement = this.findContentForPDF();
             if (!contentElement) {
                 throw new Error('No content found for PDF generation');
@@ -420,9 +419,7 @@ window.ContentRenderer = {
                     useCORS: true,
                     allowTaint: true,
                     backgroundColor: '#ffffff',
-                    logging: true,  // Enable logging for debug
-                    width: contentElement.scrollWidth,
-                    height: contentElement.scrollHeight
+                    logging: false // Disable logging for cleaner output
                 },
                 jsPDF: { 
                     unit: 'mm', 
@@ -443,13 +440,13 @@ window.ContentRenderer = {
             // Try html2pdf.js first (best quality)
             try {
                 this.updatePDFProgress(30, 'Generating PDF with html2pdf.js...');
-                await this.generatePDFWithHtml2PDF_Fixed(contentElement, pdfOptions);
+                await this.generatePDFWithVisibleElement(contentElement, pdfOptions);
                 this.updatePDFProgress(100, 'PDF completed!');
                 DEBUG.success('PDF generated with html2pdf.js');
             } catch (html2pdfError) {
                 DEBUG.warn('html2pdf.js failed, trying fallback method:', html2pdfError);
                 this.updatePDFProgress(40, 'Trying alternative method...');
-                await this.generatePDFWithFallback_Fixed(contentElement, pdfOptions);
+                await this.generatePDFWithFallbackVisible(contentElement, pdfOptions);
                 this.updatePDFProgress(100, 'PDF completed!');
                 DEBUG.success('PDF generated with fallback method');
             }
@@ -477,10 +474,9 @@ window.ContentRenderer = {
     },
     
     /**
-     * Find content element for PDF - FIXED VERSION
+     * Find content element for PDF - same as before
      */
     findContentForPDF: function() {
-        // Try different selectors in priority order
         const selectors = [
             '#main-markdown-content',
             '#main-code-content', 
@@ -500,62 +496,68 @@ window.ContentRenderer = {
             const element = document.querySelector(selector);
             if (element && element.innerHTML.trim().length > 0) {
                 DEBUG.info(`Found content using selector: ${selector}`);
-                DEBUG.info(`Content preview: ${element.innerHTML.substring(0, 200)}...`);
                 return element;
             }
         }
         
         DEBUG.error('No content element found for PDF generation');
-        DEBUG.info('Available elements:');
-        selectors.forEach(selector => {
-            const el = document.querySelector(selector);
-            DEBUG.info(`${selector}: ${el ? 'exists' : 'not found'} ${el ? `(${el.innerHTML.length} chars)` : ''}`);
-        });
-        
         return null;
     },
     
     /**
-     * Generate PDF using html2pdf.js - FIXED VERSION
+     * Generate PDF using VISIBLE element - FIXED VERSION
      */
-    generatePDFWithHtml2PDF_Fixed: async function(contentElement, options) {
-        DEBUG.info('Generating PDF with html2pdf.js (FIXED)...');
+    generatePDFWithVisibleElement: async function(contentElement, options) {
+        DEBUG.info('Generating PDF with VISIBLE element method...');
         
         // Load html2pdf.js if needed
         await this.loadHtml2PDF();
         
-        // Prepare content element for PDF
-        const preparedElement = await this.prepareContentForPDF_Fixed(contentElement);
+        // Create VISIBLE temp container
+        const visibleContainer = await this.createVisibleTempContainer(contentElement);
         
-        DEBUG.info(`Prepared element HTML length: ${preparedElement.innerHTML.length}`);
-        DEBUG.info(`Prepared element dimensions: ${preparedElement.scrollWidth}x${preparedElement.scrollHeight}`);
-        
-        // Configure html2pdf options
-        const html2pdfOptions = {
-            margin: options.margin,
-            filename: options.filename,
-            image: options.image,
-            html2canvas: options.html2canvas,
-            jsPDF: options.jsPDF,
-            pagebreak: options.pagebreak
-        };
-        
-        DEBUG.info('Starting html2pdf generation...');
-        
-        // Generate and download PDF
-        await window.html2pdf()
-            .set(html2pdfOptions)
-            .from(preparedElement)
-            .save();
-        
-        DEBUG.success('html2pdf.js generation completed successfully');
+        try {
+            DEBUG.info(`VISIBLE container dimensions: ${visibleContainer.scrollWidth}x${visibleContainer.scrollHeight}`);
+            
+            // Configure html2pdf options for visible element
+            const html2pdfOptions = {
+                margin: options.margin,
+                filename: options.filename,
+                image: options.image,
+                html2canvas: {
+                    ...options.html2canvas,
+                    width: visibleContainer.scrollWidth,
+                    height: visibleContainer.scrollHeight
+                },
+                jsPDF: options.jsPDF,
+                pagebreak: options.pagebreak
+            };
+            
+            DEBUG.info('Starting html2pdf generation from VISIBLE element...');
+            
+            // Generate PDF from visible element
+            await window.html2pdf()
+                .set(html2pdfOptions)
+                .from(visibleContainer)
+                .toPdf()
+                .save();
+            
+            DEBUG.success('PDF generated successfully from VISIBLE element');
+            
+        } finally {
+            // Always cleanup the visible container
+            if (visibleContainer && visibleContainer.parentNode) {
+                document.body.removeChild(visibleContainer);
+                DEBUG.info('VISIBLE temp container removed');
+            }
+        }
     },
     
     /**
-     * Fallback: Generate PDF using html2canvas + jsPDF - FIXED VERSION
+     * Generate PDF using fallback with VISIBLE element
      */
-    generatePDFWithFallback_Fixed: async function(contentElement, options) {
-        DEBUG.info('Generating PDF with fallback method (html2canvas + jsPDF) - FIXED...');
+    generatePDFWithFallbackVisible: async function(contentElement, options) {
+        DEBUG.info('Generating PDF with fallback + VISIBLE element...');
         
         // Load required libraries
         await Promise.all([
@@ -563,103 +565,99 @@ window.ContentRenderer = {
             this.loadJsPDF()
         ]);
         
-        const preparedElement = await this.prepareContentForPDF_Fixed(contentElement);
+        // Create VISIBLE temp container
+        const visibleContainer = await this.createVisibleTempContainer(contentElement);
         
-        DEBUG.info('Starting html2canvas rendering...');
-        
-        // Generate canvas from HTML
-        const canvas = await window.html2canvas(preparedElement, {
-            ...options.html2canvas,
-            logging: true,
-            onrendered: function(canvas) {
-                DEBUG.info(`Canvas rendered: ${canvas.width}x${canvas.height}`);
+        try {
+            DEBUG.info('Starting html2canvas from VISIBLE element...');
+            
+            // Generate canvas from VISIBLE HTML
+            const canvas = await window.html2canvas(visibleContainer, {
+                ...options.html2canvas,
+                logging: false
+            });
+            
+            DEBUG.info(`Canvas created from VISIBLE element: ${canvas.width}x${canvas.height}`);
+            
+            if (canvas.width === 0 || canvas.height === 0) {
+                throw new Error('Generated canvas from VISIBLE element is empty');
             }
-        });
-        
-        DEBUG.info(`Canvas created: ${canvas.width}x${canvas.height}`);
-        
-        if (canvas.width === 0 || canvas.height === 0) {
-            throw new Error('Generated canvas is empty (0x0 dimensions)');
-        }
-        
-        // Convert canvas to PDF
-        const { jsPDF } = window.jsPDF;
-        const pdf = new jsPDF(options.jsPDF);
-        
-        const imgData = canvas.toDataURL('image/jpeg', options.image.quality);
-        const imgWidth = 210; // A4 width in mm
-        const pageHeight = 295; // A4 height in mm  
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        
-        let heightLeft = imgHeight;
-        let position = 0;
-        
-        DEBUG.info(`Adding image to PDF: ${imgWidth}x${imgHeight}mm`);
-        
-        // Add image to PDF with page breaks
-        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-        
-        while (heightLeft >= 0) {
-            position = heightLeft - imgHeight;
-            pdf.addPage();
+            
+            // Convert canvas to PDF
+            const { jsPDF } = window.jsPDF;
+            const pdf = new jsPDF(options.jsPDF);
+            
+            const imgData = canvas.toDataURL('image/jpeg', options.image.quality);
+            const imgWidth = 210; // A4 width in mm
+            const pageHeight = 295; // A4 height in mm  
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            
+            let heightLeft = imgHeight;
+            let position = 0;
+            
+            // Add image to PDF with page breaks
             pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
             heightLeft -= pageHeight;
+            
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+            
+            // Download PDF
+            pdf.save(options.filename);
+            
+            DEBUG.success('Fallback PDF generation completed with VISIBLE element');
+            
+        } finally {
+            // Always cleanup the visible container
+            if (visibleContainer && visibleContainer.parentNode) {
+                document.body.removeChild(visibleContainer);
+                DEBUG.info('VISIBLE temp container removed (fallback)');
+            }
         }
-        
-        // Download PDF
-        pdf.save(options.filename);
-        
-        DEBUG.success('Fallback PDF generation completed successfully');
     },
     
     /**
-     * Prepare content for PDF generation - FIXED VERSION
+     * Create VISIBLE temp container for PDF generation - KEY FIX
      */
-    prepareContentForPDF_Fixed: async function(contentElement) {
-        DEBUG.info('Preparing content for PDF (FIXED)...');
-        
-        if (!contentElement) {
-            throw new Error('Content element is null or undefined');
-        }
+    createVisibleTempContainer: async function(contentElement) {
+        DEBUG.info('Creating VISIBLE temp container for PDF...');
         
         // Clone content to avoid modifying original
         const clonedContent = contentElement.cloneNode(true);
-        DEBUG.info(`Cloned content length: ${clonedContent.innerHTML.length}`);
         
         // Remove elements that shouldn't be in PDF
         const elementsToRemove = [
             '.file-navigation', '.project-navigation', '.back-to-home-btn',
-            '.copy-code-btn', '.file-actions', 'script', 'button[onclick]',
+            '.copy-code-btn', '.file-actions', 'script', 'button',
             '.pdf-btn', '.pdf-options-btn', '.download-file-btn'
         ];
         
         elementsToRemove.forEach(selector => {
             const elements = clonedContent.querySelectorAll(selector);
-            DEBUG.info(`Removing ${elements.length} elements with selector: ${selector}`);
             elements.forEach(el => el.remove());
         });
         
-        // Ensure MathJax has finished rendering
+        // Wait for MathJax if available
         if (window.MathJax && window.MathJax.typesetPromise) {
-            DEBUG.info('Waiting for MathJax to finish rendering...');
+            DEBUG.info('Waiting for MathJax in VISIBLE element...');
             try {
                 await window.MathJax.typesetPromise([clonedContent]);
-                DEBUG.success('MathJax rendering completed');
+                DEBUG.success('MathJax rendered in VISIBLE element');
             } catch (mathError) {
                 DEBUG.warn('MathJax rendering failed:', mathError);
             }
         }
         
-        // Add PDF-specific styles
-        this.addPDFStyles_Fixed(clonedContent);
-        
-        // Create temporary container for PDF generation
+        // Create VISIBLE temp container - THIS IS THE KEY FIX
         const tempContainer = document.createElement('div');
         tempContainer.id = 'pdf-temp-container';
         tempContainer.style.cssText = `
-            position: fixed !important;
-            top: 0 !important;
+            position: absolute !important;
+            top: -2000px !important;
             left: 0 !important;
             width: 794px !important;
             min-height: 1000px !important;
@@ -668,9 +666,10 @@ window.ContentRenderer = {
             line-height: 1.6 !important;
             color: #000 !important;
             padding: 20px !important;
-            overflow: visible !important;
-            z-index: -9999 !important;
-            opacity: 0.01 !important;
+            z-index: 1000 !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
         `;
         
         // Add title to PDF
@@ -679,40 +678,39 @@ window.ContentRenderer = {
         title.textContent = Utils.filenameToDisplayName(fileName);
         title.style.cssText = 'margin-bottom: 20px !important; color: #000 !important; font-size: 24px !important;';
         
+        // Add PDF-specific styles
+        this.addPDFStyles(clonedContent);
+        
         tempContainer.appendChild(title);
         tempContainer.appendChild(clonedContent);
         document.body.appendChild(tempContainer);
         
-        // Wait for rendering to complete
-        await Utils.sleep(1000);
+        // Wait for rendering - VISIBLE element renders faster
+        await Utils.sleep(500);
         
-        DEBUG.info(`Prepared container dimensions: ${tempContainer.scrollWidth}x${tempContainer.scrollHeight}`);
-        DEBUG.success('Content prepared for PDF (FIXED)');
+        DEBUG.success(`VISIBLE temp container created: ${tempContainer.scrollWidth}x${tempContainer.scrollHeight}`);
         
         return tempContainer;
     },
     
     /**
-     * Add PDF-specific styles to content - FIXED VERSION
+     * Add PDF-specific styles
      */
-    addPDFStyles_Fixed: function(contentElement) {
+    addPDFStyles: function(contentElement) {
         const pdfStyles = document.createElement('style');
         pdfStyles.textContent = `
-            /* PDF-specific styles - FIXED */
             * {
                 -webkit-print-color-adjust: exact !important;
                 color-adjust: exact !important;
                 print-color-adjust: exact !important;
-                box-sizing: border-box !important;
             }
             
-            /* Ensure all content is visible */
-            body, div, p, h1, h2, h3, h4, h5, h6, pre, code, table, tr, td, th {
+            body, div, p, h1, h2, h3, h4, h5, h6, pre, code, table, tr, td, th, li, span {
                 color: #000 !important;
-                background: transparent !important;
+                visibility: visible !important;
+                opacity: 1 !important;
             }
             
-            /* Ensure code blocks are readable */
             pre, code {
                 background: #f5f5f5 !important;
                 border: 1px solid #ddd !important;
@@ -720,32 +718,19 @@ window.ContentRenderer = {
                 border-radius: 4px !important;
                 font-family: 'Courier New', monospace !important;
                 white-space: pre-wrap !important;
-                word-wrap: break-word !important;
                 color: #000 !important;
             }
             
-            /* Preserve syntax highlighting colors */
             .token.comment { color: #6a9955 !important; }
             .token.keyword { color: #0000ff !important; }
             .token.string { color: #a31515 !important; }
             .token.number { color: #098658 !important; }
             .token.function { color: #795e26 !important; }
-            .token.operator { color: #000000 !important; }
             
-            /* Math display styling */
-            .math-display, .MathJax_Display {
-                margin: 16px 0 !important;
-                text-align: center !important;
-                page-break-inside: avoid !important;
-                color: #000 !important;
-            }
-            
-            /* Table styling */
             table {
                 width: 100% !important;
                 border-collapse: collapse !important;
                 margin: 16px 0 !important;
-                page-break-inside: avoid !important;
             }
             
             th, td {
@@ -760,72 +745,32 @@ window.ContentRenderer = {
                 font-weight: bold !important;
             }
             
-            /* Heading styles */
             h1, h2, h3, h4, h5, h6 {
                 color: #000 !important;
                 margin-top: 24px !important;
                 margin-bottom: 12px !important;
-                page-break-after: avoid !important;
             }
             
-            h1 { font-size: 24px !important; }
-            h2 { font-size: 20px !important; }
-            h3 { font-size: 18px !important; }
-            
-            /* Paragraph spacing */
-            p {
-                margin-bottom: 12px !important;
+            p, li {
+                color: #000 !important;
                 line-height: 1.6 !important;
-                color: #000 !important;
             }
             
-            /* Lists */
-            ul, ol {
-                margin: 12px 0 !important;
-                padding-left: 24px !important;
-            }
-            
-            li {
-                margin-bottom: 6px !important;
-                color: #000 !important;
-            }
-            
-            /* Blockquotes */
-            blockquote {
-                border-left: 4px solid #ccc !important;
-                margin: 16px 0 !important;
-                padding-left: 16px !important;
-                font-style: italic !important;
-                color: #666 !important;
-            }
-            
-            /* Images */
             img {
                 max-width: 700px !important;
                 height: auto !important;
-                page-break-inside: avoid !important;
+                display: block !important;
                 margin: 16px 0 !important;
-                display: block !important;
-            }
-            
-            /* Ensure visibility */
-            .markdown-content, .code-content, .text-content, .json-content {
-                display: block !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-                color: #000 !important;
             }
         `;
         
-        document.head.appendChild(pdfStyles);
-        contentElement.insertBefore(pdfStyles.cloneNode(true), contentElement.firstChild);
+        contentElement.insertBefore(pdfStyles, contentElement.firstChild);
     },
     
     /**
      * Show PDF progress indicator
      */
     showPDFProgress: function(message = 'Generating PDF...', progress = 0) {
-        // Remove existing progress indicator
         this.hidePDFProgress();
         
         const currentLang = UI.getCurrentLanguage();
@@ -971,7 +916,6 @@ window.ContentRenderer = {
     generatePDFWithOptions: async function() {
         const currentLang = UI.getCurrentLanguage();
         
-        // Simple options for now - could be enhanced with a modal dialog
         const orientation = confirm(currentLang === 'fi' ? 
             'Käytä pystysuuntaa? (Peruuta = vaakasuunta)' : 
             'Use portrait orientation? (Cancel = landscape)') ? 'portrait' : 'landscape';
@@ -997,13 +941,9 @@ window.ContentRenderer = {
      * Add file to view history
      */
     addToHistory: function(filePath) {
-        // Remove existing entry if present
         this.state.viewHistory = this.state.viewHistory.filter(path => path !== filePath);
-        
-        // Add to beginning
         this.state.viewHistory.unshift(filePath);
         
-        // Limit history size
         if (this.state.viewHistory.length > this.config.maxHistorySize) {
             this.state.viewHistory = this.state.viewHistory.slice(0, this.config.maxHistorySize);
         }
