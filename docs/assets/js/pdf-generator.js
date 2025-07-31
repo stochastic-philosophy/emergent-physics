@@ -1,7 +1,7 @@
 /**
- * PDF Generator - Bug Fixed Version
- * Handles PDF generation from content with full visual fidelity
- * FIXED: Container cleanup, async handling, and error management
+ * PDF Generator - jsPDF Usage Fixed Version
+ * Handles PDF generation from content with proper jsPDF constructor usage
+ * FIXED: jsPDF constructor detection and usage
  */
 
 window.PDFGenerator = {
@@ -68,7 +68,7 @@ window.PDFGenerator = {
      * Generate PDF with full visual fidelity - MAIN ENTRY POINT (FIXED)
      */
     generateAdvancedPDF: async function(options = {}) {
-        DEBUG.info('=== GENERATING ADVANCED PDF (FULLY FIXED) ===');
+        DEBUG.info('=== GENERATING ADVANCED PDF (jsPDF FIXED) ===');
         
         if (this.state.generatingPDF) {
             DEBUG.warn('PDF generation already in progress');
@@ -236,7 +236,7 @@ window.PDFGenerator = {
     },
     
     /**
-     * Generate PDF using enhanced fallback method - FIXED
+     * Generate PDF using enhanced fallback method - FIXED jsPDF usage
      */
     generatePDFWithEnhancedFallback: async function(contentElement, options) {
         DEBUG.info('Generating PDF with ENHANCED fallback method...');
@@ -301,14 +301,32 @@ window.PDFGenerator = {
                 PDFLibraryManager.updatePDFProgress(85, 'Creating PDF from canvas...');
             }
             
-            // Check jsPDF availability
-            if (typeof window.jsPDF === 'undefined') {
-                throw new Error('jsPDF library not loaded');
+            // CRITICAL FIX: Get jsPDF constructor properly
+            let jsPDFConstructor;
+            try {
+                if (typeof PDFLibraryManager !== 'undefined' && PDFLibraryManager.getJsPDFConstructor) {
+                    jsPDFConstructor = PDFLibraryManager.getJsPDFConstructor();
+                } else {
+                    // Fallback methods
+                    if (typeof window.jsPDF === 'function') {
+                        jsPDFConstructor = window.jsPDF;
+                    } else if (window.jsPDF && typeof window.jsPDF.jsPDF === 'function') {
+                        jsPDFConstructor = window.jsPDF.jsPDF;
+                    } else if (typeof jsPDF !== 'undefined') {
+                        jsPDFConstructor = jsPDF;
+                    } else {
+                        throw new Error('jsPDF constructor not found');
+                    }
+                }
+            } catch (constructorError) {
+                DEBUG.error('Failed to get jsPDF constructor:', constructorError);
+                throw new Error(`jsPDF constructor not available: ${constructorError.message}`);
             }
             
+            DEBUG.info('jsPDF constructor found successfully');
+            
             // Convert canvas to PDF with better settings
-            const { jsPDF } = window.jsPDF;
-            const pdf = new jsPDF(options.jsPDF);
+            const pdf = new jsPDFConstructor(options.jsPDF);
             
             const imgData = canvas.toDataURL('image/jpeg', options.image.quality);
             const imgWidth = 210; // A4 width in mm
@@ -891,14 +909,15 @@ window.PDFGenerator = {
         return {
             generating: this.state.generatingPDF,
             hasTempContainer: !!(this.state.currentTempContainer || this.state.actualTempContainer),
-            timeouts: this.config.timeouts
+            timeouts: this.config.timeouts,
+            jsPDFAvailable: typeof PDFLibraryManager !== 'undefined' ? PDFLibraryManager.checkJsPDFAvailable() : false
         };
     }
 };
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    DEBUG.info('PDFGenerator (FULLY FIXED) module loaded successfully');
+    DEBUG.info('PDFGenerator (jsPDF Usage Fixed) module loaded successfully');
 });
 
 /**
