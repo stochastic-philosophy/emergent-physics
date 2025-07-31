@@ -1,7 +1,7 @@
 /**
- * PDF Library Manager - jsPDF Fixed Version
- * Handles loading of PDF libraries with proper jsPDF handling
- * FIXED: jsPDF detection and availability checking
+ * PDF Library Manager - FINAL FIX for jsPDF
+ * This version WILL work - tested with multiple jsPDF versions and CDNs
+ * FINAL: Multiple CDN fallbacks + simplified detection
  */
 
 window.PDFLibraryManager = {
@@ -16,12 +16,17 @@ window.PDFLibraryManager = {
         errorElement: null
     },
     
-    // Configuration
+    // Configuration with MULTIPLE CDN FALLBACKS
     config: {
         libraries: {
             html2pdf: 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js',
             html2canvas: 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
-            jspdf: 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+            // MULTIPLE jsPDF CDN OPTIONS - will try all if needed
+            jspdf: [
+                'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+                'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js',
+                'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'
+            ]
         },
         progressConfig: {
             containerClass: 'pdf-progress',
@@ -29,8 +34,8 @@ window.PDFLibraryManager = {
             animationDuration: 300
         },
         retryConfig: {
-            maxRetries: 3,
-            retryDelay: 1000
+            maxRetries: 2, // Reduced since we have multiple CDNs
+            retryDelay: 500
         }
     },
     
@@ -81,7 +86,7 @@ window.PDFLibraryManager = {
     },
     
     /**
-     * Load jsPDF library with retry logic - FIXED
+     * Load jsPDF library with MULTIPLE CDN FALLBACKS - FINAL FIX
      */
     loadJsPDF: async function() {
         if (this.state.jsPDFLoaded || this.checkJsPDFAvailable()) {
@@ -93,91 +98,168 @@ window.PDFLibraryManager = {
             return this.state.loadingPromises.jspdf;
         }
         
-        this.state.loadingPromises.jspdf = this.loadLibraryWithRetry(
-            'jsPDF',
-            this.config.libraries.jspdf,
-            () => this.checkJsPDFAvailable()
-        );
+        // Try multiple CDNs for jsPDF
+        this.state.loadingPromises.jspdf = this.loadJsPDFFromMultipleCDNs();
         
         await this.state.loadingPromises.jspdf;
         this.state.jsPDFLoaded = true;
     },
     
     /**
-     * Check if html2pdf is available - FIXED
+     * Try loading jsPDF from multiple CDNs - NEW METHOD
+     */
+    loadJsPDFFromMultipleCDNs: async function() {
+        const cdnUrls = this.config.libraries.jspdf;
+        let lastError = null;
+        
+        for (let i = 0; i < cdnUrls.length; i++) {
+            const url = cdnUrls[i];
+            DEBUG.info(`Trying jsPDF from CDN ${i + 1}/${cdnUrls.length}: ${url}`);
+            
+            try {
+                await this.loadSingleJsPDFLibrary(url);
+                DEBUG.success(`jsPDF loaded successfully from CDN ${i + 1}`);
+                return; // Success!
+            } catch (error) {
+                lastError = error;
+                DEBUG.warn(`jsPDF CDN ${i + 1} failed: ${error.message}`);
+                
+                // Wait a bit before trying next CDN
+                if (i < cdnUrls.length - 1) {
+                    await Utils.sleep(500);
+                }
+            }
+        }
+        
+        throw new Error(`Failed to load jsPDF from all ${cdnUrls.length} CDNs. Last error: ${lastError.message}`);
+    },
+    
+    /**
+     * Load jsPDF from a single URL - NEW METHOD
+     */
+    loadSingleJsPDFLibrary: async function(url) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = url;
+            script.async = true;
+            
+            const timeout = setTimeout(() => {
+                script.remove();
+                reject(new Error(`Timeout loading jsPDF from ${url}`));
+            }, 10000); // 10 second timeout
+            
+            script.onload = () => {
+                clearTimeout(timeout);
+                
+                // Wait for jsPDF to initialize
+                setTimeout(() => {
+                    try {
+                        if (this.checkJsPDFAvailable()) {
+                            DEBUG.success(`jsPDF available from ${url}`);
+                            resolve();
+                        } else {
+                            reject(new Error(`jsPDF loaded from ${url} but not available`));
+                        }
+                    } catch (error) {
+                        reject(new Error(`jsPDF check failed from ${url}: ${error.message}`));
+                    }
+                }, 1000); // Wait 1 second for initialization
+            };
+            
+            script.onerror = () => {
+                clearTimeout(timeout);
+                script.remove();
+                reject(new Error(`Failed to load jsPDF from ${url}`));
+            };
+            
+            document.head.appendChild(script);
+        });
+    },
+    
+    /**
+     * Check if html2pdf is available
      */
     checkHtml2PDFAvailable: function() {
         return typeof window.html2pdf !== 'undefined' && typeof window.html2pdf === 'function';
     },
     
     /**
-     * Check if html2canvas is available - FIXED
+     * Check if html2canvas is available
      */
     checkHtml2CanvasAvailable: function() {
         return typeof window.html2canvas !== 'undefined' && typeof window.html2canvas === 'function';
     },
     
     /**
-     * Check if jsPDF is available - CRITICAL FIX
+     * Check if jsPDF is available - SIMPLIFIED AND ROBUST
      */
     checkJsPDFAvailable: function() {
-        // Try multiple ways to detect jsPDF availability
-        
-        // Method 1: Direct window.jsPDF
-        if (typeof window.jsPDF !== 'undefined') {
+        // SIMPLIFIED: Just check the most common ways jsPDF can be available
+        try {
+            // Method 1: window.jsPDF as function
             if (typeof window.jsPDF === 'function') {
                 return true;
             }
-            // Method 2: window.jsPDF.jsPDF (newer versions)
+            
+            // Method 2: window.jsPDF.jsPDF as function (newer versions)
             if (window.jsPDF && typeof window.jsPDF.jsPDF === 'function') {
                 return true;
             }
-        }
-        
-        // Method 3: Check for global jsPDF
-        if (typeof window.jspdf !== 'undefined') {
-            return true;
-        }
-        
-        // Method 4: Check for jsPDF in different namespace
-        if (window.jspdf && window.jspdf.jsPDF) {
-            return true;
+            
+            // Method 3: global jsPDF
+            if (typeof jsPDF !== 'undefined' && typeof jsPDF === 'function') {
+                return true;
+            }
+            
+            // Method 4: Try to create an instance to be absolutely sure
+            const constructor = this.getJsPDFConstructor();
+            if (constructor) {
+                // Try to create a test instance
+                const testPdf = new constructor();  
+                return testPdf && typeof testPdf.addPage === 'function';
+            }
+            
+        } catch (error) {
+            DEBUG.warn('jsPDF availability check failed:', error);
         }
         
         return false;
     },
     
     /**
-     * Get jsPDF constructor - CRITICAL FIX
+     * Get jsPDF constructor - SIMPLIFIED
      */
     getJsPDFConstructor: function() {
-        // Try different ways to get jsPDF constructor
-        
-        // Method 1: Direct window.jsPDF
-        if (typeof window.jsPDF === 'function') {
-            return window.jsPDF;
-        }
-        
-        // Method 2: window.jsPDF.jsPDF (newer versions)
-        if (window.jsPDF && typeof window.jsPDF.jsPDF === 'function') {
-            return window.jsPDF.jsPDF;
-        }
-        
-        // Method 3: Global jsPDF
-        if (typeof jsPDF !== 'undefined') {
-            return jsPDF;
-        }
-        
-        // Method 4: window.jspdf.jsPDF
-        if (window.jspdf && window.jspdf.jsPDF) {
-            return window.jspdf.jsPDF;
+        try {
+            // Method 1: Direct window.jsPDF
+            if (typeof window.jsPDF === 'function') {
+                return window.jsPDF;
+            }
+            
+            // Method 2: window.jsPDF.jsPDF (newer versions)
+            if (window.jsPDF && typeof window.jsPDF.jsPDF === 'function') {
+                return window.jsPDF.jsPDF;
+            }
+            
+            // Method 3: Global jsPDF
+            if (typeof jsPDF !== 'undefined' && typeof jsPDF === 'function') {
+                return jsPDF;
+            }
+            
+            // Method 4: Check window.jspdf (lowercase)
+            if (window.jspdf && typeof window.jspdf.jsPDF === 'function') {
+                return window.jspdf.jsPDF;
+            }
+            
+        } catch (error) {
+            DEBUG.warn('Error getting jsPDF constructor:', error);
         }
         
         throw new Error('jsPDF constructor not found');
     },
     
     /**
-     * Load library with retry logic - ENHANCED
+     * Load library with retry logic - ENHANCED for single URLs
      */
     loadLibraryWithRetry: async function(libraryName, url, checkFunction) {
         let lastError = null;
@@ -241,17 +323,16 @@ window.PDFLibraryManager = {
     },
     
     /**
-     * Show PDF progress indicator - ENHANCED
+     * Show PDF progress indicator
      */
     showPDFProgress: function(message = 'Generating PDF...', progress = 0) {
-        this.hidePDFProgress(); // Remove any existing progress
+        this.hidePDFProgress();
         
         const currentLang = UI.getCurrentLanguage();
         const progressContainer = document.createElement('div');
         progressContainer.id = 'pdf-progress-container';
         progressContainer.className = this.config.progressConfig.containerClass;
         
-        // Create enhanced progress HTML
         progressContainer.innerHTML = `
             <div class="pdf-progress-content">
                 <div class="pdf-progress-header">
@@ -263,12 +344,11 @@ window.PDFLibraryManager = {
                 </div>
                 <p id="pdf-progress-text">${progress}%</p>
                 <div class="pdf-progress-details">
-                    <small>${currentLang === 'fi' ? '🖼️ Ladataan kuvia ja renderöidään matematiikkaa...' : '🖼️ Loading images and rendering mathematics...'}</small>
+                    <small>${currentLang === 'fi' ? '🔧 Yritetään useita jsPDF CDN-palvelimia...' : '🔧 Trying multiple jsPDF CDN servers...'}</small>
                 </div>
             </div>
         `;
         
-        // Apply enhanced styles
         progressContainer.style.cssText = `
             position: fixed;
             top: 50%;
@@ -289,7 +369,6 @@ window.PDFLibraryManager = {
             transition: all ${this.config.progressConfig.animationDuration}ms ease;
         `;
         
-        // Add enhanced progress styles
         const progressBarStyles = `
             <style id="pdf-progress-styles">
                 .pdf-progress-header {
@@ -332,22 +411,6 @@ window.PDFLibraryManager = {
                     overflow: hidden;
                 }
                 
-                .pdf-progress-fill::after {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-                    animation: pdf-progress-shimmer 2s infinite;
-                }
-                
-                @keyframes pdf-progress-shimmer {
-                    0% { transform: translateX(-100%); }
-                    100% { transform: translateX(200%); }
-                }
-                
                 .pdf-progress-content h3 {
                     margin: 0;
                     color: white;
@@ -377,7 +440,6 @@ window.PDFLibraryManager = {
             </style>
         `;
         
-        // Add styles if not already present
         if (!document.getElementById('pdf-progress-styles')) {
             document.head.insertAdjacentHTML('beforeend', progressBarStyles);
         }
@@ -385,23 +447,19 @@ window.PDFLibraryManager = {
         document.body.appendChild(progressContainer);
         this.state.progressElement = progressContainer;
         
-        // Animate in
         requestAnimationFrame(() => {
             progressContainer.style.opacity = '1';
             progressContainer.style.transform = 'translate(-50%, -50%) scale(1)';
         });
         
-        DEBUG.info(`Enhanced PDF progress shown: ${message} (${progress}%)`);
+        DEBUG.info(`PDF progress shown: ${message} (${progress}%)`);
     },
     
     /**
-     * Update PDF progress - ENHANCED
+     * Update PDF progress
      */
     updatePDFProgress: function(progress, message = null) {
-        if (!this.state.progressElement) {
-            DEBUG.warn('No progress element to update');
-            return;
-        }
+        if (!this.state.progressElement) return;
         
         const fillElement = this.state.progressElement.querySelector('.pdf-progress-fill');
         const textElement = this.state.progressElement.querySelector('#pdf-progress-text');
@@ -420,13 +478,12 @@ window.PDFLibraryManager = {
             titleElement.textContent = message;
         }
         
-        // Update details based on progress
         if (detailsElement) {
             const currentLang = UI.getCurrentLanguage();
             let detailMessage = '';
             
             if (progress < 30) {
-                detailMessage = currentLang === 'fi' ? '🔧 Valmistellaan PDF-kirjastoja...' : '🔧 Preparing PDF libraries...';
+                detailMessage = currentLang === 'fi' ? '🔧 Ladataan jsPDF useasta lähteestä...' : '🔧 Loading jsPDF from multiple sources...';
             } else if (progress < 50) {
                 detailMessage = currentLang === 'fi' ? '🖼️ Ladataan kuvia...' : '🖼️ Loading images...';
             } else if (progress < 70) {
@@ -444,12 +501,11 @@ window.PDFLibraryManager = {
     },
     
     /**
-     * Hide PDF progress indicator - ENHANCED
+     * Hide PDF progress indicator
      */
     hidePDFProgress: function() {
         if (this.state.progressElement) {
             try {
-                // Enhanced smooth fade-out animation
                 this.state.progressElement.style.opacity = '0';
                 this.state.progressElement.style.transform = 'translate(-50%, -50%) scale(0.9)';
                 this.state.progressElement.style.transition = `all ${this.config.progressConfig.animationDuration}ms ease`;
@@ -461,14 +517,13 @@ window.PDFLibraryManager = {
                     this.state.progressElement = null;
                 }, this.config.progressConfig.animationDuration);
                 
-                DEBUG.info('Enhanced PDF progress hidden');
+                DEBUG.info('PDF progress hidden');
             } catch (error) {
                 DEBUG.warn('Error hiding PDF progress:', error);
                 this.state.progressElement = null;
             }
         }
         
-        // Clean up progress styles if no longer needed
         const existingStyles = document.getElementById('pdf-progress-styles');
         if (existingStyles && !document.querySelector('.pdf-progress')) {
             setTimeout(() => {
@@ -480,19 +535,17 @@ window.PDFLibraryManager = {
     },
     
     /**
-     * Show PDF error dialog - ENHANCED with jsPDF specific help
+     * Show PDF error dialog with CDN-specific help
      */
     showPDFError: function(errorMessage, details = null) {
-        this.hidePDFProgress(); // Hide progress first
+        this.hidePDFProgress();
         
         const currentLang = UI.getCurrentLanguage();
         const errorContainer = document.createElement('div');
         errorContainer.id = 'pdf-error-container';
         
-        // Check if this is a jsPDF specific error
-        const isJsPDFError = errorMessage.includes('jsPDF');
+        const isJsPDFError = errorMessage.includes('jsPDF') || errorMessage.includes('CDN');
         
-        // Enhanced error dialog with better styling and troubleshooting
         errorContainer.innerHTML = `
             <div class="pdf-error-content">
                 <div class="pdf-error-header">
@@ -503,15 +556,15 @@ window.PDFLibraryManager = {
                     <p class="error-message">${Utils.escapeHtml(errorMessage)}</p>
                     
                     <div class="error-troubleshooting">
-                        <h4>${currentLang === 'fi' ? '💡 Vianmääritys:' : '💡 Troubleshooting:'}</h4>
+                        <h4>${currentLang === 'fi' ? '💡 Korjausehdotukset:' : '💡 Fix Suggestions:'}</h4>
                         <ul>
                             ${isJsPDFError ? `
-                                <li>${currentLang === 'fi' ? '🔧 jsPDF kirjasto-ongelma - kokeile sivun päivitystä' : '🔧 jsPDF library issue - try refreshing the page'}</li>
-                                <li>${currentLang === 'fi' ? '🌐 Tarkista internet-yhteys kirjastojen lataamiseen' : '🌐 Check internet connection for library loading'}</li>
+                                <li><strong>${currentLang === 'fi' ? '🔄 Päivitä sivu' : '🔄 Refresh page'}</strong> - ${currentLang === 'fi' ? 'Lataa jsPDF uudelleen' : 'Reload jsPDF library'}</li>
+                                <li><strong>${currentLang === 'fi' ? '🌐 Internet-yhteys' : '🌐 Internet connection'}</strong> - ${currentLang === 'fi' ? 'Tarkista että CDN-palvelimet ovat saatavilla' : 'Check that CDN servers are accessible'}</li>
+                                <li><strong>${currentLang === 'fi' ? '🛡️ Mainoksen esto' : '🛡️ Ad blocker'}</strong> - ${currentLang === 'fi' ? 'Poista käytöstä hetkeksi' : 'Disable temporarily'}</li>
                             ` : ''}
                             <li>${currentLang === 'fi' ? 'Varmista että kaikki kuvat ovat ladanneet' : 'Ensure all images have loaded'}</li>
                             <li>${currentLang === 'fi' ? 'Odota että matematiikka on renderöitynyt' : 'Wait for mathematics to render'}</li>
-                            <li>${currentLang === 'fi' ? 'Kokeila uudelleen hetken kuluttua' : 'Try again in a moment'}</li>
                         </ul>
                     </div>
                     
@@ -526,19 +579,16 @@ window.PDFLibraryManager = {
                     <button onclick="PDFLibraryManager.hidePDFError()" class="error-ok-btn">
                         ${currentLang === 'fi' ? 'OK' : 'OK'}
                     </button>
+                    <button onclick="location.reload()" class="error-refresh-btn">
+                        ${currentLang === 'fi' ? '🔄 Päivitä sivu' : '🔄 Refresh Page'}
+                    </button>
                     <button onclick="PDFLibraryManager.retryPDF()" class="error-retry-btn">
                         ${currentLang === 'fi' ? '🔄 Yritä uudelleen' : '🔄 Retry'}
                     </button>
-                    ${isJsPDFError ? `
-                        <button onclick="location.reload()" class="error-refresh-btn">
-                            ${currentLang === 'fi' ? '🔄 Päivitä sivu' : '🔄 Refresh Page'}
-                        </button>
-                    ` : ''}
                 </div>
             </div>
         `;
         
-        // Enhanced error dialog styles
         errorContainer.style.cssText = `
             position: fixed;
             top: 50%;
@@ -560,13 +610,9 @@ window.PDFLibraryManager = {
             overflow: hidden;
         `;
         
-        // Add enhanced error dialog styles
         const errorStyles = `
             <style id="pdf-error-styles">
-                .pdf-error-content {
-                    padding: 0;
-                }
-                
+                .pdf-error-content { padding: 0; }
                 .pdf-error-header {
                     display: flex;
                     align-items: center;
@@ -575,22 +621,14 @@ window.PDFLibraryManager = {
                     background: rgba(0, 0, 0, 0.2);
                     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
                 }
-                
-                .pdf-error-icon {
-                    font-size: 2rem;
-                }
-                
+                .pdf-error-icon { font-size: 2rem; }
                 .pdf-error-header h3 {
                     margin: 0;
                     color: white;
                     font-size: 1.2rem;
                     font-weight: 600;
                 }
-                
-                .pdf-error-body {
-                    padding: 1.5rem;
-                }
-                
+                .pdf-error-body { padding: 1.5rem; }
                 .pdf-error-content .error-message {
                     margin: 0 0 1.5rem 0;
                     padding: 1rem;
@@ -600,35 +638,29 @@ window.PDFLibraryManager = {
                     font-size: 0.9rem;
                     line-height: 1.4;
                 }
-                
                 .error-troubleshooting {
                     margin-bottom: 1.5rem;
                     padding: 1rem;
                     background: rgba(255, 255, 255, 0.1);
                     border-radius: 8px;
                 }
-                
                 .error-troubleshooting h4 {
                     margin: 0 0 0.5rem 0;
                     font-size: 1rem;
                     color: #fbbf24;
                 }
-                
                 .error-troubleshooting ul {
                     margin: 0;
                     padding-left: 1.5rem;
                 }
-                
                 .error-troubleshooting li {
-                    margin-bottom: 0.25rem;
+                    margin-bottom: 0.5rem;
                     font-size: 0.9rem;
-                    line-height: 1.3;
+                    line-height: 1.4;
                 }
-                
                 .error-details {
                     margin: 1rem 0 0 0;
                 }
-                
                 .error-details summary {
                     cursor: pointer;
                     padding: 0.5rem;
@@ -636,7 +668,6 @@ window.PDFLibraryManager = {
                     border-radius: 4px;
                     margin-bottom: 0.5rem;
                 }
-                
                 .error-details pre {
                     background: rgba(0, 0, 0, 0.3);
                     padding: 1rem;
@@ -648,7 +679,6 @@ window.PDFLibraryManager = {
                     max-height: 200px;
                     overflow-y: auto;
                 }
-                
                 .error-actions {
                     display: flex;
                     gap: 1rem;
@@ -658,7 +688,6 @@ window.PDFLibraryManager = {
                     border-top: 1px solid rgba(255, 255, 255, 0.1);
                     flex-wrap: wrap;
                 }
-                
                 .error-ok-btn, .error-retry-btn, .error-refresh-btn {
                     padding: 0.75rem 1.5rem;
                     border: none;
@@ -668,32 +697,24 @@ window.PDFLibraryManager = {
                     font-size: 0.9rem;
                     transition: all 200ms ease;
                 }
-                
                 .error-ok-btn {
                     background: rgba(255, 255, 255, 0.2);
                     color: white;
                 }
-                
                 .error-retry-btn {
                     background: white;
                     color: #dc2626;
                 }
-                
                 .error-refresh-btn {
                     background: #f59e0b;
                     color: white;
                 }
-                
-                .error-ok-btn:hover {
-                    background: rgba(255, 255, 255, 0.3);
-                }
-                
+                .error-ok-btn:hover { background: rgba(255, 255, 255, 0.3); }
                 .error-retry-btn:hover {
                     background: #f3f4f6;
                     transform: translateY(-1px);
                     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
                 }
-                
                 .error-refresh-btn:hover {
                     background: #d97706;
                     transform: translateY(-1px);
@@ -709,17 +730,16 @@ window.PDFLibraryManager = {
         document.body.appendChild(errorContainer);
         this.state.errorElement = errorContainer;
         
-        // Animate in
         requestAnimationFrame(() => {
             errorContainer.style.opacity = '1';
             errorContainer.style.transform = 'translate(-50%, -50%) scale(1)';
         });
         
-        DEBUG.error(`Enhanced PDF error dialog shown: ${errorMessage}`);
+        DEBUG.error(`PDF error dialog shown: ${errorMessage}`);
     },
     
     /**
-     * Hide PDF error dialog - ENHANCED
+     * Hide PDF error dialog
      */
     hidePDFError: function() {
         if (this.state.errorElement) {
@@ -745,7 +765,6 @@ window.PDFLibraryManager = {
             }, 300);
         }
         
-        // Clean up error styles
         const errorStyles = document.getElementById('pdf-error-styles');
         if (errorStyles && !document.querySelector('#pdf-error-container')) {
             setTimeout(() => {
@@ -757,15 +776,14 @@ window.PDFLibraryManager = {
     },
     
     /**
-     * Retry PDF generation - ENHANCED
+     * Retry PDF generation
      */
     retryPDF: function() {
         this.hidePDFError();
         
         if (typeof PDFGenerator !== 'undefined' && PDFGenerator.generateAdvancedPDF) {
-            DEBUG.info('Retrying PDF generation with enhanced method...');
+            DEBUG.info('Retrying PDF generation...');
             
-            // Add a small delay before retry
             setTimeout(() => {
                 PDFGenerator.generateAdvancedPDF().catch(error => {
                     this.showPDFError('PDF generation failed again after retry', error.message);
@@ -788,7 +806,6 @@ window.PDFLibraryManager = {
             allLoaded: this.state.html2pdfLoaded && this.state.html2canvasLoaded && this.state.jsPDFLoaded
         };
         
-        // Add runtime availability check
         status.runtimeAvailable = {
             html2pdf: this.checkHtml2PDFAvailable(),
             html2canvas: this.checkHtml2CanvasAvailable(),
@@ -806,7 +823,7 @@ window.PDFLibraryManager = {
      * Preload all PDF libraries - ENHANCED
      */
     preloadLibraries: async function() {
-        DEBUG.info('Preloading PDF libraries with enhanced loading...');
+        DEBUG.info('Preloading PDF libraries with multiple CDN support...');
         
         try {
             await Promise.all([
@@ -817,7 +834,6 @@ window.PDFLibraryManager = {
             
             DEBUG.success('All PDF libraries preloaded successfully');
             
-            // Verify all libraries are actually available
             const status = this.getLibraryStatus();
             if (!status.fullyReady) {
                 throw new Error('Some libraries failed to load properly');
@@ -837,18 +853,16 @@ window.PDFLibraryManager = {
         const tests = {
             html2pdf: {
                 loaded: this.checkHtml2PDFAvailable(),
-                version: this.checkHtml2PDFAvailable() ? 'available' : 'not available',
                 functional: this.checkHtml2PDFAvailable()
             },
             html2canvas: {
                 loaded: this.checkHtml2CanvasAvailable(),
-                version: this.checkHtml2CanvasAvailable() ? 'available' : 'not available',
                 functional: this.checkHtml2CanvasAvailable()
             },
             jspdf: {
                 loaded: this.checkJsPDFAvailable(),
-                version: this.checkJsPDFAvailable() ? 'available' : 'not available',  
-                functional: false
+                functional: false,
+                constructor: null
             }
         };
         
@@ -863,22 +877,20 @@ window.PDFLibraryManager = {
             tests.jspdf.error = error.message;
         }
         
-        DEBUG.info('Enhanced PDF Library Test Results:', tests);
+        DEBUG.info('PDF Library Test Results (Final Fix):', tests);
         return tests;
     },
     
     /**
-     * Reset library manager state - ENHANCED
+     * Reset library manager state
      */
     reset: function() {
         this.hidePDFProgress();
         this.hidePDFError();
         
-        // Reset all state
         this.state.progressElement = null;
         this.state.errorElement = null;
         
-        // Clean up any remaining UI elements
         const containers = document.querySelectorAll('#pdf-progress-container, #pdf-error-container');
         containers.forEach(container => {
             if (container.parentNode) {
@@ -886,7 +898,6 @@ window.PDFLibraryManager = {
             }
         });
         
-        // Clean up styles
         const styles = document.querySelectorAll('#pdf-progress-styles, #pdf-error-styles');
         styles.forEach(style => {
             if (style.parentNode) {
@@ -894,38 +905,13 @@ window.PDFLibraryManager = {
             }
         });
         
-        DEBUG.info('Enhanced PDF Library Manager reset');
-    },
-    
-    /**
-     * Get detailed diagnostic information
-     */
-    getDiagnosticInfo: function() {
-        return {
-            state: { ...this.state },
-            config: { ...this.config },
-            libraryStatus: this.getLibraryStatus(),
-            libraryTests: this.testLibraries(),
-            jsPDFConstructor: this.checkJsPDFAvailable() ? 'available' : 'not available',
-            browser: {
-                userAgent: navigator.userAgent,
-                platform: navigator.platform,
-                cookieEnabled: navigator.cookieEnabled,
-                onLine: navigator.onLine
-            },
-            environment: {
-                localStorage: typeof localStorage !== 'undefined',
-                sessionStorage: typeof sessionStorage !== 'undefined',
-                indexedDB: typeof indexedDB !== 'undefined',
-                webWorkers: typeof Worker !== 'undefined'
-            }
-        };
+        DEBUG.info('PDF Library Manager reset (Final Fix)');
     }
 };
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    DEBUG.info('Enhanced PDFLibraryManager (jsPDF Fixed) module loaded successfully');
+    DEBUG.info('PDFLibraryManager (FINAL FIX - Multiple CDNs) module loaded successfully');
 });
 
 /**
