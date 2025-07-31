@@ -1,7 +1,7 @@
 /**
- * PDF Library Manager - Enhanced Version with Better Error Handling
- * Handles loading of PDF libraries, progress indicators, and error handling
- * ENHANCED: Better support for image and math content in PDFs
+ * PDF Library Manager - jsPDF Fixed Version
+ * Handles loading of PDF libraries with proper jsPDF handling
+ * FIXED: jsPDF detection and availability checking
  */
 
 window.PDFLibraryManager = {
@@ -25,8 +25,8 @@ window.PDFLibraryManager = {
         },
         progressConfig: {
             containerClass: 'pdf-progress',
-            minDisplayTime: 1000, // Minimum time to show progress (ms)
-            animationDuration: 300 // Animation duration for show/hide
+            minDisplayTime: 1000,
+            animationDuration: 300
         },
         retryConfig: {
             maxRetries: 3,
@@ -38,7 +38,7 @@ window.PDFLibraryManager = {
      * Load html2pdf.js library with retry logic
      */
     loadHtml2PDF: async function() {
-        if (this.state.html2pdfLoaded || typeof window.html2pdf !== 'undefined') {
+        if (this.state.html2pdfLoaded || this.checkHtml2PDFAvailable()) {
             this.state.html2pdfLoaded = true;
             return;
         }
@@ -50,7 +50,7 @@ window.PDFLibraryManager = {
         this.state.loadingPromises.html2pdf = this.loadLibraryWithRetry(
             'html2pdf', 
             this.config.libraries.html2pdf,
-            () => typeof window.html2pdf !== 'undefined'
+            () => this.checkHtml2PDFAvailable()
         );
         
         await this.state.loadingPromises.html2pdf;
@@ -61,7 +61,7 @@ window.PDFLibraryManager = {
      * Load html2canvas library with retry logic
      */
     loadHtml2Canvas: async function() {
-        if (this.state.html2canvasLoaded || typeof window.html2canvas !== 'undefined') {
+        if (this.state.html2canvasLoaded || this.checkHtml2CanvasAvailable()) {
             this.state.html2canvasLoaded = true;
             return;
         }
@@ -73,7 +73,7 @@ window.PDFLibraryManager = {
         this.state.loadingPromises.html2canvas = this.loadLibraryWithRetry(
             'html2canvas',
             this.config.libraries.html2canvas,
-            () => typeof window.html2canvas !== 'undefined'
+            () => this.checkHtml2CanvasAvailable()
         );
         
         await this.state.loadingPromises.html2canvas;
@@ -81,10 +81,10 @@ window.PDFLibraryManager = {
     },
     
     /**
-     * Load jsPDF library with retry logic
+     * Load jsPDF library with retry logic - FIXED
      */
     loadJsPDF: async function() {
-        if (this.state.jsPDFLoaded || typeof window.jsPDF !== 'undefined') {
+        if (this.state.jsPDFLoaded || this.checkJsPDFAvailable()) {
             this.state.jsPDFLoaded = true;
             return;
         }
@@ -96,11 +96,84 @@ window.PDFLibraryManager = {
         this.state.loadingPromises.jspdf = this.loadLibraryWithRetry(
             'jsPDF',
             this.config.libraries.jspdf,
-            () => typeof window.jsPDF !== 'undefined'
+            () => this.checkJsPDFAvailable()
         );
         
         await this.state.loadingPromises.jspdf;
         this.state.jsPDFLoaded = true;
+    },
+    
+    /**
+     * Check if html2pdf is available - FIXED
+     */
+    checkHtml2PDFAvailable: function() {
+        return typeof window.html2pdf !== 'undefined' && typeof window.html2pdf === 'function';
+    },
+    
+    /**
+     * Check if html2canvas is available - FIXED
+     */
+    checkHtml2CanvasAvailable: function() {
+        return typeof window.html2canvas !== 'undefined' && typeof window.html2canvas === 'function';
+    },
+    
+    /**
+     * Check if jsPDF is available - CRITICAL FIX
+     */
+    checkJsPDFAvailable: function() {
+        // Try multiple ways to detect jsPDF availability
+        
+        // Method 1: Direct window.jsPDF
+        if (typeof window.jsPDF !== 'undefined') {
+            if (typeof window.jsPDF === 'function') {
+                return true;
+            }
+            // Method 2: window.jsPDF.jsPDF (newer versions)
+            if (window.jsPDF && typeof window.jsPDF.jsPDF === 'function') {
+                return true;
+            }
+        }
+        
+        // Method 3: Check for global jsPDF
+        if (typeof window.jspdf !== 'undefined') {
+            return true;
+        }
+        
+        // Method 4: Check for jsPDF in different namespace
+        if (window.jspdf && window.jspdf.jsPDF) {
+            return true;
+        }
+        
+        return false;
+    },
+    
+    /**
+     * Get jsPDF constructor - CRITICAL FIX
+     */
+    getJsPDFConstructor: function() {
+        // Try different ways to get jsPDF constructor
+        
+        // Method 1: Direct window.jsPDF
+        if (typeof window.jsPDF === 'function') {
+            return window.jsPDF;
+        }
+        
+        // Method 2: window.jsPDF.jsPDF (newer versions)
+        if (window.jsPDF && typeof window.jsPDF.jsPDF === 'function') {
+            return window.jsPDF.jsPDF;
+        }
+        
+        // Method 3: Global jsPDF
+        if (typeof jsPDF !== 'undefined') {
+            return jsPDF;
+        }
+        
+        // Method 4: window.jspdf.jsPDF
+        if (window.jspdf && window.jspdf.jsPDF) {
+            return window.jspdf.jsPDF;
+        }
+        
+        throw new Error('jsPDF constructor not found');
     },
     
     /**
@@ -126,13 +199,20 @@ window.PDFLibraryManager = {
                     script.onload = () => {
                         clearTimeout(timeout);
                         
-                        // Check if library is actually available
-                        if (checkFunction()) {
-                            DEBUG.success(`${libraryName} loaded successfully`);
-                            resolve();
-                        } else {
-                            reject(new Error(`${libraryName} loaded but not available`));
-                        }
+                        // Wait a bit for library to initialize
+                        setTimeout(() => {
+                            try {
+                                // Check if library is actually available
+                                if (checkFunction()) {
+                                    DEBUG.success(`${libraryName} loaded successfully`);
+                                    resolve();
+                                } else {
+                                    reject(new Error(`${libraryName} loaded but not available`));
+                                }
+                            } catch (error) {
+                                reject(new Error(`${libraryName} check failed: ${error.message}`));
+                            }
+                        }, 500); // Wait 500ms for initialization
                     };
                     
                     script.onerror = () => {
@@ -400,7 +480,7 @@ window.PDFLibraryManager = {
     },
     
     /**
-     * Show PDF error dialog - ENHANCED
+     * Show PDF error dialog - ENHANCED with jsPDF specific help
      */
     showPDFError: function(errorMessage, details = null) {
         this.hidePDFProgress(); // Hide progress first
@@ -408,6 +488,9 @@ window.PDFLibraryManager = {
         const currentLang = UI.getCurrentLanguage();
         const errorContainer = document.createElement('div');
         errorContainer.id = 'pdf-error-container';
+        
+        // Check if this is a jsPDF specific error
+        const isJsPDFError = errorMessage.includes('jsPDF');
         
         // Enhanced error dialog with better styling and troubleshooting
         errorContainer.innerHTML = `
@@ -422,9 +505,13 @@ window.PDFLibraryManager = {
                     <div class="error-troubleshooting">
                         <h4>${currentLang === 'fi' ? '💡 Vianmääritys:' : '💡 Troubleshooting:'}</h4>
                         <ul>
+                            ${isJsPDFError ? `
+                                <li>${currentLang === 'fi' ? '🔧 jsPDF kirjasto-ongelma - kokeile sivun päivitystä' : '🔧 jsPDF library issue - try refreshing the page'}</li>
+                                <li>${currentLang === 'fi' ? '🌐 Tarkista internet-yhteys kirjastojen lataamiseen' : '🌐 Check internet connection for library loading'}</li>
+                            ` : ''}
                             <li>${currentLang === 'fi' ? 'Varmista että kaikki kuvat ovat ladanneet' : 'Ensure all images have loaded'}</li>
                             <li>${currentLang === 'fi' ? 'Odota että matematiikka on renderöitynyt' : 'Wait for mathematics to render'}</li>
-                            <li>${currentLang === 'fi' ? 'Kokeile uudelleen hetken kuluttua' : 'Try again in a moment'}</li>
+                            <li>${currentLang === 'fi' ? 'Kokeila uudelleen hetken kuluttua' : 'Try again in a moment'}</li>
                         </ul>
                     </div>
                     
@@ -442,6 +529,11 @@ window.PDFLibraryManager = {
                     <button onclick="PDFLibraryManager.retryPDF()" class="error-retry-btn">
                         ${currentLang === 'fi' ? '🔄 Yritä uudelleen' : '🔄 Retry'}
                     </button>
+                    ${isJsPDFError ? `
+                        <button onclick="location.reload()" class="error-refresh-btn">
+                            ${currentLang === 'fi' ? '🔄 Päivitä sivu' : '🔄 Refresh Page'}
+                        </button>
+                    ` : ''}
                 </div>
             </div>
         `;
@@ -564,9 +656,10 @@ window.PDFLibraryManager = {
                     padding: 1.5rem;
                     background: rgba(0, 0, 0, 0.1);
                     border-top: 1px solid rgba(255, 255, 255, 0.1);
+                    flex-wrap: wrap;
                 }
                 
-                .error-ok-btn, .error-retry-btn {
+                .error-ok-btn, .error-retry-btn, .error-refresh-btn {
                     padding: 0.75rem 1.5rem;
                     border: none;
                     border-radius: 8px;
@@ -586,12 +679,23 @@ window.PDFLibraryManager = {
                     color: #dc2626;
                 }
                 
+                .error-refresh-btn {
+                    background: #f59e0b;
+                    color: white;
+                }
+                
                 .error-ok-btn:hover {
                     background: rgba(255, 255, 255, 0.3);
                 }
                 
                 .error-retry-btn:hover {
                     background: #f3f4f6;
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                }
+                
+                .error-refresh-btn:hover {
+                    background: #d97706;
                     transform: translateY(-1px);
                     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
                 }
@@ -674,7 +778,7 @@ window.PDFLibraryManager = {
     },
     
     /**
-     * Get library loading status - ENHANCED
+     * Get library loading status - ENHANCED with proper checks
      */
     getLibraryStatus: function() {
         const status = {
@@ -686,9 +790,9 @@ window.PDFLibraryManager = {
         
         // Add runtime availability check
         status.runtimeAvailable = {
-            html2pdf: typeof window.html2pdf !== 'undefined',
-            html2canvas: typeof window.html2canvas !== 'undefined',
-            jspdf: typeof window.jsPDF !== 'undefined'
+            html2pdf: this.checkHtml2PDFAvailable(),
+            html2canvas: this.checkHtml2CanvasAvailable(),
+            jspdf: this.checkJsPDFAvailable()
         };
         
         status.fullyReady = status.runtimeAvailable.html2pdf && 
@@ -732,35 +836,31 @@ window.PDFLibraryManager = {
     testLibraries: function() {
         const tests = {
             html2pdf: {
-                loaded: typeof window.html2pdf !== 'undefined',
-                version: window.html2pdf ? 'available' : 'not available',
-                functional: false
+                loaded: this.checkHtml2PDFAvailable(),
+                version: this.checkHtml2PDFAvailable() ? 'available' : 'not available',
+                functional: this.checkHtml2PDFAvailable()
             },
             html2canvas: {
-                loaded: typeof window.html2canvas !== 'undefined',
-                version: window.html2canvas ? 'available' : 'not available',
-                functional: false
+                loaded: this.checkHtml2CanvasAvailable(),
+                version: this.checkHtml2CanvasAvailable() ? 'available' : 'not available',
+                functional: this.checkHtml2CanvasAvailable()
             },
             jspdf: {
-                loaded: typeof window.jsPDF !== 'undefined',
-                version: window.jsPDF ? 'available' : 'not available',  
+                loaded: this.checkJsPDFAvailable(),
+                version: this.checkJsPDFAvailable() ? 'available' : 'not available',  
                 functional: false
             }
         };
         
-        // Test basic functionality
+        // Test jsPDF functionality
         try {
-            if (tests.html2pdf.loaded) {
-                tests.html2pdf.functional = typeof window.html2pdf === 'function';
-            }
-            if (tests.html2canvas.loaded) {
-                tests.html2canvas.functional = typeof window.html2canvas === 'function';
-            }
-            if (tests.jspdf.loaded) {
-                tests.jspdf.functional = typeof window.jsPDF === 'function';
+            const constructor = this.getJsPDFConstructor();
+            if (constructor) {
+                tests.jspdf.functional = true;
+                tests.jspdf.constructor = 'found';
             }
         } catch (error) {
-            DEBUG.warn('Error testing library functionality:', error);
+            tests.jspdf.error = error.message;
         }
         
         DEBUG.info('Enhanced PDF Library Test Results:', tests);
@@ -806,6 +906,7 @@ window.PDFLibraryManager = {
             config: { ...this.config },
             libraryStatus: this.getLibraryStatus(),
             libraryTests: this.testLibraries(),
+            jsPDFConstructor: this.checkJsPDFAvailable() ? 'available' : 'not available',
             browser: {
                 userAgent: navigator.userAgent,
                 platform: navigator.platform,
@@ -824,7 +925,7 @@ window.PDFLibraryManager = {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    DEBUG.info('Enhanced PDFLibraryManager module loaded successfully');
+    DEBUG.info('Enhanced PDFLibraryManager (jsPDF Fixed) module loaded successfully');
 });
 
 /**
