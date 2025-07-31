@@ -1,7 +1,7 @@
 /**
- * PDF Generator - Fixed Version with Image and Math Support
+ * PDF Generator - Bug Fixed Version
  * Handles PDF generation from content with full visual fidelity
- * FIXED: Images and mathematics now properly included in PDF
+ * FIXED: Container cleanup, async handling, and error management
  */
 
 window.PDFGenerator = {
@@ -9,7 +9,8 @@ window.PDFGenerator = {
     // PDF Generation state
     state: {
         generatingPDF: false,
-        currentTempContainer: null
+        currentTempContainer: null,
+        actualTempContainer: null
     },
     
     // Configuration
@@ -58,7 +59,8 @@ window.PDFGenerator = {
         timeouts: {
             imageLoad: 10000,        // 10 seconds for images
             mathRender: 8000,        // 8 seconds for MathJax
-            finalRender: 3000        // 3 seconds final wait
+            finalRender: 3000,       // 3 seconds final wait
+            libraryLoad: 15000       // 15 seconds for library loading
         }
     },
     
@@ -66,7 +68,7 @@ window.PDFGenerator = {
      * Generate PDF with full visual fidelity - MAIN ENTRY POINT (FIXED)
      */
     generateAdvancedPDF: async function(options = {}) {
-        DEBUG.info('=== GENERATING ADVANCED PDF (FIXED FOR IMAGES & MATH) ===');
+        DEBUG.info('=== GENERATING ADVANCED PDF (FULLY FIXED) ===');
         
         if (this.state.generatingPDF) {
             DEBUG.warn('PDF generation already in progress');
@@ -77,9 +79,11 @@ window.PDFGenerator = {
         
         try {
             // Show progress
-            PDFLibraryManager.showPDFProgress('Initializing PDF generation...', 0);
+            if (typeof PDFLibraryManager !== 'undefined') {
+                PDFLibraryManager.showPDFProgress('Initializing PDF generation...', 0);
+            }
             
-            const currentFile = ContentRenderer.getCurrentFile();
+            const currentFile = ContentRenderer ? ContentRenderer.getCurrentFile() : null;
             if (!currentFile) {
                 throw new Error('No file currently loaded');
             }
@@ -88,7 +92,9 @@ window.PDFGenerator = {
             DEBUG.info(`PDF generation for file: ${fileName}`);
             
             // Update progress
-            PDFLibraryManager.updatePDFProgress(10, 'Preparing content...');
+            if (typeof PDFLibraryManager !== 'undefined') {
+                PDFLibraryManager.updatePDFProgress(10, 'Preparing content...');
+            }
             
             // Find and prepare content
             const contentElement = this.findContentForPDF();
@@ -102,35 +108,49 @@ window.PDFGenerator = {
             // Configure PDF options
             const pdfOptions = this.buildPDFOptions(fileName, options);
             
-            PDFLibraryManager.updatePDFProgress(20, 'Loading PDF libraries...');
+            if (typeof PDFLibraryManager !== 'undefined') {
+                PDFLibraryManager.updatePDFProgress(20, 'Loading PDF libraries...');
+            }
             
             // Try html2pdf.js first (best quality) - FIXED VERSION
             try {
-                PDFLibraryManager.updatePDFProgress(30, 'Generating PDF with enhanced method...');
+                if (typeof PDFLibraryManager !== 'undefined') {
+                    PDFLibraryManager.updatePDFProgress(30, 'Generating PDF with enhanced method...');
+                }
                 await this.generatePDFWithProperRendering(contentElement, pdfOptions);
-                PDFLibraryManager.updatePDFProgress(100, 'PDF completed!');
+                if (typeof PDFLibraryManager !== 'undefined') {
+                    PDFLibraryManager.updatePDFProgress(100, 'PDF completed!');
+                }
                 DEBUG.success('PDF generated with enhanced method');
             } catch (html2pdfError) {
                 DEBUG.warn('Enhanced method failed, trying fallback:', html2pdfError);
-                PDFLibraryManager.updatePDFProgress(40, 'Trying alternative method...');
+                if (typeof PDFLibraryManager !== 'undefined') {
+                    PDFLibraryManager.updatePDFProgress(40, 'Trying alternative method...');
+                }
                 await this.generatePDFWithEnhancedFallback(contentElement, pdfOptions);
-                PDFLibraryManager.updatePDFProgress(100, 'PDF completed!');
+                if (typeof PDFLibraryManager !== 'undefined') {
+                    PDFLibraryManager.updatePDFProgress(100, 'PDF completed!');
+                }
                 DEBUG.success('PDF generated with fallback method');
             }
             
             // Hide progress after a brief delay
-            setTimeout(() => {
-                PDFLibraryManager.hidePDFProgress();
-            }, 1500);
+            if (typeof PDFLibraryManager !== 'undefined') {
+                setTimeout(() => {
+                    PDFLibraryManager.hidePDFProgress();
+                }, 1500);
+            }
             
-            if (UI.showNotification) {
+            if (typeof UI !== 'undefined' && UI.showNotification) {
                 UI.showNotification('PDF downloaded successfully', 'success');
             }
             
         } catch (error) {
-            PDFLibraryManager.hidePDFProgress();
+            if (typeof PDFLibraryManager !== 'undefined') {
+                PDFLibraryManager.hidePDFProgress();
+                PDFLibraryManager.showPDFError(`PDF generation failed: ${error.message}`, error.stack);
+            }
             DEBUG.reportError(error, 'Advanced PDF generation failed');
-            PDFLibraryManager.showPDFError(`PDF generation failed: ${error.message}`, error.stack);
         } finally {
             this.state.generatingPDF = false;
             this.cleanupPDFGeneration();
@@ -144,22 +164,32 @@ window.PDFGenerator = {
         DEBUG.info('Generating PDF with PROPER image and math rendering...');
         
         // Load html2pdf.js if needed
-        await PDFLibraryManager.loadHtml2PDF();
+        if (typeof PDFLibraryManager !== 'undefined') {
+            await PDFLibraryManager.loadHtml2PDF();
+        } else {
+            throw new Error('PDFLibraryManager not available');
+        }
         
         // Create properly positioned temp container - FIXED
         const properContainer = await this.createProperTempContainer(contentElement);
         
         try {
             // CRITICAL FIX: Wait for all images to load
-            PDFLibraryManager.updatePDFProgress(40, 'Loading images...');
+            if (typeof PDFLibraryManager !== 'undefined') {
+                PDFLibraryManager.updatePDFProgress(40, 'Loading images...');
+            }
             await this.waitForAllImages(properContainer);
             
             // CRITICAL FIX: Wait for MathJax to finish rendering
-            PDFLibraryManager.updatePDFProgress(60, 'Rendering mathematics...');
+            if (typeof PDFLibraryManager !== 'undefined') {
+                PDFLibraryManager.updatePDFProgress(60, 'Rendering mathematics...');
+            }
             await this.waitForMathJax(properContainer);
             
             // Additional wait for final rendering
-            PDFLibraryManager.updatePDFProgress(70, 'Final rendering...');
+            if (typeof PDFLibraryManager !== 'undefined') {
+                PDFLibraryManager.updatePDFProgress(70, 'Final rendering...');
+            }
             await Utils.sleep(this.config.timeouts.finalRender);
             
             DEBUG.info(`PROPER container final dimensions: ${properContainer.scrollWidth}x${properContainer.scrollHeight}`);
@@ -182,9 +212,15 @@ window.PDFGenerator = {
             };
             
             DEBUG.info('Starting html2pdf generation from PROPER container...');
-            PDFLibraryManager.updatePDFProgress(80, 'Generating PDF...');
+            if (typeof PDFLibraryManager !== 'undefined') {
+                PDFLibraryManager.updatePDFProgress(80, 'Generating PDF...');
+            }
             
             // Generate PDF from properly rendered container
+            if (typeof window.html2pdf === 'undefined') {
+                throw new Error('html2pdf library not loaded');
+            }
+            
             await window.html2pdf()
                 .set(html2pdfOptions)
                 .from(properContainer)
@@ -194,12 +230,8 @@ window.PDFGenerator = {
             DEBUG.success('PDF generated successfully with proper rendering');
             
         } finally {
-            // Always cleanup the container
-            if (properContainer && properContainer.parentNode) {
-                document.body.removeChild(properContainer);
-                this.state.currentTempContainer = null;
-                DEBUG.info('PROPER temp container removed');
-            }
+            // Always cleanup the container - FIXED
+            this.cleanupContainer(properContainer);
         }
     },
     
@@ -210,23 +242,36 @@ window.PDFGenerator = {
         DEBUG.info('Generating PDF with ENHANCED fallback method...');
         
         // Load required libraries
-        await Promise.all([
-            PDFLibraryManager.loadHtml2Canvas(),
-            PDFLibraryManager.loadJsPDF()
-        ]);
+        if (typeof PDFLibraryManager !== 'undefined') {
+            await Promise.all([
+                PDFLibraryManager.loadHtml2Canvas(),
+                PDFLibraryManager.loadJsPDF()
+            ]);
+        } else {
+            throw new Error('PDFLibraryManager not available');
+        }
         
         // Create properly positioned temp container
         const properContainer = await this.createProperTempContainer(contentElement);
         
         try {
             // CRITICAL FIX: Wait for all content to load
-            PDFLibraryManager.updatePDFProgress(50, 'Loading all content...');
+            if (typeof PDFLibraryManager !== 'undefined') {
+                PDFLibraryManager.updatePDFProgress(50, 'Loading all content...');
+            }
             await this.waitForAllImages(properContainer);
             await this.waitForMathJax(properContainer);
             await Utils.sleep(2000); // Extra wait
             
             DEBUG.info('Starting html2canvas from ENHANCED container...');
-            PDFLibraryManager.updatePDFProgress(70, 'Creating canvas...');
+            if (typeof PDFLibraryManager !== 'undefined') {
+                PDFLibraryManager.updatePDFProgress(70, 'Creating canvas...');
+            }
+            
+            // Check library availability
+            if (typeof window.html2canvas === 'undefined') {
+                throw new Error('html2canvas library not loaded');
+            }
             
             // Generate canvas with ENHANCED settings
             const canvas = await window.html2canvas(properContainer, {
@@ -252,7 +297,14 @@ window.PDFGenerator = {
                 throw new Error('Generated canvas is empty - content may not have rendered properly');
             }
             
-            PDFLibraryManager.updatePDFProgress(85, 'Creating PDF from canvas...');
+            if (typeof PDFLibraryManager !== 'undefined') {
+                PDFLibraryManager.updatePDFProgress(85, 'Creating PDF from canvas...');
+            }
+            
+            // Check jsPDF availability
+            if (typeof window.jsPDF === 'undefined') {
+                throw new Error('jsPDF library not loaded');
+            }
             
             // Convert canvas to PDF with better settings
             const { jsPDF } = window.jsPDF;
@@ -283,12 +335,8 @@ window.PDFGenerator = {
             DEBUG.success('Enhanced fallback PDF generation completed');
             
         } finally {
-            // Always cleanup
-            if (properContainer && properContainer.parentNode) {
-                document.body.removeChild(properContainer);
-                this.state.currentTempContainer = null;
-                DEBUG.info('Enhanced temp container removed');
-            }
+            // Always cleanup - FIXED
+            this.cleanupContainer(properContainer);
         }
     },
     
@@ -305,12 +353,17 @@ window.PDFGenerator = {
         const elementsToRemove = [
             '.file-navigation', '.project-navigation', '.back-to-home-btn',
             '.copy-code-btn', '.file-actions', 'script', 'button',
-            '.pdf-btn', '.pdf-options-btn', '.download-file-btn'
+            '.pdf-btn', '.pdf-options-btn', '.download-file-btn',
+            '.pdf-readiness-indicator'
         ];
         
         elementsToRemove.forEach(selector => {
             const elements = clonedContent.querySelectorAll(selector);
-            elements.forEach(el => el.remove());
+            elements.forEach(el => {
+                if (el && el.parentNode) {
+                    el.parentNode.removeChild(el);
+                }
+            });
         });
         
         // CRITICAL FIX: Create a VISIBLE container that doesn't interfere with layout
@@ -325,12 +378,14 @@ window.PDFGenerator = {
             left: 0 !important;
             width: 794px !important;
             min-height: 1000px !important;
+            max-width: 794px !important;
             background: white !important;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-size: 14px !important;
             line-height: 1.6 !important;
             color: #000 !important;
             padding: 20px !important;
+            box-sizing: border-box !important;
             z-index: 9999 !important;
             opacity: 1 !important;
             visibility: visible !important;
@@ -341,19 +396,24 @@ window.PDFGenerator = {
         `;
         
         // Add title to PDF
-        const fileName = ContentRenderer.getCurrentFile() ? ContentRenderer.getCurrentFile().split('/').pop() : 'document';
-        const title = document.createElement('h1');
-        title.textContent = Utils.filenameToDisplayName(fileName);
-        title.style.cssText = 'margin-bottom: 20px !important; color: #000 !important; font-size: 24px !important; font-weight: bold !important;';
+        const fileName = ContentRenderer && ContentRenderer.getCurrentFile ? 
+                         (ContentRenderer.getCurrentFile() || '').split('/').pop() : 
+                         'document';
+        if (fileName && fileName !== 'document') {
+            const title = document.createElement('h1');
+            title.textContent = Utils ? Utils.filenameToDisplayName(fileName) : fileName;
+            title.style.cssText = 'margin-bottom: 20px !important; color: #000 !important; font-size: 24px !important; font-weight: bold !important;';
+            tempContainer.appendChild(title);
+        }
         
         // Add comprehensive PDF-specific styles - ENHANCED
         this.addEnhancedPDFStyles(clonedContent);
         
-        tempContainer.appendChild(title);
         tempContainer.appendChild(clonedContent);
         
         // Create a hidden wrapper to contain the temp container without affecting layout
         const hiddenWrapper = document.createElement('div');
+        hiddenWrapper.id = 'pdf-hidden-wrapper';
         hiddenWrapper.style.cssText = `
             position: fixed !important;
             top: 100vh !important;
@@ -363,12 +423,13 @@ window.PDFGenerator = {
             overflow: hidden !important;
             pointer-events: none !important;
             z-index: 9998 !important;
+            opacity: 0 !important;
         `;
         
         hiddenWrapper.appendChild(tempContainer);
         document.body.appendChild(hiddenWrapper);
         
-        // Store reference for cleanup
+        // Store references for cleanup - FIXED
         this.state.currentTempContainer = hiddenWrapper;
         this.state.actualTempContainer = tempContainer;
         
@@ -384,6 +445,11 @@ window.PDFGenerator = {
      * Wait for all images to load - CRITICAL FIX
      */
     waitForAllImages: async function(container) {
+        if (!container) {
+            DEBUG.warn('No container provided for image loading');
+            return;
+        }
+        
         const images = container.querySelectorAll('img');
         DEBUG.info(`Waiting for ${images.length} images to load...`);
         
@@ -392,30 +458,30 @@ window.PDFGenerator = {
             return;
         }
         
-        const imagePromises = Array.from(images).map(img => {
+        const imagePromises = Array.from(images).map((img, index) => {
             return new Promise((resolve) => {
                 if (img.complete && img.naturalHeight !== 0) {
-                    DEBUG.info(`Image already loaded: ${img.src}`);
+                    DEBUG.info(`Image ${index + 1} already loaded: ${img.src}`);
                     resolve();
                 } else {
                     const timeout = setTimeout(() => {
-                        DEBUG.warn(`Image load timeout: ${img.src}`);
+                        DEBUG.warn(`Image ${index + 1} load timeout: ${img.src}`);
                         resolve(); // Continue even if image fails
                     }, this.config.timeouts.imageLoad);
                     
                     img.onload = () => {
                         clearTimeout(timeout);
-                        DEBUG.info(`Image loaded successfully: ${img.src}`);
+                        DEBUG.info(`Image ${index + 1} loaded successfully: ${img.src}`);
                         resolve();
                     };
                     
                     img.onerror = () => {
                         clearTimeout(timeout);
-                        DEBUG.warn(`Image failed to load: ${img.src}`);
+                        DEBUG.warn(`Image ${index + 1} failed to load: ${img.src}`);
                         resolve(); // Continue even if image fails
                     };
                     
-                    // Trigger load if src is not set
+                    // Trigger load if src is not set or needs refresh
                     if (!img.src && img.getAttribute('src')) {
                         img.src = img.getAttribute('src');
                     }
@@ -433,6 +499,11 @@ window.PDFGenerator = {
     waitForMathJax: async function(container) {
         DEBUG.info('Waiting for MathJax to render mathematics...');
         
+        if (!container) {
+            DEBUG.warn('No container provided for MathJax rendering');
+            return;
+        }
+        
         // Check if MathJax is available
         if (!window.MathJax || !window.MathJax.typesetPromise) {
             DEBUG.info('MathJax not available, skipping math rendering');
@@ -447,7 +518,7 @@ window.PDFGenerator = {
             // Wait for MathJax to process the container
             await Promise.race([
                 window.MathJax.typesetPromise([container]),
-                new Promise((resolve, reject) => {
+                new Promise((resolve) => {
                     setTimeout(() => {
                         DEBUG.warn('MathJax rendering timeout');
                         resolve(); // Continue even if timeout
@@ -661,7 +732,7 @@ window.PDFGenerator = {
             }
             
             /* Hide unwanted elements */
-            .copy-code-btn, .heading-anchor, button, .file-actions, .file-navigation {
+            .copy-code-btn, .heading-anchor, button, .file-actions, .file-navigation, .pdf-readiness-indicator {
                 display: none !important;
             }
             
@@ -685,7 +756,7 @@ window.PDFGenerator = {
         
         return {
             margin: userOptions.margin || defaultOptions.margin,
-            filename: `${Utils.getFilenameWithoutExtension(fileName)}.pdf`,
+            filename: `${Utils ? Utils.getFilenameWithoutExtension(fileName) : fileName.replace(/\.[^/.]+$/, '')}.pdf`,
             image: { ...defaultOptions.image, ...userOptions.image },
             html2canvas: { 
                 ...defaultOptions.html2canvas,
@@ -705,7 +776,7 @@ window.PDFGenerator = {
     findContentForPDF: function() {
         for (const selector of this.config.contentSelectors) {
             const element = document.querySelector(selector);
-            if (element && element.innerHTML.trim().length > 0) {
+            if (element && element.innerHTML && element.innerHTML.trim().length > 0) {
                 DEBUG.info(`Found content using selector: ${selector}`);
                 return element;
             }
@@ -719,7 +790,8 @@ window.PDFGenerator = {
      * Generate PDF with user options dialog
      */
     generatePDFWithOptions: async function() {
-        const currentLang = UI.getCurrentLanguage();
+        const currentLang = (typeof UI !== 'undefined' && UI.getCurrentLanguage) ? 
+                           UI.getCurrentLanguage() : 'en';
         
         const orientation = confirm(currentLang === 'fi' ? 
             'Käytä pystysuuntaa? (Peruuta = vaakasuunta)' : 
@@ -734,38 +806,75 @@ window.PDFGenerator = {
     },
     
     /**
+     * Clean up specific container - FIXED
+     */
+    cleanupContainer: function(container) {
+        try {
+            // Find the wrapper (parent container)
+            let wrapperToRemove = null;
+            
+            if (container && container.parentNode) {
+                if (container.parentNode.id === 'pdf-hidden-wrapper') {
+                    wrapperToRemove = container.parentNode;
+                } else {
+                    wrapperToRemove = container;
+                }
+            }
+            
+            if (wrapperToRemove && wrapperToRemove.parentNode) {
+                wrapperToRemove.parentNode.removeChild(wrapperToRemove);
+                DEBUG.info('PDF container cleaned up successfully');
+            }
+        } catch (error) {
+            DEBUG.warn('Error cleaning up PDF container:', error);
+        }
+    },
+    
+    /**
      * Clean up temporary PDF elements - ENHANCED
      */
     cleanupPDFGeneration: function() {
-        // Clean up main temp container
-        if (this.state.currentTempContainer) {
-            try {
-                if (this.state.currentTempContainer.parentNode) {
-                    document.body.removeChild(this.state.currentTempContainer);
-                }
+        try {
+            // Clean up main temp containers
+            if (this.state.currentTempContainer) {
+                this.cleanupContainer(this.state.currentTempContainer);
                 this.state.currentTempContainer = null;
+            }
+            
+            if (this.state.actualTempContainer) {
+                this.cleanupContainer(this.state.actualTempContainer);
                 this.state.actualTempContainer = null;
-                DEBUG.info('PDF temp containers cleaned up');
-            } catch (error) {
-                DEBUG.warn('Error during PDF cleanup:', error);
             }
+            
+            // Remove any leftover temp elements by ID
+            const idsToClean = [
+                'pdf-temp-container',
+                'pdf-temp-container-proper', 
+                'pdf-hidden-wrapper'
+            ];
+            
+            idsToClean.forEach(id => {
+                const element = document.getElementById(id);
+                if (element && element.parentNode) {
+                    element.parentNode.removeChild(element);
+                }
+            });
+            
+            // Clean up any hidden wrappers by style
+            const hiddenWrappers = document.querySelectorAll('div[style*="position: fixed"][style*="100vh"]');
+            hiddenWrappers.forEach(wrapper => {
+                if (wrapper.parentNode && 
+                    (wrapper.id === 'pdf-hidden-wrapper' || 
+                     wrapper.querySelector('#pdf-temp-container-proper'))) {
+                    wrapper.parentNode.removeChild(wrapper);
+                }
+            });
+            
+            DEBUG.info('PDF generation cleanup completed');
+            
+        } catch (error) {
+            DEBUG.warn('Error during PDF cleanup:', error);
         }
-        
-        // Remove any leftover temp elements
-        const tempContainers = document.querySelectorAll('#pdf-temp-container, #pdf-temp-container-proper');
-        tempContainers.forEach(container => {
-            if (container.parentNode) {
-                container.parentNode.removeChild(container);
-            }
-        });
-        
-        // Clean up any hidden wrappers
-        const hiddenWrappers = document.querySelectorAll('div[style*="position: fixed"][style*="100vh"]');
-        hiddenWrappers.forEach(wrapper => {
-            if (wrapper.parentNode) {
-                wrapper.parentNode.removeChild(wrapper);
-            }
-        });
     },
     
     /**
@@ -781,7 +890,7 @@ window.PDFGenerator = {
     getStatus: function() {
         return {
             generating: this.state.generatingPDF,
-            hasTempContainer: !!this.state.currentTempContainer,
+            hasTempContainer: !!(this.state.currentTempContainer || this.state.actualTempContainer),
             timeouts: this.config.timeouts
         };
     }
@@ -789,7 +898,7 @@ window.PDFGenerator = {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    DEBUG.info('PDFGenerator (FIXED) module loaded successfully');
+    DEBUG.info('PDFGenerator (FULLY FIXED) module loaded successfully');
 });
 
 /**
