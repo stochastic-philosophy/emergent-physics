@@ -1,7 +1,7 @@
 /**
- * Main Application Logic (Updated for Refactored Modules)
+ * Main Application Logic (Without PDF functionality)
  * Coordinates between specialized modules and provides global state management
- * Updated to handle refactored PDF modules
+ * PDF modules removed for simplified functionality
  */
 
 // Ensure DEBUG is available (fallback)
@@ -33,17 +33,14 @@ window.App = {
             themeManager: false,
             ui: false,
             storage: false,
-            utils: false,
-            // PDF modules (refactored)
-            pdfGenerator: false,
-            pdfLibraryManager: false
+            utils: false
         }
     },
     
     // Application configuration
     config: {
-        version: '2.1.0',
-        phase: 'Phase 3 - PDF Generation (Refactored)',
+        version: '2.0.0',
+        phase: 'Phase 2 - Core Functionality',
         debug: localStorage.getItem('debug_mode') === 'true',
         initTimeout: 10000, // 10 seconds
         retryAttempts: 3
@@ -53,7 +50,7 @@ window.App = {
      * Initialize the application
      */
     init: async function() {
-        DEBUG.info('=== INITIALIZING APP (Refactored PDF Modules v2.1) ===');
+        DEBUG.info('=== INITIALIZING APP (Core Functionality v2.0) ===');
         
         try {
             // Check for required dependencies
@@ -70,12 +67,9 @@ window.App = {
             await this.initializeModules(); 
             await this.initializeNavigation();
             
-            // Initialize PDF modules
-            await this.initializePDFModules();
-            
             // Mark as initialized
             this.state.initialized = true;
-            DEBUG.success('=== APP INITIALIZED SUCCESSFULLY (Refactored PDF v2.1) ===');
+            DEBUG.success('=== APP INITIALIZED SUCCESSFULLY (Core v2.0) ===');
             
         } catch (error) {
             DEBUG.reportError(error, 'App initialization failed');
@@ -90,8 +84,7 @@ window.App = {
         const requiredModules = [
             'ThemeManager', 'Utils', 'Storage', 'UI', 
             'FileManager', 'MarkdownProcessor',
-            'ProjectManager', 'ContentRenderer', 'NavigationManager',
-            'PDFGenerator', 'PDFLibraryManager'  // New PDF modules
+            'ProjectManager', 'ContentRenderer', 'NavigationManager'
         ];
         
         const missing = requiredModules.filter(dep => typeof window[dep] === 'undefined');
@@ -120,10 +113,7 @@ window.App = {
             themeManager: typeof ThemeManager !== 'undefined',
             ui: typeof UI !== 'undefined',
             storage: typeof Storage !== 'undefined',
-            utils: typeof Utils !== 'undefined',
-            // PDF modules (refactored)
-            pdfGenerator: typeof PDFGenerator !== 'undefined',
-            pdfLibraryManager: typeof PDFLibraryManager !== 'undefined'
+            utils: typeof Utils !== 'undefined'
         };
     },
     
@@ -188,39 +178,6 @@ window.App = {
         } catch (error) {
             DEBUG.reportError(error, 'Module initialization failed');
             throw error;
-        }
-    },
-    
-    /**
-     * Initialize PDF modules (new)
-     */
-    initializePDFModules: async function() {
-        DEBUG.info('Initializing PDF modules...');
-        
-        try {
-            // PDF modules don't need explicit initialization, 
-            // but we can test their availability
-            if (PDFGenerator && PDFLibraryManager) {
-                DEBUG.success('PDF modules loaded successfully');
-                
-                // Optionally preload PDF libraries for better performance
-                if (this.config.debug) {
-                    setTimeout(() => {
-                        PDFLibraryManager.preloadLibraries().then(success => {
-                            if (success) {
-                                DEBUG.success('PDF libraries preloaded');
-                            } else {
-                                DEBUG.warn('PDF library preloading failed');
-                            }
-                        });
-                    }, 2000);
-                }
-            } else {
-                DEBUG.error('PDF modules not available');
-            }
-        } catch (error) {
-            DEBUG.reportError(error, 'PDF module initialization failed');
-            // Don't throw - PDF is not critical for basic app functionality
         }
     },
     
@@ -294,19 +251,11 @@ window.App = {
     },
     
     /**
-     * Get module status (updated for PDF modules)
+     * Get module status
      */
     getModuleStatus: function() {
         this.updateModuleStates();
-        
-        const status = { ...this.state.modules };
-        
-        // Add PDF library status if available
-        if (status.pdfLibraryManager && PDFLibraryManager.getLibraryStatus) {
-            status.pdfLibraries = PDFLibraryManager.getLibraryStatus();
-        }
-        
-        return status;
+        return { ...this.state.modules };
     },
     
     /**
@@ -327,21 +276,6 @@ window.App = {
             modules: this.getModuleStatus(),
             state: this.getState()
         };
-        
-        // Add PDF-specific information
-        if (this.state.modules.pdfGenerator && this.state.modules.pdfLibraryManager) {
-            info.pdfCapabilities = {
-                available: true,
-                generatorReady: typeof PDFGenerator !== 'undefined',
-                libraryManagerReady: typeof PDFLibraryManager !== 'undefined',
-                librariesLoaded: PDFLibraryManager.getLibraryStatus ? PDFLibraryManager.getLibraryStatus() : null
-            };
-        } else {
-            info.pdfCapabilities = {
-                available: false,
-                reason: 'PDF modules not loaded'
-            };
-        }
         
         return info;
     },
@@ -364,11 +298,6 @@ window.App = {
             }
             if (ContentRenderer) {
                 ContentRenderer.clearCurrentFile();
-            }
-            
-            // Reset PDF modules
-            if (PDFLibraryManager && PDFLibraryManager.reset) {
-                PDFLibraryManager.reset();
             }
             
             // Show loading
@@ -403,7 +332,7 @@ window.App = {
     },
     
     /**
-     * Get debug information (updated for PDF modules)
+     * Get debug information
      */
     getDebugInfo: function() {
         const debugInfo = {
@@ -421,15 +350,6 @@ window.App = {
             storage: Storage ? Storage.getUsageInfo() : null,
             cache: FileManager ? FileManager.getCacheStats() : null
         };
-        
-        // Add PDF-specific debug info
-        if (this.state.modules.pdfGenerator && this.state.modules.pdfLibraryManager) {
-            debugInfo.pdf = {
-                generatorStatus: PDFGenerator.getStatus ? PDFGenerator.getStatus() : null,
-                librariesStatus: PDFLibraryManager.getLibraryStatus(),
-                librariesTested: PDFLibraryManager.testLibraries()
-            };
-        }
         
         return debugInfo;
     },
