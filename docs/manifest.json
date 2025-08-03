@@ -1,7 +1,7 @@
 {
-  "version": "2.0.0",
+  "version": "1.1.0",
   "last_updated": "2025-01-30",
-  "description": "Emergent Physics Research Projects Manifest - Core functionality without PDF generation",
+  "description": "Emergent Physics Research Projects Manifest - Phase 3 with PDF Generation removed",
   "projects": [
     {
       "id": "indivisible-stochastic-processes",
@@ -59,8 +59,8 @@
     "supported_markdown": [".md", ".markdown"],
     "supported_code": [".py", ".js", ".r", ".html", ".css", ".json"],
     "supported_data": [".json", ".csv", ".txt", ".pkl", ".png", ".jpg", ".gif"],
-    "supported_documents": [".docx", ".doc"],
-    "downloadable": [".zip", ".tar.gz", ".docx", ".pkl", ".json", ".csv", ".md", ".py", ".js", ".r", ".html", ".css", ".txt"]
+    "supported_documents": [".pdf", ".docx", ".doc"],
+    "downloadable": [".zip", ".tar.gz", ".pdf", ".docx", ".pkl", ".json", ".csv"]
   },
   "categories_definition": {
     "fi": {
@@ -86,7 +86,7 @@
       },
       "downloads": {
         "name": "Lataukset",
-        "description": "Valmiit dokumentit latattavaksi",
+        "description": "Valmiit PDF ja Word -dokumentit",
         "icon": "📥"
       }
     },
@@ -113,7 +113,7 @@
       },
       "downloads": {
         "name": "Downloads",
-        "description": "Ready documents for download",
+        "description": "Ready PDF and Word documents",
         "icon": "📥"
       }
     }
@@ -146,56 +146,33 @@
       "marked": "https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js",
       "mathjax": "https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js",
       "prism": "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js",
-      "feather": "https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"
+      "feather": "https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js",
+      "jszip": "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
     }
   },
-  "core_features": {
-    "markdown_processing": {
-      "status": "implemented",
-      "version": "1.0.0",
-      "description": "Full markdown to HTML conversion with LaTeX math and code highlighting",
-      "libraries": ["marked.js", "mathjax", "prism.js"],
-      "supported_content": ["markdown", "latex", "code", "tables", "images"]
-    },
-    "file_viewing": {
-      "status": "implemented",
-      "version": "1.0.0",
-      "description": "View and download various file types including markdown, code, data, and images"
-    },
-    "project_management": {
-      "status": "implemented",
-      "version": "1.0.0", 
-      "description": "Dynamic project loading and navigation with manifest-based file organization"
-    },
-    "theme_management": {
-      "status": "implemented",
-      "version": "1.0.0",
-      "description": "Light/dark theme switching with language support"
-    }
-  },
-  "planned_features": {
+  "phase_3_features": {
     "zip_downloads": {
       "status": "planned",
-      "version": "2.1.0",
+      "version": "1.1.0",
       "description": "Package entire projects or categories into downloadable ZIP files"
     },
     "search_functionality": {
       "status": "planned", 
-      "version": "2.2.0",
+      "version": "1.2.0",
       "description": "Real-time search across markdown content with highlighting"
     },
     "word_export": {
       "status": "planned",
-      "version": "2.3.0", 
+      "version": "1.3.0", 
       "description": "Export markdown content to Word documents using docx.js"
     }
   },
   "debug_info": {
     "creation_date": "2025-01-25",
     "updated_date": "2025-01-30",
-    "phase": "Phase 2 - Core Functionality",
+    "phase": "Phase 3 - Advanced Features (PDF removed)",
     "created_for": "GitHub Pages static hosting",
-    "current_version": "2.0.0",
+    "current_version": "1.1.0",
     "limitations": [
       "No server-side processing",
       "No automatic directory listing", 
@@ -203,9 +180,10 @@
     ],
     "workarounds": [
       "Manifest-based file listing",
+      "Client-side ZIP generation with JSZip",
       "CDN-based external libraries",
       "LocalStorage for user preferences",
-      "Client-side file downloads"
+      "Direct file downloads"
     ],
     "testing": {
       "test_cases": [
@@ -213,7 +191,7 @@
         "Syntax highlighted code blocks", 
         "Complex markdown tables",
         "Mixed content with images",
-        "File download functionality"
+        "Direct file downloads"
       ],
       "browsers_tested": ["Chrome", "Firefox", "Safari", "Edge"],
       "devices_tested": ["Desktop", "Tablet", "Mobile"]
