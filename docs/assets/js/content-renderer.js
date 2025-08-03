@@ -36,7 +36,7 @@ window.ContentRenderer = {
     },
     
     /**
-     * View file content (Main entry point)
+     * View file content (Main entry point) - WITH FULL DEBUG
      */
     viewFile: async function(filePath) {
         console.log(`=== VIEWING FILE: ${filePath} ===`);
@@ -55,9 +55,13 @@ window.ContentRenderer = {
                 return;
             }
             
-            // Load file content
+            // Load file content - DEBUG POINT 1
+            console.log('🔍 BEFORE FileManager.loadFile() call');
             const content = await FileManager.loadFile(filePath);
-            console.log(`File content loaded: ${content.length} characters`);
+            console.log('🔍 AFTER FileManager.loadFile() - content type:', typeof content);
+            console.log('🔍 Content value:', content);
+            console.log('🔍 Content constructor:', content ? content.constructor.name : 'null');
+            console.log(`File content loaded: ${typeof content === 'string' ? content.length + ' characters' : 'object'}`);
             
             // Update state
             this.state.currentFile = filePath;
@@ -68,8 +72,10 @@ window.ContentRenderer = {
                 App.setState({ currentFile: filePath });
             }
             
-            // Render content based on file type
+            // Render content based on file type - DEBUG POINT 2
+            console.log('🔍 BEFORE renderFileContent() call');
             await this.renderFileContent(content, fileType, filePath);
+            console.log('🔍 AFTER renderFileContent() call');
             
             // Update URL
             if (typeof NavigationManager !== 'undefined') {
@@ -95,9 +101,14 @@ window.ContentRenderer = {
     },
     
     /**
-     * Render file content based on type
+     * Render file content based on type - WITH DEBUG
      */
     renderFileContent: async function(content, fileType, filePath) {
+        console.log('🔍 renderFileContent() called');
+        console.log('🔍 Content type at entry:', typeof content);
+        console.log('🔍 Content value at entry:', content);
+        console.log('🔍 File type:', fileType);
+        
         const contentArea = document.querySelector(UI.selectors.mainContent);
         if (!contentArea) {
             throw new Error('Content area not found');
@@ -140,8 +151,13 @@ window.ContentRenderer = {
                 break;
                 
             case 'data':
+                console.log('🔍 BEFORE renderDataContent() call');
+                console.log('🔍 Content type before data render:', typeof content);
+                console.log('🔍 Content value before data render:', content);
+                
                 html += '<div class="data-content" id="main-data-content">';
-                html += await this.renderDataContent(content, fileName);
+                const dataContent = await this.renderDataContent(content, fileName);
+                html += dataContent;
                 html += '</div>';
                 break;
                 
