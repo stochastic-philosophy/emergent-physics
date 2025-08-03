@@ -194,21 +194,33 @@ window.ContentRenderer = {
         if (fileName.endsWith('.json')) {
             try {
                 console.log('Rendering JSON content, type:', typeof content);
+                console.log('Content sample:', String(content).substring(0, 100));
                 
-                let jsonData;
                 let formattedJson;
                 
-                // Handle different content types
-                if (typeof content === 'string') {
-                    // Content is a JSON string, parse it
-                    jsonData = JSON.parse(content);
-                    formattedJson = JSON.stringify(jsonData, null, 2);
+                // Always convert to string first, then handle JSON
+                const contentString = String(content);
+                
+                // Check if it's already formatted JSON or needs parsing
+                if (contentString === '[object Object]') {
+                    // Object was converted to string wrong way, try to get original
+                    if (typeof content === 'object' && content !== null) {
+                        formattedJson = JSON.stringify(content, null, 2);
+                    } else {
+                        throw new Error('Invalid object data');
+                    }
                 } else if (typeof content === 'object' && content !== null) {
-                    // Content is already an object, stringify it
+                    // Content is a JavaScript object, stringify it
                     formattedJson = JSON.stringify(content, null, 2);
                 } else {
-                    // Fallback - convert whatever it is to string
-                    formattedJson = String(content);
+                    // Content is a string, check if it's valid JSON
+                    try {
+                        const parsed = JSON.parse(contentString);
+                        formattedJson = JSON.stringify(parsed, null, 2);
+                    } catch (parseError) {
+                        // Not valid JSON, show as-is
+                        formattedJson = contentString;
+                    }
                 }
                 
                 console.log('JSON formatted successfully, length:', formattedJson.length);
@@ -222,24 +234,36 @@ window.ContentRenderer = {
                 </div>`;
                 
             } catch (e) {
-                console.error('JSON parsing failed:', e);
+                console.error('JSON rendering failed:', e);
                 console.log('Original content type:', typeof content);
-                console.log('Original content sample:', String(content).substring(0, 200));
+                console.log('Original content:', content);
                 
-                // Fallback: show raw content
-                const rawContent = typeof content === 'string' ? content : String(content);
+                // Ultimate fallback: show whatever we have as text
+                let fallbackContent;
+                if (typeof content === 'object' && content !== null) {
+                    try {
+                        fallbackContent = JSON.stringify(content, null, 2);
+                    } catch (stringifyError) {
+                        fallbackContent = '[Unable to display object]';
+                    }
+                } else {
+                    fallbackContent = String(content);
+                }
+                
                 return `<div class="json-content">
                     <div class="json-header error">
-                        <span class="file-type-label">JSON Data (Parse Error)</span>
-                        <span class="error-message">Invalid JSON format</span>
+                        <span class="file-type-label">JSON Data (Error)</span>
+                        <span class="error-message">Could not format JSON</span>
                     </div>
-                    <pre class="language-text"><code class="language-text">${Utils.escapeHtml(rawContent)}</code></pre>
+                    <pre class="language-text"><code class="language-text">${Utils.escapeHtml(fallbackContent)}</code></pre>
                 </div>`;
             }
         } else if (fileName.endsWith('.csv')) {
             return this.renderCSVContent(content);
         } else {
-            return `<div class="text-content"><pre>${Utils.escapeHtml(content)}</pre></div>`;
+            // For non-JSON data files, ensure we have a string
+            const contentString = typeof content === 'string' ? content : String(content);
+            return `<div class="text-content"><pre>${Utils.escapeHtml(contentString)}</pre></div>`;
         }
     },
     
