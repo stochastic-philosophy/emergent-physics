@@ -152,13 +152,16 @@ window.ContentRenderer = {
     },
     
     /**
-     * Render file content based on type - WITH DEBUG
+     * Render file content based on type - FULLY FIXED DEBUG
      */
     renderFileContent: async function(content, fileType, filePath) {
         console.log('🔍 renderFileContent() called');
         console.log('🔍 Content type at entry:', typeof content);
         console.log('🔍 Content value at entry:', content);
         console.log('🔍 File type:', fileType);
+        
+        // Get debug element safely
+        const debugElement = document.getElementById('immediate-debug');
         
         const contentArea = document.querySelector(UI.selectors.mainContent);
         if (!contentArea) {
@@ -197,11 +200,21 @@ window.ContentRenderer = {
             case 'code':
                 // SPECIAL CHECK: If it's a .json file but detected as code, treat as JSON
                 if (fileName.endsWith('.json')) {
-                    console.log('🔧 OVERRIDE: .json file detected, using JSON renderer instead of code');
+                    if (debugElement) {
+                        debugElement.innerHTML += `🔧 OVERRIDE: .json file detected, using JSON renderer<br>`;
+                        debugElement.innerHTML += `📋 About to call renderDataContent() with object<br>`;
+                    }
+                    console.log('🔧 JSON OVERRIDE: Using renderDataContent() for .json file');
+                    console.log('🔧 Content before renderDataContent:', typeof content, content);
+                    
                     html += '<div class="data-content" id="main-data-content">';
                     const jsonContent = await this.renderDataContent(content, fileName);
                     html += jsonContent;
                     html += '</div>';
+                    
+                    if (debugElement) {
+                        debugElement.innerHTML += `✅ renderDataContent() completed<br>`;
+                    }
                 } else {
                     // Normal code rendering for non-JSON files
                     const language = this.detectCodeLanguage(fileName);
@@ -231,7 +244,9 @@ window.ContentRenderer = {
                 break;
                 
             default:
-                html += `<div class="text-content" id="main-text-content"><pre>${Utils.escapeHtml(content)}</pre></div>`;
+                // Ensure content is string for default rendering
+                const defaultContent = typeof content === 'object' ? JSON.stringify(content, null, 2) : String(content);
+                html += `<div class="text-content" id="main-text-content"><pre>${Utils.escapeHtml(defaultContent)}</pre></div>`;
         }
         
         html += `</div>`;
