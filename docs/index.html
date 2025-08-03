@@ -113,7 +113,7 @@
         </div>
     </div>
 
-    <!-- JavaScript Modules (Core functionality without PDF) -->
+    <!-- JavaScript Modules (PDF modules removed, everything else unchanged) -->
     
     <!-- LAYER 1: Core utilities (no dependencies) -->
     <script src="assets/js/debug-logger.js"></script>
@@ -132,8 +132,9 @@
     <script src="assets/js/project-manager.js"></script>
     <script src="assets/js/navigation-manager.js"></script>
     
-    <!-- LAYER 5: Content rendering (without PDF modules) -->
+    <!-- LAYER 5: Content rendering (PDF modules removed) -->
     <script src="assets/js/content-renderer.js"></script>
+    <!-- PDF modules removed: pdf-library-manager.js, pdf-generator.js -->
     
     <!-- LAYER 6: Main application orchestration (depends on all layers) -->
     <script src="assets/js/app.js"></script>
@@ -147,11 +148,11 @@
         });
     </script>
     
-    <!-- Development helper for debugging core modules -->
+    <!-- Development helper for debugging (PDF modules removed) -->
     <script>
         if (window.DEBUG_MODE) {
             window.addEventListener('load', function() {
-                console.group('🔧 Core Modules Status');
+                console.group('🔧 Modules Status (PDF Removed)');
                 console.log('App Info:', window.App ? App.getInfo() : 'Not loaded');
                 console.log('Module Status:', window.App ? App.getModuleStatus() : 'Not available');
                 console.log('ContentRenderer:', typeof ContentRenderer !== 'undefined' ? '✅ Loaded' : '❌ Missing');
@@ -163,6 +164,9 @@
                 console.log('UI:', typeof UI !== 'undefined' ? '✅ Loaded' : '❌ Missing');
                 console.log('Utils:', typeof Utils !== 'undefined' ? '✅ Loaded' : '❌ Missing');
                 console.log('Storage:', typeof Storage !== 'undefined' ? '✅ Loaded' : '❌ Missing');
+                
+                // PDF modules removed from debug
+                console.log('Note: PDF modules intentionally removed');
                 console.groupEnd();
             });
         }
