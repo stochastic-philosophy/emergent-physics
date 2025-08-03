@@ -113,7 +113,7 @@
         </div>
     </div>
 
-    <!-- JavaScript Modules (PDF modules removed, everything else unchanged) -->
+    <!-- JavaScript Modules (ORIGINAL - Only PDF modules removed) -->
     
     <!-- LAYER 1: Core utilities (no dependencies) -->
     <script src="assets/js/debug-logger.js"></script>
@@ -134,7 +134,10 @@
     
     <!-- LAYER 5: Content rendering (PDF modules removed) -->
     <script src="assets/js/content-renderer.js"></script>
-    <!-- PDF modules removed: pdf-library-manager.js, pdf-generator.js -->
+    <!-- PDF modules removed: 
+    <script src="assets/js/pdf-library-manager.js"></script>
+    <script src="assets/js/pdf-generator.js"></script>
+    -->
     
     <!-- LAYER 6: Main application orchestration (depends on all layers) -->
     <script src="assets/js/app.js"></script>
@@ -148,25 +151,18 @@
         });
     </script>
     
-    <!-- Development helper for debugging (PDF modules removed) -->
+    <!-- Development helper for debugging refactored modules -->
     <script>
         if (window.DEBUG_MODE) {
             window.addEventListener('load', function() {
-                console.group('🔧 Modules Status (PDF Removed)');
+                console.group('🔧 Refactored PDF Modules Status');
                 console.log('App Info:', window.App ? App.getInfo() : 'Not loaded');
                 console.log('Module Status:', window.App ? App.getModuleStatus() : 'Not available');
                 console.log('ContentRenderer:', typeof ContentRenderer !== 'undefined' ? '✅ Loaded' : '❌ Missing');
-                console.log('ProjectManager:', typeof ProjectManager !== 'undefined' ? '✅ Loaded' : '❌ Missing');
-                console.log('NavigationManager:', typeof NavigationManager !== 'undefined' ? '✅ Loaded' : '❌ Missing');
-                console.log('MarkdownProcessor:', typeof MarkdownProcessor !== 'undefined' ? '✅ Loaded' : '❌ Missing');
-                console.log('FileManager:', typeof FileManager !== 'undefined' ? '✅ Loaded' : '❌ Missing');
-                console.log('ThemeManager:', typeof ThemeManager !== 'undefined' ? '✅ Loaded' : '❌ Missing');
-                console.log('UI:', typeof UI !== 'undefined' ? '✅ Loaded' : '❌ Missing');
-                console.log('Utils:', typeof Utils !== 'undefined' ? '✅ Loaded' : '❌ Missing');
-                console.log('Storage:', typeof Storage !== 'undefined' ? '✅ Loaded' : '❌ Missing');
                 
-                // PDF modules removed from debug
-                console.log('Note: PDF modules intentionally removed');
+                // PDF modules removed - no longer check for them
+                console.log('PDF Modules: ❌ Intentionally Removed');
+                
                 console.groupEnd();
             });
         }
