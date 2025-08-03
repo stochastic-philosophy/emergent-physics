@@ -113,7 +113,7 @@
         </div>
     </div>
 
-    <!-- JavaScript Modules (ORIGINAL - Only PDF modules removed) -->
+    <!-- JavaScript Modules - YKSINKERTAINEN JÄRJESTYS -->
     
     <!-- LAYER 1: Core utilities (no dependencies) -->
     <script src="assets/js/debug-logger.js"></script>
@@ -132,12 +132,11 @@
     <script src="assets/js/project-manager.js"></script>
     <script src="assets/js/navigation-manager.js"></script>
     
-    <!-- LAYER 5: Content rendering (PDF modules removed) -->
+    <!-- LAYER 5: YKSINKERTAINEN CONTENT RENDERING -->
     <script src="assets/js/content-renderer.js"></script>
-    <!-- PDF modules removed: 
-    <script src="assets/js/pdf-library-manager.js"></script>
-    <script src="assets/js/pdf-generator.js"></script>
-    -->
+    <!-- EI FileTypeDetector - extension otetaan suoraan stringistä -->
+    <!-- EI default_renderer - debug popup riittää fallbackiksi -->
+    <!-- Rendererit ladataan dynaamisesti: {extension}_renderer.js -->
     
     <!-- LAYER 6: Main application orchestration (depends on all layers) -->
     <script src="assets/js/app.js"></script>
@@ -151,21 +150,46 @@
         });
     </script>
     
-    <!-- Development helper for debugging refactored modules -->
+    <!-- Development helper for debugging simplified system -->
+    <!-- DEBUG: Jos debuggausta tarvitaan tableteilla, käytä popup-ratkaisua -->
+    <!-- console.log ei toimi tableteilla - tee debug popup kuten theme-debug -->
     <script>
         if (window.DEBUG_MODE) {
             window.addEventListener('load', function() {
-                console.group('🔧 Refactored PDF Modules Status');
-                console.log('App Info:', window.App ? App.getInfo() : 'Not loaded');
-                console.log('Module Status:', window.App ? App.getModuleStatus() : 'Not available');
-                console.log('ContentRenderer:', typeof ContentRenderer !== 'undefined' ? '✅ Loaded' : '❌ Missing');
+                // Debug info saatavilla yksinkertaisessa järjestelmässä:
+                // - ContentRenderer.getDebugInfo() - latautuneet rendererit
+                // - App.getInfo() - app status
+                // - Testaa: ContentRenderer.getFileExtension('test.json') → 'json'
                 
-                // PDF modules removed - no longer check for them
-                console.log('PDF Modules: ❌ Intentionally Removed');
-                
-                console.groupEnd();
+                // Luo debug popup tarpeen mukaan:
+                // const debugInfo = ContentRenderer.getDebugInfo();
+                // UI.showNotification(`Renderers: ${JSON.stringify(debugInfo)}`, 'info', 10000);
             });
         }
     </script>
+    
+    <!-- Renderer directory structure info (for development) -->
+    <!--
+    YKSINKERTAINEN RENDERER JÄRJESTELMÄ:
+    
+    assets/js/renderers/
+    ├── json_renderer.js         ← .json tiedostoille
+    ├── md_renderer.js          ← .md tiedostoille  
+    ├── py_renderer.js          ← .py tiedostoille
+    ├── js_renderer.js          ← .js tiedostoille
+    ├── html_renderer.js        ← .html tiedostoille
+    ├── css_renderer.js         ← .css tiedostoille
+    ├── txt_renderer.js         ← .txt tiedostoille
+    └── csv_renderer.js         ← .csv tiedostoille
+    
+    YKSINKERTAINEN LOGIIKKA:
+    1. test.json → getFileExtension() → 'json'
+    2. 'json' → 'json_renderer.js' → lataa
+    3. json_renderer.render(content) → HTML
+    4. Jos renderer puuttuu → debug popup
+    
+    EI FileTypeDetector:ia (satoja rivejä koodia poistettu)
+    EI default_renderer:ia (debug popup riittää)
+    -->
 </body>
 </html>
