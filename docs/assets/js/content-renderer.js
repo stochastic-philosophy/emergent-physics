@@ -222,18 +222,21 @@ window.ContentRenderer = {
     },
     
     /**
-     * Render data content (JSON, CSV, etc.) - POPUP DEBUG VERSION
+     * Render data content (JSON, CSV, etc.) - VISIBLE DEBUG ON PAGE
      */
     renderDataContent: async function(content, fileName) {
         if (fileName.endsWith('.json')) {
-            // Debug to popup window
-            if (window.DEBUG && DEBUG.info) {
-                DEBUG.info('=== JSON RENDERING DEBUG ===');
-                DEBUG.info('📁 File: ' + fileName);
-                DEBUG.info('📋 Content type: ' + typeof content);
-                DEBUG.info('🏗️ Constructor: ' + (content ? content.constructor.name : 'null'));
-                DEBUG.info('📝 String test: ' + String(content).substring(0, 100));
-            }
+            
+            // Create debug info that will be visible on the page
+            let debugInfo = '';
+            debugInfo += `<div style="background: #e0f2fe; border: 1px solid #0284c7; padding: 1rem; margin: 1rem 0; border-radius: 6px; font-family: monospace; font-size: 0.8rem;">`;
+            debugInfo += `<strong>🔍 JSON DEBUG INFO:</strong><br>`;
+            debugInfo += `📁 File: ${fileName}<br>`;
+            debugInfo += `📋 Content type: ${typeof content}<br>`;
+            debugInfo += `🏗️ Constructor: ${content ? content.constructor.name : 'null'}<br>`;
+            debugInfo += `📏 Content length: ${typeof content === 'string' ? content.length : 'N/A'}<br>`;
+            debugInfo += `🔍 Is Array: ${Array.isArray(content)}<br>`;
+            debugInfo += `📝 String conversion test: "${String(content).substring(0, 100)}..."<br>`;
             
             let jsonText = '';
             
@@ -242,54 +245,41 @@ window.ContentRenderer = {
                 // Content is a JavaScript object - convert to JSON string
                 try {
                     jsonText = JSON.stringify(content, null, 2);
-                    if (window.DEBUG && DEBUG.info) {
-                        DEBUG.info('✅ SUCCESS: Converted JavaScript object to JSON');
-                        DEBUG.info('📏 JSON length: ' + jsonText.length + ' characters');
-                    }
+                    debugInfo += `✅ SUCCESS: Converted JavaScript object to JSON<br>`;
+                    debugInfo += `📏 JSON length: ${jsonText.length} characters<br>`;
                 } catch (error) {
                     jsonText = '{\n  "error": "Could not convert object to JSON",\n  "message": "' + error.message + '"\n}';
-                    if (window.DEBUG && DEBUG.error) {
-                        DEBUG.error('❌ JSON.stringify() failed: ' + error.message);
-                    }
+                    debugInfo += `❌ JSON.stringify() failed: ${error.message}<br>`;
                 }
             } else if (typeof content === 'string') {
                 // Content is already a string
                 if (content === '[object Object]') {
                     jsonText = '{\n  "error": "Object was corrupted during loading"\n}';
-                    if (window.DEBUG && DEBUG.error) {
-                        DEBUG.error('⚠️ FOUND CORRUPTED [object Object] string!');
-                    }
+                    debugInfo += `⚠️ FOUND CORRUPTED [object Object] string!<br>`;
                 } else {
                     // Try to parse and reformat if it's a JSON string
                     try {
                         const parsed = JSON.parse(content);
                         jsonText = JSON.stringify(parsed, null, 2);
-                        if (window.DEBUG && DEBUG.info) {
-                            DEBUG.info('✅ Reformatted JSON string');
-                        }
+                        debugInfo += `✅ Reformatted JSON string<br>`;
                     } catch (parseError) {
                         // Not valid JSON, use as-is
                         jsonText = content;
-                        if (window.DEBUG && DEBUG.info) {
-                            DEBUG.info('ℹ️ Using string content as-is (not valid JSON)');
-                        }
+                        debugInfo += `ℹ️ Using string content as-is (not valid JSON)<br>`;
                     }
                 }
             } else {
                 // Other types (number, boolean, null, etc.)
                 jsonText = JSON.stringify(content, null, 2);
-                if (window.DEBUG && DEBUG.info) {
-                    DEBUG.info('✅ Converted ' + typeof content + ' to JSON');
-                }
+                debugInfo += `✅ Converted ${typeof content} to JSON<br>`;
             }
             
-            if (window.DEBUG && DEBUG.info) {
-                DEBUG.info('🏁 FINAL JSON TEXT LENGTH: ' + jsonText.length);
-                DEBUG.info('🔚 First 100 chars: ' + jsonText.substring(0, 100));
-                DEBUG.info('=== END JSON DEBUG ===');
-            }
+            debugInfo += `🏁 FINAL JSON TEXT LENGTH: ${jsonText.length}<br>`;
+            debugInfo += `🔚 First 100 chars: "${jsonText.substring(0, 100)}..."<br>`;
+            debugInfo += `</div>`;
             
             return `<div class="json-content">
+                ${debugInfo}
                 <div class="json-header">
                     <span class="file-type-label">JSON Data</span>
                     <span class="json-size">${jsonText.split('\n').length} lines</span>
