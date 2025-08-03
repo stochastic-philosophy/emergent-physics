@@ -1270,3 +1270,159 @@ code:not(pre code) {
         display: none !important;
     }
 }
+
+/* CSV table styling */
+.csv-content .table-container {
+    margin: 1.5rem 0;
+}
+
+.csv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.csv-table th,
+.csv-table td {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    text-align: left;
+}
+
+.csv-table th {
+    background: var(--card-background);
+    font-weight: 600;
+}
+
+.csv-truncated {
+    text-align: center;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-top: 1rem;
+}
+
+/* JSON content styling - FIXED AND ENHANCED */
+.json-content {
+    margin: 1.5rem 0;
+}
+
+.json-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: var(--card-background, #f8fafc);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    font-size: 0.875rem;
+}
+
+.json-header.error {
+    background: var(--error-background, #fef2f2);
+    border-color: var(--error-border, #fecaca);
+    color: var(--error-color, #dc2626);
+}
+
+.file-type-label {
+    font-weight: 600;
+    color: var(--text-color, #374151);
+}
+
+.json-header.error .file-type-label {
+    color: var(--error-color, #dc2626);
+}
+
+.json-size {
+    color: var(--text-secondary, #6b7280);
+    font-size: 0.8rem;
+}
+
+.error-message {
+    color: var(--error-color, #dc2626);
+    font-size: 0.8rem;
+}
+
+.json-content pre {
+    margin: 0;
+    border-radius: 0 0 6px 6px;
+    border-top: none;
+    background: var(--code-background, #f8fafc);
+    border: 1px solid var(--border-color, #e2e8f0);
+    padding: 1rem;
+    overflow-x: auto;
+    font-family: 'Courier New', Consolas, Monaco, monospace;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.json-content code {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    line-height: 1.5;
+    color: var(--code-text, #374151);
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+}
+
+/* JSON syntax highlighting improvements */
+.language-json .token.property {
+    color: var(--code-keyword, #0066cc);
+    font-weight: 600;
+}
+
+.language-json .token.string {
+    color: var(--code-string, #690);
+}
+
+.language-json .token.number {
+    color: var(--code-number, #905);
+    font-weight: 500;
+}
+
+.language-json .token.boolean {
+    color: var(--code-function, #c90);
+    font-weight: 600;
+}
+
+.language-json .token.null {
+    color: var(--code-comment, #999);
+    font-style: italic;
+}
+
+.language-json .token.punctuation {
+    color: var(--text-color, #374151);
+}
+
+/* Make JSON more readable */
+.json-content .language-json {
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* Data content general styling */
+.data-content {
+    margin: 1.5rem 0;
+}
+
+.data-content pre {
+    background: var(--code-background, #f8fafc);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 6px;
+    padding: 1rem;
+    overflow-x: auto;
+    font-family: 'Courier New', Consolas, Monaco, monospace;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--code-text, #374151);
+}
+
+.data-content code {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+}
