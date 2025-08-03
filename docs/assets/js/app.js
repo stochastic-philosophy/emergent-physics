@@ -1,7 +1,7 @@
 /**
- * Main Application Logic (Without PDF functionality)
+ * Main Application Logic (PDF modules removed only)
  * Coordinates between specialized modules and provides global state management
- * PDF modules removed for simplified functionality
+ * Only PDF functionality removed, all else unchanged
  */
 
 // Ensure DEBUG is available (fallback)
@@ -34,13 +34,14 @@ window.App = {
             ui: false,
             storage: false,
             utils: false
+            // PDF modules removed: pdfGenerator, pdfLibraryManager
         }
     },
     
     // Application configuration
     config: {
-        version: '2.0.0',
-        phase: 'Phase 2 - Core Functionality',
+        version: '2.1.0',
+        phase: 'Phase 3 - PDF Generation (PDF removed)',
         debug: localStorage.getItem('debug_mode') === 'true',
         initTimeout: 10000, // 10 seconds
         retryAttempts: 3
@@ -50,7 +51,7 @@ window.App = {
      * Initialize the application
      */
     init: async function() {
-        DEBUG.info('=== INITIALIZING APP (Core Functionality v2.0) ===');
+        DEBUG.info('=== INITIALIZING APP (PDF Modules Removed v2.1) ===');
         
         try {
             // Check for required dependencies
@@ -67,9 +68,11 @@ window.App = {
             await this.initializeModules(); 
             await this.initializeNavigation();
             
+            // PDF modules initialization removed
+            
             // Mark as initialized
             this.state.initialized = true;
-            DEBUG.success('=== APP INITIALIZED SUCCESSFULLY (Core v2.0) ===');
+            DEBUG.success('=== APP INITIALIZED SUCCESSFULLY (PDF Removed v2.1) ===');
             
         } catch (error) {
             DEBUG.reportError(error, 'App initialization failed');
@@ -85,6 +88,7 @@ window.App = {
             'ThemeManager', 'Utils', 'Storage', 'UI', 
             'FileManager', 'MarkdownProcessor',
             'ProjectManager', 'ContentRenderer', 'NavigationManager'
+            // PDF modules removed: 'PDFGenerator', 'PDFLibraryManager'
         ];
         
         const missing = requiredModules.filter(dep => typeof window[dep] === 'undefined');
@@ -114,6 +118,7 @@ window.App = {
             ui: typeof UI !== 'undefined',
             storage: typeof Storage !== 'undefined',
             utils: typeof Utils !== 'undefined'
+            // PDF modules removed: pdfGenerator, pdfLibraryManager
         };
     },
     
