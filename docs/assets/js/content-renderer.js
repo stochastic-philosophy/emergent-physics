@@ -36,9 +36,20 @@ window.ContentRenderer = {
     },
     
     /**
-     * View file content (Main entry point) - DEBUG ON PAGE
+     * View file content (Main entry point) - EARLY DEBUG
      */
     viewFile: async function(filePath) {
+        // IMMEDIATE DEBUG - show this first thing
+        const immediateDebug = `
+            <div id="immediate-debug" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: orange; color: black; padding: 1rem; border-radius: 6px; z-index: 9999; font-family: monospace; font-size: 0.9rem; border: 2px solid red;">
+                <strong>🚨 viewFile() CALLED!</strong><br>
+                📁 File path: ${filePath}<br>
+                🔍 File ends with .json: ${filePath.endsWith('.json')}<br>
+                ⏰ Time: ${new Date().toLocaleTimeString()}<br>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', immediateDebug);
+        
         console.log(`=== VIEWING FILE: ${filePath} ===`);
         
         try {
@@ -48,6 +59,12 @@ window.ContentRenderer = {
             const fileType = FileManager.detectFileType(filePath);
             console.log(`File type detected: ${fileType}`);
             
+            // Update debug with file type
+            const debugElement = document.getElementById('immediate-debug');
+            if (debugElement) {
+                debugElement.innerHTML += `📊 File type: ${fileType}<br>`;
+            }
+            
             // Check if file is viewable
             if (!FileManager.isViewable(filePath)) {
                 UI.hideLoading();
@@ -55,29 +72,20 @@ window.ContentRenderer = {
                 return;
             }
             
+            // Update debug before loading
+            if (debugElement) {
+                debugElement.innerHTML += `🔄 About to call FileManager.loadFile()...<br>`;
+            }
+            
             // Load file content with debug
             const content = await FileManager.loadFile(filePath);
             
-            // DEBUG: Add debug info directly to page if it's a JSON file
-            if (filePath.endsWith('.json')) {
-                const debugHtml = `
-                    <div style="position: fixed; top: 100px; right: 20px; background: red; color: white; padding: 1rem; border-radius: 6px; z-index: 9999; max-width: 400px; font-family: monospace; font-size: 0.8rem;">
-                        <strong>🚨 JSON DEBUG - viewFile():</strong><br>
-                        📁 File: ${filePath}<br>
-                        📋 Content type: ${typeof content}<br>
-                        🏗️ Constructor: ${content ? content.constructor.name : 'null'}<br>
-                        📏 Content: ${typeof content === 'string' ? '"' + content.substring(0, 50) + '..."' : 'OBJECT'}<br>
-                        🔍 String test: "${String(content).substring(0, 50)}..."<br>
-                        📊 File type detected: ${fileType}<br>
-                    </div>
-                `;
-                document.body.insertAdjacentHTML('beforeend', debugHtml);
-                
-                // Remove debug after 10 seconds
-                setTimeout(() => {
-                    const debugElement = document.querySelector('div[style*="position: fixed"]');
-                    if (debugElement) debugElement.remove();
-                }, 10000);
+            // Update debug with loaded content info
+            if (debugElement) {
+                debugElement.innerHTML += `✅ FileManager.loadFile() completed<br>`;
+                debugElement.innerHTML += `📋 Content type: ${typeof content}<br>`;
+                debugElement.innerHTML += `🏗️ Constructor: ${content ? content.constructor.name : 'null'}<br>`;
+                debugElement.innerHTML += `📏 Content sample: "${String(content).substring(0, 30)}..."<br>`;
             }
             
             // Update state
@@ -89,8 +97,20 @@ window.ContentRenderer = {
                 App.setState({ currentFile: filePath });
             }
             
+            // Update debug before rendering
+            if (debugElement) {
+                debugElement.innerHTML += `🎨 About to render content...<br>`;
+            }
+            
             // Render content based on file type
             await this.renderFileContent(content, fileType, filePath);
+            
+            // Update debug after rendering
+            if (debugElement) {
+                debugElement.innerHTML += `✅ Rendering completed!<br>`;
+                debugElement.style.background = 'green';
+                debugElement.style.color = 'white';
+            }
             
             // Update URL
             if (typeof NavigationManager !== 'undefined') {
@@ -106,10 +126,26 @@ window.ContentRenderer = {
             UI.updatePageTitle(`${displayName} - ${projectId}`);
             
             UI.hideLoading();
+            
+            // Remove debug after 15 seconds
+            setTimeout(() => {
+                const debugEl = document.getElementById('immediate-debug');
+                if (debugEl) debugEl.remove();
+            }, 15000);
+            
             console.log(`✅ File viewing completed: ${filePath}`);
             
         } catch (error) {
             console.error(`❌ Failed to view file: ${filePath}`, error);
+            
+            // Update debug with error
+            const debugElement = document.getElementById('immediate-debug');
+            if (debugElement) {
+                debugElement.innerHTML += `❌ ERROR: ${error.message}<br>`;
+                debugElement.style.background = 'red';
+                debugElement.style.color = 'white';
+            }
+            
             UI.hideLoading();
             UI.showError(`Failed to load file: ${error.message}`, true);
         }
