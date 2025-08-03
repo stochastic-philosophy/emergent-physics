@@ -1,7 +1,7 @@
 {
   "version": "1.1.0",
   "last_updated": "2025-01-30",
-  "description": "Emergent Physics Research Projects Manifest - Phase 3 with PDF Generation removed",
+  "description": "Emergent Physics Research Projects Manifest - Phase 3 with PDF Generation",
   "projects": [
     {
       "id": "indivisible-stochastic-processes",
@@ -170,7 +170,7 @@
   "debug_info": {
     "creation_date": "2025-01-25",
     "updated_date": "2025-01-30",
-    "phase": "Phase 3 - Advanced Features (PDF removed)",
+    "phase": "Phase 3 - Advanced Features",
     "created_for": "GitHub Pages static hosting",
     "current_version": "1.1.0",
     "limitations": [
@@ -182,8 +182,7 @@
       "Manifest-based file listing",
       "Client-side ZIP generation with JSZip",
       "CDN-based external libraries",
-      "LocalStorage for user preferences",
-      "Direct file downloads"
+      "LocalStorage for user preferences"
     ],
     "testing": {
       "test_cases": [
@@ -191,7 +190,7 @@
         "Syntax highlighted code blocks", 
         "Complex markdown tables",
         "Mixed content with images",
-        "Direct file downloads"
+        "Long documents with page breaks"
       ],
       "browsers_tested": ["Chrome", "Firefox", "Safari", "Edge"],
       "devices_tested": ["Desktop", "Tablet", "Mobile"]
