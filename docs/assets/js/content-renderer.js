@@ -36,7 +36,7 @@ window.ContentRenderer = {
     },
     
     /**
-     * View file content (Main entry point) - WITH POPUP DEBUG
+     * View file content (Main entry point) - DEBUG ON PAGE
      */
     viewFile: async function(filePath) {
         console.log(`=== VIEWING FILE: ${filePath} ===`);
@@ -55,21 +55,29 @@ window.ContentRenderer = {
                 return;
             }
             
-            // Add debug info to popup window
-            if (window.DEBUG && DEBUG.info) {
-                DEBUG.info('🔍 BEFORE FileManager.loadFile() call for: ' + filePath);
-            }
-            
-            // Load file content - DEBUG POINT 1
+            // Load file content with debug
             const content = await FileManager.loadFile(filePath);
             
-            // Debug to popup window
-            if (window.DEBUG && DEBUG.info) {
-                DEBUG.info('🔍 AFTER FileManager.loadFile():');
-                DEBUG.info('  - Content type: ' + typeof content);
-                DEBUG.info('  - Content constructor: ' + (content ? content.constructor.name : 'null'));
-                DEBUG.info('  - Is Array: ' + Array.isArray(content));
-                DEBUG.info('  - String test: ' + String(content).substring(0, 50));
+            // DEBUG: Add debug info directly to page if it's a JSON file
+            if (filePath.endsWith('.json')) {
+                const debugHtml = `
+                    <div style="position: fixed; top: 100px; right: 20px; background: red; color: white; padding: 1rem; border-radius: 6px; z-index: 9999; max-width: 400px; font-family: monospace; font-size: 0.8rem;">
+                        <strong>🚨 JSON DEBUG - viewFile():</strong><br>
+                        📁 File: ${filePath}<br>
+                        📋 Content type: ${typeof content}<br>
+                        🏗️ Constructor: ${content ? content.constructor.name : 'null'}<br>
+                        📏 Content: ${typeof content === 'string' ? '"' + content.substring(0, 50) + '..."' : 'OBJECT'}<br>
+                        🔍 String test: "${String(content).substring(0, 50)}..."<br>
+                        📊 File type detected: ${fileType}<br>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', debugHtml);
+                
+                // Remove debug after 10 seconds
+                setTimeout(() => {
+                    const debugElement = document.querySelector('div[style*="position: fixed"]');
+                    if (debugElement) debugElement.remove();
+                }, 10000);
             }
             
             // Update state
@@ -79,11 +87,6 @@ window.ContentRenderer = {
             // Update App state if available
             if (typeof App !== 'undefined' && App.setState) {
                 App.setState({ currentFile: filePath });
-            }
-            
-            // Debug before rendering
-            if (window.DEBUG && DEBUG.info) {
-                DEBUG.info('🔍 BEFORE renderFileContent() - content type: ' + typeof content);
             }
             
             // Render content based on file type
@@ -107,12 +110,6 @@ window.ContentRenderer = {
             
         } catch (error) {
             console.error(`❌ Failed to view file: ${filePath}`, error);
-            
-            // Debug error to popup
-            if (window.DEBUG && DEBUG.error) {
-                DEBUG.error('❌ viewFile error: ' + error.message);
-            }
-            
             UI.hideLoading();
             UI.showError(`Failed to load file: ${error.message}`, true);
         }
