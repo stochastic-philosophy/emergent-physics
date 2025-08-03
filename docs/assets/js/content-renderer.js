@@ -1,6 +1,6 @@
 /**
- * Content Renderer - Core file rendering without PDF functionality
- * Core file rendering with PDF features removed
+ * Content Renderer - Compatible with Fixed PDF Generator
+ * Core file rendering with reliable PDF integration
  */
 
 window.ContentRenderer = {
@@ -32,7 +32,7 @@ window.ContentRenderer = {
      * Initialize ContentRenderer
      */
     init: function() {
-        console.log('Initializing ContentRenderer...');
+        console.log('Initializing ContentRenderer (Compatible)...');
     },
     
     /**
@@ -598,7 +598,7 @@ window.ContentRenderer = {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('ContentRenderer module loaded successfully');
+    console.log('ContentRenderer (Compatible) module loaded successfully');
 });
 
 /**
