@@ -39,7 +39,7 @@ window.ContentRenderer = {
             // 1. Hae file extension suoraan
             const extension = this.getFileExtension(filePath);
             
-            // 2. Tarkista onko viewable (yksinkertainen lista)
+            // 2. Tarkista onko viewable (käytä omaa funktiota, EI FileManager:ia)
             if (!this.isViewableExtension(extension)) {
                 UI.hideLoading();
                 UI.showError(`File type not supported for viewing: .${extension}`, true);
