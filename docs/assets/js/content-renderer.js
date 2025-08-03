@@ -186,7 +186,7 @@ window.ContentRenderer = {
             </nav>
         `;
         
-        // Render content based on file type
+        // Render content based on file type - FIXED JSON DETECTION
         switch (fileType) {
             case 'markdown':
                 html += '<div class="markdown-content" id="main-markdown-content">';
@@ -195,10 +195,24 @@ window.ContentRenderer = {
                 break;
                 
             case 'code':
-                const language = this.detectCodeLanguage(fileName);
-                html += `<div class="code-content" id="main-code-content">`;
-                html += `<pre class="language-${language}"><code class="language-${language}">${Utils.escapeHtml(content)}</code></pre>`;
-                html += `</div>`;
+                // SPECIAL CHECK: If it's a .json file but detected as code, treat as JSON
+                if (fileName.endsWith('.json')) {
+                    if (debugElement) {
+                        debugElement.innerHTML += `🔧 OVERRIDE: .json file detected, using JSON renderer instead of code<br>`;
+                    }
+                    html += '<div class="data-content" id="main-data-content">';
+                    const jsonContent = await this.renderDataContent(content, fileName);
+                    html += jsonContent;
+                    html += '</div>';
+                } else {
+                    // Normal code rendering for non-JSON files
+                    const language = this.detectCodeLanguage(fileName);
+                    // Ensure content is string for code rendering
+                    const codeContent = typeof content === 'object' ? JSON.stringify(content, null, 2) : String(content);
+                    html += `<div class="code-content" id="main-code-content">`;
+                    html += `<pre class="language-${language}"><code class="language-${language}">${Utils.escapeHtml(codeContent)}</code></pre>`;
+                    html += `</div>`;
+                }
                 break;
                 
             case 'data':
