@@ -92,8 +92,12 @@ window.ContentRenderer = {
      */
     isViewableExtension: function(extension) {
         const viewableExtensions = [
-            'json', 'md', 'markdown', 'py', 'js', 'r', 'html', 'css', 'txt', 
-            'csv', 'xml', 'yaml', 'yml', 'sh', 'bat', 'sql'
+            // Tekstit ja data
+            'json', 'md', 'markdown', 'txt', 'csv', 'xml', 'yaml', 'yml',
+            // Koodi
+            'py', 'js', 'r', 'html', 'css', 'sh', 'bat', 'sql',
+            // Kuvat
+            'png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'
         ];
         return viewableExtensions.includes(extension);
     },
@@ -284,8 +288,14 @@ window.ContentRenderer = {
             
             // Yksinkertainen downloadable check
             const downloadableExtensions = [
-                'json', 'csv', 'pdf', 'docx', 'doc', 'txt', 'py', 'js', 'r',
-                'zip', 'tar', 'gz', 'xlsx', 'xls', 'pptx', 'ppt'
+                // Data ja dokumentit
+                'json', 'csv', 'txt', 'xml', 'yaml', 'yml',
+                // Koodi
+                'py', 'js', 'r', 'html', 'css',
+                // Kuvat
+                'png', 'jpg', 'jpeg', 'gif', 'svg', 'webp',
+                // Dokumentit ja arkistot
+                'pdf', 'docx', 'doc', 'zip', 'tar', 'gz', 'xlsx', 'xls', 'pptx', 'ppt'
             ];
             
             if (!downloadableExtensions.includes(extension)) {
