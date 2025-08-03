@@ -1,7 +1,7 @@
 {
-  "version": "1.1.0",
-  "last_updated": "2025-07-30",
-  "description": "Emergent Physics Research Projects Manifest - Phase 3 with PDF Generation",
+  "version": "2.0.0",
+  "last_updated": "2025-01-30",
+  "description": "Emergent Physics Research Projects Manifest - Core functionality without PDF generation",
   "projects": [
     {
       "id": "indivisible-stochastic-processes",
@@ -14,7 +14,7 @@
         "en": "Research on hybrid systems indivisible behavior based on Jacob Barandes' theory"
       },
       "status": "active",
-      "created": "2025-07-25",
+      "created": "2025-01-25",
       "tags": ["quantum-mechanics", "stochastic-processes", "hybrid-systems", "barandes-theory"],
       "languages": ["fi", "en"],
       "categories": {
@@ -49,7 +49,6 @@
       "markdown_processing": true,
       "latex_rendering": true,
       "code_highlighting": true,
-      "pdf_generation": true,
       "zip_downloads": false,
       "word_export": false,
       "search_functionality": false,
@@ -60,8 +59,8 @@
     "supported_markdown": [".md", ".markdown"],
     "supported_code": [".py", ".js", ".r", ".html", ".css", ".json"],
     "supported_data": [".json", ".csv", ".txt", ".pkl", ".png", ".jpg", ".gif"],
-    "supported_documents": [".pdf", ".docx", ".doc"],
-    "downloadable": [".zip", ".tar.gz", ".pdf", ".docx", ".pkl", ".json", ".csv"]
+    "supported_documents": [".docx", ".doc"],
+    "downloadable": [".zip", ".tar.gz", ".docx", ".pkl", ".json", ".csv", ".md", ".py", ".js", ".r", ".html", ".css", ".txt"]
   },
   "categories_definition": {
     "fi": {
@@ -87,7 +86,7 @@
       },
       "downloads": {
         "name": "Lataukset",
-        "description": "Valmiit PDF ja Word -dokumentit",
+        "description": "Valmiit dokumentit latattavaksi",
         "icon": "📥"
       }
     },
@@ -114,7 +113,7 @@
       },
       "downloads": {
         "name": "Downloads",
-        "description": "Ready PDF and Word documents",
+        "description": "Ready documents for download",
         "icon": "📥"
       }
     }
@@ -147,77 +146,74 @@
       "marked": "https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js",
       "mathjax": "https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js",
       "prism": "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js",
-      "feather": "https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js",
-      "html2pdf": "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js",
-      "html2canvas": "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
-      "jspdf": "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
-      "jszip": "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
-    },
-    "pdf_generation": {
-      "primary_library": "html2pdf.js",
-      "fallback_libraries": ["html2canvas", "jspdf"],
-      "features": {
-        "latex_preservation": true,
-        "syntax_highlighting": true,
-        "css_styling": true,
-        "page_breaks": true,
-        "images": true,
-        "tables": true
-      }
+      "feather": "https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"
     }
   },
-  "phase_3_features": {
-    "pdf_generation": {
+  "core_features": {
+    "markdown_processing": {
       "status": "implemented",
       "version": "1.0.0",
-      "description": "Full visual fidelity PDF generation preserving LaTeX math and code highlighting",
-      "libraries": ["html2pdf.js", "html2canvas", "jspdf"],
-      "supported_content": ["markdown", "latex", "code", "tables", "images"],
-      "options": ["portrait/landscape", "margin_settings", "quality_settings"]
+      "description": "Full markdown to HTML conversion with LaTeX math and code highlighting",
+      "libraries": ["marked.js", "mathjax", "prism.js"],
+      "supported_content": ["markdown", "latex", "code", "tables", "images"]
     },
+    "file_viewing": {
+      "status": "implemented",
+      "version": "1.0.0",
+      "description": "View and download various file types including markdown, code, data, and images"
+    },
+    "project_management": {
+      "status": "implemented",
+      "version": "1.0.0", 
+      "description": "Dynamic project loading and navigation with manifest-based file organization"
+    },
+    "theme_management": {
+      "status": "implemented",
+      "version": "1.0.0",
+      "description": "Light/dark theme switching with language support"
+    }
+  },
+  "planned_features": {
     "zip_downloads": {
       "status": "planned",
-      "version": "1.1.0",
+      "version": "2.1.0",
       "description": "Package entire projects or categories into downloadable ZIP files"
     },
     "search_functionality": {
       "status": "planned", 
-      "version": "1.2.0",
+      "version": "2.2.0",
       "description": "Real-time search across markdown content with highlighting"
     },
     "word_export": {
       "status": "planned",
-      "version": "1.3.0", 
+      "version": "2.3.0", 
       "description": "Export markdown content to Word documents using docx.js"
     }
   },
   "debug_info": {
     "creation_date": "2025-01-25",
     "updated_date": "2025-01-30",
-    "phase": "Phase 3 - Advanced Features",
+    "phase": "Phase 2 - Core Functionality",
     "created_for": "GitHub Pages static hosting",
-    "current_version": "1.1.0",
+    "current_version": "2.0.0",
     "limitations": [
       "No server-side processing",
       "No automatic directory listing", 
-      "Client-side file processing only",
-      "PDF generation requires modern browser support"
+      "Client-side file processing only"
     ],
     "workarounds": [
       "Manifest-based file listing",
-      "Client-side ZIP generation with JSZip",
       "CDN-based external libraries",
       "LocalStorage for user preferences",
-      "html2pdf.js for visual PDF fidelity",
-      "Fallback methods for PDF generation"
+      "Client-side file downloads"
     ],
     "testing": {
-      "pdf_test_cases": [
+      "test_cases": [
         "LaTeX mathematical formulas",
         "Syntax highlighted code blocks", 
         "Complex markdown tables",
         "Mixed content with images",
-        "Long documents with page breaks"
+        "File download functionality"
       ],
       "browsers_tested": ["Chrome", "Firefox", "Safari", "Edge"],
       "devices_tested": ["Desktop", "Tablet", "Mobile"]
