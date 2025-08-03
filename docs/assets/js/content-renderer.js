@@ -197,9 +197,7 @@ window.ContentRenderer = {
             case 'code':
                 // SPECIAL CHECK: If it's a .json file but detected as code, treat as JSON
                 if (fileName.endsWith('.json')) {
-                    if (debugElement) {
-                        debugElement.innerHTML += `🔧 OVERRIDE: .json file detected, using JSON renderer instead of code<br>`;
-                    }
+                    console.log('🔧 OVERRIDE: .json file detected, using JSON renderer instead of code');
                     html += '<div class="data-content" id="main-data-content">';
                     const jsonContent = await this.renderDataContent(content, fileName);
                     html += jsonContent;
