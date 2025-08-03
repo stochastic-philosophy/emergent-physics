@@ -36,7 +36,7 @@ window.ContentRenderer = {
     },
     
     /**
-     * View file content (Main entry point) - WITH FULL DEBUG
+     * View file content (Main entry point) - WITH POPUP DEBUG
      */
     viewFile: async function(filePath) {
         console.log(`=== VIEWING FILE: ${filePath} ===`);
@@ -55,13 +55,22 @@ window.ContentRenderer = {
                 return;
             }
             
+            // Add debug info to popup window
+            if (window.DEBUG && DEBUG.info) {
+                DEBUG.info('🔍 BEFORE FileManager.loadFile() call for: ' + filePath);
+            }
+            
             // Load file content - DEBUG POINT 1
-            console.log('🔍 BEFORE FileManager.loadFile() call');
             const content = await FileManager.loadFile(filePath);
-            console.log('🔍 AFTER FileManager.loadFile() - content type:', typeof content);
-            console.log('🔍 Content value:', content);
-            console.log('🔍 Content constructor:', content ? content.constructor.name : 'null');
-            console.log(`File content loaded: ${typeof content === 'string' ? content.length + ' characters' : 'object'}`);
+            
+            // Debug to popup window
+            if (window.DEBUG && DEBUG.info) {
+                DEBUG.info('🔍 AFTER FileManager.loadFile():');
+                DEBUG.info('  - Content type: ' + typeof content);
+                DEBUG.info('  - Content constructor: ' + (content ? content.constructor.name : 'null'));
+                DEBUG.info('  - Is Array: ' + Array.isArray(content));
+                DEBUG.info('  - String test: ' + String(content).substring(0, 50));
+            }
             
             // Update state
             this.state.currentFile = filePath;
@@ -72,10 +81,13 @@ window.ContentRenderer = {
                 App.setState({ currentFile: filePath });
             }
             
-            // Render content based on file type - DEBUG POINT 2
-            console.log('🔍 BEFORE renderFileContent() call');
+            // Debug before rendering
+            if (window.DEBUG && DEBUG.info) {
+                DEBUG.info('🔍 BEFORE renderFileContent() - content type: ' + typeof content);
+            }
+            
+            // Render content based on file type
             await this.renderFileContent(content, fileType, filePath);
-            console.log('🔍 AFTER renderFileContent() call');
             
             // Update URL
             if (typeof NavigationManager !== 'undefined') {
@@ -95,6 +107,12 @@ window.ContentRenderer = {
             
         } catch (error) {
             console.error(`❌ Failed to view file: ${filePath}`, error);
+            
+            // Debug error to popup
+            if (window.DEBUG && DEBUG.error) {
+                DEBUG.error('❌ viewFile error: ' + error.message);
+            }
+            
             UI.hideLoading();
             UI.showError(`Failed to load file: ${error.message}`, true);
         }
@@ -204,11 +222,18 @@ window.ContentRenderer = {
     },
     
     /**
-     * Render data content (JSON, CSV, etc.) - FIXED OBJECT TO TEXT CONVERSION
+     * Render data content (JSON, CSV, etc.) - POPUP DEBUG VERSION
      */
     renderDataContent: async function(content, fileName) {
         if (fileName.endsWith('.json')) {
-            console.log('JSON rendering - content type:', typeof content);
+            // Debug to popup window
+            if (window.DEBUG && DEBUG.info) {
+                DEBUG.info('=== JSON RENDERING DEBUG ===');
+                DEBUG.info('📁 File: ' + fileName);
+                DEBUG.info('📋 Content type: ' + typeof content);
+                DEBUG.info('🏗️ Constructor: ' + (content ? content.constructor.name : 'null'));
+                DEBUG.info('📝 String test: ' + String(content).substring(0, 100));
+            }
             
             let jsonText = '';
             
@@ -217,35 +242,52 @@ window.ContentRenderer = {
                 // Content is a JavaScript object - convert to JSON string
                 try {
                     jsonText = JSON.stringify(content, null, 2);
-                    console.log('✅ Converted JavaScript object to JSON string');
+                    if (window.DEBUG && DEBUG.info) {
+                        DEBUG.info('✅ SUCCESS: Converted JavaScript object to JSON');
+                        DEBUG.info('📏 JSON length: ' + jsonText.length + ' characters');
+                    }
                 } catch (error) {
-                    console.error('❌ Failed to stringify object:', error);
-                    jsonText = '[Error: Could not convert object to JSON]';
+                    jsonText = '{\n  "error": "Could not convert object to JSON",\n  "message": "' + error.message + '"\n}';
+                    if (window.DEBUG && DEBUG.error) {
+                        DEBUG.error('❌ JSON.stringify() failed: ' + error.message);
+                    }
                 }
             } else if (typeof content === 'string') {
                 // Content is already a string
                 if (content === '[object Object]') {
                     jsonText = '{\n  "error": "Object was corrupted during loading"\n}';
-                    console.log('⚠️ Found corrupted [object Object] string');
+                    if (window.DEBUG && DEBUG.error) {
+                        DEBUG.error('⚠️ FOUND CORRUPTED [object Object] string!');
+                    }
                 } else {
                     // Try to parse and reformat if it's a JSON string
                     try {
                         const parsed = JSON.parse(content);
                         jsonText = JSON.stringify(parsed, null, 2);
-                        console.log('✅ Reformatted JSON string');
+                        if (window.DEBUG && DEBUG.info) {
+                            DEBUG.info('✅ Reformatted JSON string');
+                        }
                     } catch (parseError) {
                         // Not valid JSON, use as-is
                         jsonText = content;
-                        console.log('ℹ️ Using string content as-is');
+                        if (window.DEBUG && DEBUG.info) {
+                            DEBUG.info('ℹ️ Using string content as-is (not valid JSON)');
+                        }
                     }
                 }
             } else {
                 // Other types (number, boolean, null, etc.)
                 jsonText = JSON.stringify(content, null, 2);
-                console.log('✅ Converted other type to JSON');
+                if (window.DEBUG && DEBUG.info) {
+                    DEBUG.info('✅ Converted ' + typeof content + ' to JSON');
+                }
             }
             
-            console.log('Final JSON text length:', jsonText.length);
+            if (window.DEBUG && DEBUG.info) {
+                DEBUG.info('🏁 FINAL JSON TEXT LENGTH: ' + jsonText.length);
+                DEBUG.info('🔚 First 100 chars: ' + jsonText.substring(0, 100));
+                DEBUG.info('=== END JSON DEBUG ===');
+            }
             
             return `<div class="json-content">
                 <div class="json-header">
