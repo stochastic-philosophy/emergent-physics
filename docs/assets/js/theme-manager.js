@@ -285,9 +285,14 @@ window.ThemeManager = {
             this.flags.initialized = true;
             
             // Auto-show debug panel on tablets (optional)
-            setTimeout(() => {
-                this.showDebug();
-            }, 1000);
+            
+            // Show debug panel only if explicitly requested
+            // Käyttäjä voi aktivoida: localStorage.setItem('show_theme_debug', 'true')
+            if (window.DEBUG_MODE && localStorage.getItem('show_theme_debug') === 'true') {
+                setTimeout(() => {
+                    this.showDebug();
+                }, 1000);
+            }
             
             this.log('✅ ThemeManager initialized');
             
