@@ -100,7 +100,6 @@ window.ThemeManager = {
      * Create visual debug panel
      */
     createDebugPanel: function() {
-        return;
         if (this.debug.element) return;
         
         const panel = document.createElement('div');
@@ -139,7 +138,7 @@ window.ThemeManager = {
             </div>
         `;
         
-        document.body.appendChild(panel);
+        // document.body.appendChild(panel);
         this.debug.element = panel;
     },
     
