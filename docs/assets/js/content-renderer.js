@@ -36,6 +36,14 @@ window.ContentRenderer = {
         try {
             UI.showLoading('Loading file content...');
             
+            // TALLENNA scroll position ennen tiedoston avaamista
+            if (typeof NavigationManager !== 'undefined' && NavigationManager.saveScrollPosition) {
+                const projectId = ProjectManager ? ProjectManager.getCurrentProject() : null;
+                if (projectId) {
+                    NavigationManager.saveScrollPosition(projectId);
+                }
+            }
+            
             // 1. Hae file extension suoraan
             const extension = this.getFileExtension(filePath);
             
