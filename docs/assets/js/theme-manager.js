@@ -286,7 +286,7 @@ window.ThemeManager = {
             
             // Auto-show debug panel on tablets (optional)
             setTimeout(() => {
-                this.showDebug();
+                // this.showDebug();
             }, 1000);
             
             this.log('✅ ThemeManager initialized');
