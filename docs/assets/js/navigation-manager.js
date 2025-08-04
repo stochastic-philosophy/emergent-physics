@@ -9,7 +9,8 @@ window.NavigationManager = {
     state: {
         currentRoute: {},
         navigationHistory: [],
-        isNavigating: false
+        isNavigating: false,
+        scrollPositions: {}
     },
     
     // Configuration
