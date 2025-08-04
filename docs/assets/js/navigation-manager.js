@@ -1,6 +1,9 @@
 /**
- * Navigation Manager - URL-navigaatio ja historia
- * Handles URL routing, browser history, and navigation events
+ * Navigation Manager - URL-navigaatio ja historia + Scroll Position Muisti
+ * Handles URL routing, browser history, navigation events and scroll position restoration
+ * 
+ * DEBUG: Jos debuggausta tarvitaan, käytä popup-ratkaisua (kuten theme-debug popup)
+ * Tabletit eivät tue console.log komponentteja selaimissa.
  */
 
 window.NavigationManager = {
@@ -10,20 +13,20 @@ window.NavigationManager = {
         currentRoute: {},
         navigationHistory: [],
         isNavigating: false,
-        scrollPositions: {}
+        scrollPositions: new Map() // Uusi: scroll position muisti
     },
     
     // Configuration
     config: {
         maxHistorySize: 50,
-        pushStateEnabled: true
+        pushStateEnabled: true,
+        scrollRestoreDelay: 200 // Viive scroll palauttamiselle
     },
     
     /**
      * Initialize NavigationManager
      */
     init: function() {
-        DEBUG.info('Initializing NavigationManager...');
         this.setupEventListeners();
         this.handleInitialRoute();
     },
@@ -36,7 +39,6 @@ window.NavigationManager = {
         window.addEventListener('popstate', (e) => {
             if (this.state.isNavigating) return; // Prevent loops
             
-            DEBUG.info('Handling popstate event');
             if (e.state && e.state.project) {
                 this.navigateToProject(e.state.project, e.state.file, false);
             } else {
@@ -53,7 +55,74 @@ window.NavigationManager = {
             }
         });
         
-        DEBUG.info('Navigation event listeners set up');
+        // UUSI: Tallenna scroll position kun sivu vieritetään
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                this.saveCurrentScrollPosition();
+            }, 150); // Debounce scroll tallennusta
+        });
+    },
+    
+    /**
+     * UUSI: Tallenna nykyinen scroll position
+     */
+    saveCurrentScrollPosition: function() {
+        const currentProject = ProjectManager ? ProjectManager.getCurrentProject() : null;
+        const currentFile = ContentRenderer ? ContentRenderer.getCurrentFile() : null;
+        
+        if (currentProject) {
+            const scrollY = window.scrollY || window.pageYOffset;
+            const key = currentFile ? `${currentProject}:${currentFile}` : currentProject;
+            
+            this.state.scrollPositions.set(key, {
+                scrollY: scrollY,
+                timestamp: Date.now(),
+                url: window.location.href
+            });
+            
+            // Debug: näytä popup jos debug mode on
+            if (window.DEBUG_MODE && localStorage.getItem('show_scroll_debug') === 'true') {
+                this.showScrollDebug(`💾 Saved scroll: ${key} → ${scrollY}px`);
+            }
+        }
+    },
+    
+    /**
+     * UUSI: Palauta scroll position
+     */
+    restoreScrollPosition: function(projectId, fileId = null) {
+        const key = fileId ? `${projectId}:${fileId}` : projectId;
+        const saved = this.state.scrollPositions.get(key);
+        
+        if (saved) {
+            // Käytä timeoutia varmistamaan että DOM on valmis
+            setTimeout(() => {
+                window.scrollTo({
+                    top: saved.scrollY,
+                    behavior: 'smooth'
+                });
+                
+                // Debug popup
+                if (window.DEBUG_MODE && localStorage.getItem('show_scroll_debug') === 'true') {
+                    this.showScrollDebug(`📖 Restored scroll: ${key} → ${saved.scrollY}px`);
+                }
+            }, this.config.scrollRestoreDelay);
+            
+            return true;
+        }
+        
+        return false;
+    },
+    
+    /**
+     * UUSI: Debug popup scroll toiminnoille
+     */
+    showScrollDebug: function(message) {
+        if (UI && UI.showNotification) {
+            UI.showNotification(message, 'info', 3000);
+        }
     },
     
     /**
@@ -63,8 +132,6 @@ window.NavigationManager = {
         const params = Utils.parseQueryString();
         const project = params.project;
         const file = params.file;
-        
-        DEBUG.info(`Handling initial route. Project: ${project}, File: ${file}`);
         
         if (project) {
             // Small delay to ensure other modules are ready
@@ -77,17 +144,26 @@ window.NavigationManager = {
     },
     
     /**
-     * Navigate to project with optional file
+     * Navigate to project with optional file + scroll restoration
      */
     navigateToProject: async function(projectId, fileId = null, updateHistory = true) {
-        DEBUG.info(`Navigating to project: ${projectId}, file: ${fileId}`);
-        
         try {
             this.state.isNavigating = true;
+            
+            // UUSI: Tallenna nykyinen scroll position ennen navigointia
+            this.saveCurrentScrollPosition();
             
             // Load project first
             if (typeof ProjectManager !== 'undefined') {
                 await ProjectManager.selectProject(projectId);
+                
+                // UUSI: Palauta scroll position projektille (jos ei mennä tiedostoon)
+                if (!fileId) {
+                    // Pieni viive varmistamaan että projekti on ladattu
+                    setTimeout(() => {
+                        this.restoreScrollPosition(projectId);
+                    }, this.config.scrollRestoreDelay + 100);
+                }
             }
             
             // Then load file if specified
@@ -95,6 +171,7 @@ window.NavigationManager = {
                 const filePath = ProjectManager.findFileInProject(fileId);
                 if (filePath) {
                     await ContentRenderer.viewFile(filePath);
+                    // Tiedostonäkymässä scroll alkaa aina ylhäältä
                 }
             }
             
@@ -108,20 +185,21 @@ window.NavigationManager = {
             this.addToNavigationHistory({ project: projectId, file: fileId });
             
         } catch (error) {
-            DEBUG.reportError(error, 'Navigation failed');
+            // Silent error handling
         } finally {
             this.state.isNavigating = false;
         }
     },
     
     /**
-     * Navigate to file within current project
+     * Navigate to file within current project + tallenna scroll position
      */
     navigateToFile: async function(filePath, updateHistory = true) {
-        DEBUG.info(`Navigating to file: ${filePath}`);
-        
         try {
             this.state.isNavigating = true;
+            
+            // UUSI: Tallenna scroll position ENNEN tiedostoon siirtymistä
+            this.saveCurrentScrollPosition();
             
             if (typeof ContentRenderer !== 'undefined') {
                 await ContentRenderer.viewFile(filePath);
@@ -140,7 +218,7 @@ window.NavigationManager = {
             this.addToNavigationHistory({ project: projectId, file: fileName });
             
         } catch (error) {
-            DEBUG.reportError(error, 'File navigation failed');
+            // Silent error handling
         } finally {
             this.state.isNavigating = false;
         }
@@ -162,9 +240,8 @@ window.NavigationManager = {
         
         try {
             window.history.pushState(state, '', url);
-            DEBUG.info(`URL updated: ${url}`);
         } catch (error) {
-            DEBUG.warn('Failed to update URL:', error);
+            // Silent error handling
         }
     },
     
@@ -184,31 +261,45 @@ window.NavigationManager = {
         
         try {
             window.history.replaceState(state, '', url);
-            DEBUG.info(`URL replaced: ${url}`);
         } catch (error) {
-            DEBUG.warn('Failed to replace URL:', error);
+            // Silent error handling
         }
     },
     
     /**
-     * Go back to home/welcome screen or previous level
+     * Go back to home/welcome screen or previous level + SCROLL RESTORATION
      */
     goBackToHome: function(updateHistory = true) {
-        DEBUG.info('Navigating back to home');
-        
         try {
             this.state.isNavigating = true;
             
-            // If viewing a file, go back to project
+            // If viewing a file, go back to project WITH SCROLL RESTORATION
             const currentFile = ContentRenderer ? ContentRenderer.getCurrentFile() : null;
             const currentProject = ProjectManager ? ProjectManager.getCurrentProject() : null;
             
             if (currentFile && currentProject) {
-                DEBUG.info('Going back from file to project');
+                // MUUTETTU: Palaa projektiin ja palauta scroll position
+                
                 // Clear file state
                 if (ContentRenderer) ContentRenderer.clearCurrentFile();
+                
                 // Reload project view
-                if (ProjectManager) ProjectManager.selectProject(currentProject);
+                if (ProjectManager) {
+                    ProjectManager.selectProject(currentProject).then(() => {
+                        // UUSI: Palauta scroll position projektin lataamisen jälkeen
+                        setTimeout(() => {
+                            const restored = this.restoreScrollPosition(currentProject);
+                            
+                            if (window.DEBUG_MODE && localStorage.getItem('show_scroll_debug') === 'true') {
+                                this.showScrollDebug(restored ? 
+                                    `🔙 Back to project + scroll restored` : 
+                                    `🔙 Back to project (no saved scroll)`
+                                );
+                            }
+                        }, this.config.scrollRestoreDelay);
+                    });
+                }
+                
                 // Update URL to remove file parameter
                 if (updateHistory) this.updateUrl(currentProject);
                 this.state.currentRoute = { project: currentProject, file: null };
@@ -228,7 +319,7 @@ window.NavigationManager = {
             }
             
         } catch (error) {
-            DEBUG.reportError(error, 'Failed to navigate back');
+            // Silent error handling
         } finally {
             this.state.isNavigating = false;
         }
@@ -238,8 +329,6 @@ window.NavigationManager = {
      * Show welcome screen
      */
     showWelcome: function() {
-        DEBUG.info('Showing welcome screen');
-        
         // Clear states in other modules
         if (ProjectManager) ProjectManager.state.currentProject = null;
         if (ContentRenderer) ContentRenderer.clearCurrentFile();
@@ -253,6 +342,9 @@ window.NavigationManager = {
         // Remove project highlighting
         const projectItems = document.querySelectorAll('.project-item');
         projectItems.forEach(item => item.classList.remove('active'));
+        
+        // Scroll to top for welcome screen
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     
     /**
@@ -269,7 +361,7 @@ window.NavigationManager = {
                 this.goBackToHome();
             }
         } catch (error) {
-            DEBUG.error('Failed to handle internal link:', error);
+            // Silent error handling
         }
     },
     
@@ -344,11 +436,11 @@ window.NavigationManager = {
     },
     
     /**
-     * Clear navigation history
+     * Clear navigation history + scroll positions
      */
     clearHistory: function() {
         this.state.navigationHistory = [];
-        DEBUG.info('Navigation history cleared');
+        this.state.scrollPositions.clear(); // UUSI: tyhjennä myös scroll muisti
     },
     
     /**
@@ -396,7 +488,6 @@ window.NavigationManager = {
      */
     setPushStateEnabled: function(enabled) {
         this.config.pushStateEnabled = enabled;
-        DEBUG.info(`Push state ${enabled ? 'enabled' : 'disabled'}`);
     },
     
     /**
@@ -404,6 +495,27 @@ window.NavigationManager = {
      */
     isNavigating: function() {
         return this.state.isNavigating;
+    },
+    
+    /**
+     * UUSI: Get scroll debug info
+     */
+    getScrollDebugInfo: function() {
+        const positions = {};
+        for (const [key, value] of this.state.scrollPositions) {
+            positions[key] = {
+                scrollY: value.scrollY,
+                age: Date.now() - value.timestamp,
+                url: value.url
+            };
+        }
+        
+        return {
+            savedPositions: positions,
+            currentScroll: window.scrollY,
+            currentProject: ProjectManager ? ProjectManager.getCurrentProject() : null,
+            currentFile: ContentRenderer ? ContentRenderer.getCurrentFile() : null
+        };
     }
 };
 
@@ -416,8 +528,6 @@ window.Navigation = {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    DEBUG.info('NavigationManager module loaded successfully');
-    
     // Small delay to ensure other modules are ready
     setTimeout(() => {
         NavigationManager.init();
