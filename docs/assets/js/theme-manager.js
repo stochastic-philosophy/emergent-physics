@@ -161,12 +161,8 @@ window.ThemeManager = {
      */
     showDebug: function() {
         this.createDebugPanel();
-        if (window.DEBUG_MODE && localStorage.getItem('show_theme_debug') === 'true') {
-            this.debug.element.style.display = 'block';
-            this.debug.visible = true;
-        } else {
-            this.debug.visible = false;
-        }
+        this.debug.element.style.display = 'block';
+        this.debug.visible = true;
         this.refreshDebug();
     },
     
