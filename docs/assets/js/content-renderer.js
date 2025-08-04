@@ -109,11 +109,9 @@ window.ContentRenderer = {
         const isImageType = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(extension);
         const rendererName = isImageType ? 'image_renderer' : `${extension}_renderer`;
         
-        // const rendererName = `${extension}_renderer`;
-        
         // Tarkista onko renderer jo ladattu
         if (typeof window[rendererName] === 'undefined') {
-            const success = await this.loadRenderer(extension);
+            const success = await this.loadRenderer(rendererName); // ← MUUTETTU: anna rendererName, ei extension
             if (!success) return null;
         }
         
@@ -123,17 +121,20 @@ window.ContentRenderer = {
     /**
      * Lataa renderer dynaamisesti
      */
-    loadRenderer: async function(extension) {
-        if (this.state.loadedRenderers.has(extension)) {
+    loadRenderer: async function(rendererName) { // ← MUUTETTU: ota vastaan rendererName suoraan
+        // Poista "_renderer" suffix cache-avaimeen
+        const cacheKey = rendererName.replace('_renderer', '');
+        
+        if (this.state.loadedRenderers.has(cacheKey)) {
             return true; // Jo ladattu
         }
         
-        const rendererFile = `${extension}_renderer.js`;
+        const rendererFile = `${rendererName}.js`; // esim. "image_renderer.js"
         const rendererPath = `${this.config.renderersPath}${rendererFile}`;
         
         try {
             await this.loadScript(rendererPath);
-            this.state.loadedRenderers.add(extension);
+            this.state.loadedRenderers.add(cacheKey);
             return true;
         } catch (error) {
             return false; // Lataus epäonnistui
