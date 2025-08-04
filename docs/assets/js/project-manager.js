@@ -1,6 +1,9 @@
 /**
- * Project Manager - Projektien hallinta ja navigaatio
- * Handles project loading, manifest processing, and project-level navigation
+ * Project Manager - Projektien hallinta ja navigaatio + Scroll Position Tuki
+ * Handles project loading, manifest processing, and project-level navigation with scroll memory
+ * 
+ * DEBUG: Jos debuggausta tarvitaan, käytä popup-ratkaisua (kuten theme-debug popup)
+ * Tabletit eivät tue console.log komponentteja selaimissa.
  */
 
 window.ProjectManager = {
@@ -16,14 +19,14 @@ window.ProjectManager = {
     state: {
         projects: [],
         currentProject: null,
-        projectCache: new Map()
+        projectCache: new Map(),
+        lastScrollPosition: null // UUSI: muista viimeinen scroll position
     },
     
     /**
      * Initialize ProjectManager
      */
     init: function() {
-        DEBUG.info('Initializing ProjectManager...');
         this.loadManifest();
     },
     
@@ -31,13 +34,10 @@ window.ProjectManager = {
      * Load manifest.json with projects list
      */
     loadManifest: async function() {
-        DEBUG.info('Loading project manifest...');
-        
         try {
             // Try to load from cache first
             const cached = Storage.getCachedProject('manifest');
             if (cached) {
-                DEBUG.info('Using cached manifest');
                 this.state.projects = cached.projects || [];
                 this.renderProjectsList();
                 return;
@@ -54,11 +54,9 @@ window.ProjectManager = {
             // Cache the manifest
             Storage.cacheProject('manifest', manifest, 60 * 60 * 1000); // 1 hour
             
-            DEBUG.success(`Loaded ${this.state.projects.length} projects from manifest`);
             this.renderProjectsList();
             
         } catch (error) {
-            DEBUG.error('Failed to load manifest, using fallback');
             // Fallback: use default project structure
             this.state.projects = [{
                 id: 'indivisible-stochastic-processes',
@@ -71,7 +69,6 @@ window.ProjectManager = {
                     en: 'Research on hybrid systems indivisible behavior'
                 }
             }];
-            DEBUG.info('Using fallback project list');
             this.renderProjectsList();
         }
     },
@@ -80,10 +77,8 @@ window.ProjectManager = {
      * Render projects list in navigation
      */
     renderProjectsList: function() {
-        DEBUG.info('Rendering projects list...');
         const projectsList = document.querySelector(UI.selectors.projectsList);
         if (!projectsList) {
-            DEBUG.error('Projects list element not found');
             return;
         }
         
@@ -106,16 +101,12 @@ window.ProjectManager = {
             
             projectsList.appendChild(projectElement);
         });
-        
-        DEBUG.success(`Rendered ${this.state.projects.length} projects in navigation`);
     },
     
     /**
-     * Select and load a project
+     * Select and load a project + SCROLL POSITION AWARENESS
      */
     selectProject: async function(projectId) {
-        DEBUG.info(`=== SELECTING PROJECT: ${projectId} ===`);
-        
         try {
             UI.showLoading();
             this.state.currentProject = projectId;
@@ -138,7 +129,7 @@ window.ProjectManager = {
             // Load project structure
             await this.loadProjectStructure(projectId);
             
-            // Update URL and page title
+            // Update URL and page title (NavigationManager hoitaa scroll position)
             if (typeof NavigationManager !== 'undefined') {
                 NavigationManager.updateUrl(projectId);
             }
@@ -146,10 +137,11 @@ window.ProjectManager = {
             UI.updatePageTitle(projectName);
             
             UI.hideLoading();
-            DEBUG.success(`Project ${projectId} loaded successfully`);
+            
+            // UUSI: Anna NavigationManager:ille mahdollisuus palauttaa scroll position
+            // Tämä tapahtuu NavigationManager.navigateToProject() funktion kautta
             
         } catch (error) {
-            DEBUG.reportError(error, `Failed to load project: ${projectId}`);
             UI.showError(`Failed to load project: ${projectId}`, true);
             UI.hideLoading();
         }
@@ -159,31 +151,23 @@ window.ProjectManager = {
      * Load project file structure
      */
     loadProjectStructure: async function(projectId) {
-        DEBUG.info(`Loading project structure for: ${projectId}`);
-        
         const currentLang = UI.getCurrentLanguage();
         const projectPath = `${this.config.projectsBasePath}${projectId}/${currentLang}/`;
-        
-        DEBUG.info(`Project path: ${projectPath}`);
         
         try {
             // Try to load project-specific manifest
             const projectManifestUrl = `${projectPath}manifest.json`;
-            DEBUG.info(`Fetching: ${projectManifestUrl}`);
             
             const response = await fetch(projectManifestUrl);
             
             if (response.ok) {
-                DEBUG.success('Project manifest loaded successfully');
                 const projectManifest = await response.json();
                 this.renderProjectContent(projectManifest, projectPath);
             } else {
-                DEBUG.warn(`Project manifest not found (${response.status}), using basic structure`);
                 this.renderBasicProjectStructure(projectId, projectPath);
             }
             
         } catch (error) {
-            DEBUG.error(`Error loading project manifest: ${error.message}`);
             this.renderBasicProjectStructure(projectId, projectPath);
         }
     },
@@ -192,10 +176,8 @@ window.ProjectManager = {
      * Render project content from manifest
      */
     renderProjectContent: function(manifest, basePath) {
-        DEBUG.info('Rendering project content from manifest');
         const contentArea = document.querySelector(UI.selectors.mainContent);
         if (!contentArea) {
-            DEBUG.error('Content area not found!');
             return;
         }
         
@@ -223,8 +205,6 @@ window.ProjectManager = {
         html += `</div>`;
         contentArea.innerHTML = html;
         
-        DEBUG.success('Project content rendered successfully');
-        
         // Load file lists for each category
         this.loadCategoryFiles(manifest, basePath);
     },
@@ -245,7 +225,6 @@ window.ProjectManager = {
                     this.renderCategoryFiles(categoryElement, filesList, basePath);
                 }
             } catch (error) {
-                DEBUG.error(`Failed to load files for category ${categoryKey}:`, error);
                 const categoryElement = document.querySelector(`[data-category="${categoryKey}"]`);
                 if (categoryElement) {
                     categoryElement.innerHTML = '<div class="error-loading">Failed to load files</div>';
@@ -255,7 +234,7 @@ window.ProjectManager = {
     },
     
     /**
-     * Render files for a category
+     * Render files for a category + SCROLL POSITION TALLENNUKSELLA
      */
     renderCategoryFiles: function(categoryElement, filesList, basePath) {
         if (!filesList || !filesList.files || filesList.files.length === 0) {
@@ -285,7 +264,7 @@ window.ProjectManager = {
                     </div>
                     <div class="file-actions">
                         ${FileManager.isViewable(fileName) ? `
-                            <button class="view-btn" onclick="ContentRenderer.viewFile('${filePath}')">
+                            <button class="view-btn" onclick="ProjectManager.viewFileWithScrollSave('${filePath}')">
                                 ${currentLang === 'fi' ? '👁️ Katso' : '👁️ View'}
                             </button>
                         ` : ''}
@@ -300,17 +279,31 @@ window.ProjectManager = {
         });
         
         categoryElement.innerHTML = html;
-        DEBUG.info(`Rendered ${filesList.files.length} files for category`);
+    },
+    
+    /**
+     * UUSI: View file with scroll position saving
+     * Tämä funktio kutsutaan kun klikataan "👁️ Katso" nappia
+     */
+    viewFileWithScrollSave: function(filePath) {
+        // Käytä NavigationManager:in navigateToFile funktiota
+        // joka automaattisesti tallentaa scroll position
+        if (typeof NavigationManager !== 'undefined') {
+            NavigationManager.navigateToFile(filePath);
+        } else {
+            // Fallback jos NavigationManager ei ole saatavilla
+            if (typeof ContentRenderer !== 'undefined') {
+                ContentRenderer.viewFile(filePath);
+            }
+        }
     },
     
     /**
      * Render basic project structure (fallback)
      */
     renderBasicProjectStructure: function(projectId, basePath) {
-        DEBUG.info('Rendering basic project structure (fallback)');
         const contentArea = document.querySelector(UI.selectors.mainContent);
         if (!contentArea) {
-            DEBUG.error('Content area not found!');
             return;
         }
         
@@ -349,8 +342,6 @@ window.ProjectManager = {
         
         html += `</div>`;
         contentArea.innerHTML = html;
-        
-        DEBUG.success('Basic project structure rendered successfully');
     },
     
     /**
@@ -438,7 +429,8 @@ window.ProjectManager = {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    DEBUG.info('ProjectManager module loaded successfully');
+    // DEBUG: Jos debuggausta tarvitaan, käytä popup-ratkaisua theme-debugin tapaan
+    // console.log ei toimi tableteilla
 });
 
 /**
