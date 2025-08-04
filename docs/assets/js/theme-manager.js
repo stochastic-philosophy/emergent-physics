@@ -138,7 +138,7 @@ window.ThemeManager = {
             </div>
         `;
         
-        // document.body.appendChild(panel);
+        document.body.appendChild(panel);
         this.debug.element = panel;
     },
     
@@ -162,7 +162,11 @@ window.ThemeManager = {
     showDebug: function() {
         this.createDebugPanel();
         this.debug.element.style.display = 'block';
-        this.debug.visible = true;
+        if (window.DEBUG_MODE && localStorage.getItem('show_theme_debug') === 'true') {
+            this.debug.visible = true;
+        } else {
+            this.debug.visible = false;
+        }
         this.refreshDebug();
     },
     
