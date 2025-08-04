@@ -106,7 +106,10 @@ window.ContentRenderer = {
      * Hae renderer extension perusteella
      */
     getRenderer: async function(extension) {
-        const rendererName = `${extension}_renderer`;
+        const isImageType = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(extension);
+        const rendererName = isImageType ? 'image_renderer' : `${extension}_renderer`;
+        
+        // const rendererName = `${extension}_renderer`;
         
         // Tarkista onko renderer jo ladattu
         if (typeof window[rendererName] === 'undefined') {
