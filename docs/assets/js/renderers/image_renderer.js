@@ -1,12 +1,12 @@
 /**
- * PNG Renderer - Käsittelee .png kuvatiedostot
+ * Image Renderer - Käsittelee kuvatiedostot
  * Responsiivinen kuvan näyttö zoom-toiminnallisuudella
  * 
  * DEBUG: Jos debuggausta tarvitaan, käytä popup-ratkaisua (kuten theme-debug popup)
  * Tabletit eivät tue console.log komponentteja selaimissa.
  */
 
-window.png_renderer = {
+window.image_renderer = {
     
     /**
      * Renderöi PNG kuva
